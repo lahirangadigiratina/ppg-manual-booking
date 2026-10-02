@@ -1,0 +1,67 @@
+import {
+  ManualFieldLabel,
+  ManualStepHeading,
+  manualInputClassName,
+} from './manualFormShared'
+
+export function ManualSenderDetailsStep() {
+  return (
+    <div>
+      <ManualStepHeading step={2} title="Sender Details" />
+
+      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+        <div>
+          <ManualFieldLabel htmlFor="sender-business-name">
+            Business Name (optional)
+          </ManualFieldLabel>
+          <input
+            id="sender-business-name"
+            type="text"
+            placeholder="e.g., Hubbed"
+            className={manualInputClassName}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+            <ManualFieldLabel htmlFor="sender-first-name" required>
+              First Name
+            </ManualFieldLabel>
+            <input
+              id="sender-first-name"
+              type="text"
+              placeholder="Jane"
+              className={manualInputClassName}
+              autoComplete="given-name"
+            />
+          </div>
+          <div>
+            <ManualFieldLabel htmlFor="sender-last-name" required>
+              Last Name
+            </ManualFieldLabel>
+            <input
+              id="sender-last-name"
+              type="text"
+              placeholder="Smith"
+              className={manualInputClassName}
+              autoComplete="family-name"
+            />
+          </div>
+        </div>
+
+        <div>
+          <ManualFieldLabel htmlFor="sender-email" required>
+            Email
+          </ManualFieldLabel>
+          <input
+            id="sender-email"
+            type="email"
+            placeholder="jane@example.com"
+            className={manualInputClassName}
+            autoComplete="email"
+          />
+        </div>
+      </form>
+    </div>
+  )
+}
