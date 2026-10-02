@@ -31,7 +31,7 @@ export function ManualFlowStepper({
       aria-label="Booking progress"
       className={
         compact
-          ? `pb-2 ${className}`
+          ? `pb-0 ${className}`
           : `mb-6 border-b border-border-light pb-6 ${className}`
       }
     >

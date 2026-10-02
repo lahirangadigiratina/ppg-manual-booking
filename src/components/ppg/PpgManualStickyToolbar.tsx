@@ -24,10 +24,13 @@ export function PpgManualStickyToolbar({
   const showStepper = manualStep >= 1 && manualStep <= 8
 
   return (
-    <div className="shrink-0 space-y-0 bg-white pb-1">
+    <div className="shrink-0 space-y-0 bg-white">
       <PpgPortalHeader badge={manualBadge(manualStep, manualStepCount)} compact />
       {showStepper && <ManualFlowStepper manualStep={manualStep} compact />}
-      <div className="border-b border-border-light" aria-hidden />
+      <div
+        className="mt-3 border-b border-border-light sm:mt-4"
+        aria-hidden
+      />
     </div>
   )
 }
