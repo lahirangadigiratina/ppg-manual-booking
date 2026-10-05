@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import { PpgAgentPortal } from './components/ppg/PpgAgentPortal'
 import type { NavItemId } from './config/navigation'
+import { PPG_HOME_PATH } from './config/ppgRoutes'
 import { ReturnParcelContent } from './pages/ReturnParcelContent'
 
 const hubMeta = {
@@ -15,26 +17,49 @@ function pageTitleForNav(id: NavItemId): string {
   return 'Return Parcel'
 }
 
-function App() {
-  const [activeNavId, setActiveNavId] = useState<NavItemId>('returns')
+function navIdFromPath(pathname: string): NavItemId {
+  return pathname.startsWith(PPG_HOME_PATH) ? 'ppg' : 'returns'
+}
 
-  const isPpg = activeNavId === 'ppg'
+function App() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [activeNavId, setActiveNavId] = useState<NavItemId>(() =>
+    navIdFromPath(location.pathname),
+  )
+
+  useEffect(() => {
+    setActiveNavId(navIdFromPath(location.pathname))
+  }, [location.pathname])
+
+  const handleNavigate = (id: NavItemId) => {
+    setActiveNavId(id)
+    navigate(id === 'ppg' ? PPG_HOME_PATH : '/returns')
+  }
 
   return (
-    <AppLayout
-      activeNavId={activeNavId}
-      onNavigate={setActiveNavId}
-      pageTitle={pageTitleForNav(activeNavId)}
-      locationName={hubMeta.locationName}
-      hubName={hubMeta.hubName}
-      mainClassName={
-        isPpg
-          ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
-          : 'overflow-y-auto bg-page-bg'
-      }
-    >
-      {isPpg ? <PpgAgentPortal /> : <ReturnParcelContent />}
-    </AppLayout>
+    <Routes>
+      <Route path="/" element={<Navigate to="/returns" replace />} />
+      <Route
+        path="*"
+        element={
+          <AppLayout
+            activeNavId={activeNavId}
+            onNavigate={handleNavigate}
+            pageTitle={pageTitleForNav(activeNavId)}
+            locationName={hubMeta.locationName}
+            hubName={hubMeta.hubName}
+            mainClassName={
+              activeNavId === 'ppg'
+                ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
+                : 'overflow-y-auto bg-page-bg'
+            }
+          >
+            {activeNavId === 'ppg' ? <PpgAgentPortal /> : <ReturnParcelContent />}
+          </AppLayout>
+        }
+      />
+    </Routes>
   )
 }
 

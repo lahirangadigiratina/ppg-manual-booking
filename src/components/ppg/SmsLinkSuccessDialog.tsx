@@ -1,28 +1,11 @@
 import { Check } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { formatAustralianMobileDisplay } from './ppgSmsUtils'
 
 interface SmsLinkSuccessDialogProps {
   open: boolean
   mobileNumber: string
   onClose: () => void
-}
-
-function formatAustralianMobileDisplay(value: string) {
-  const trimmed = value.trim()
-  if (!trimmed) {
-    return '—'
-  }
-  if (trimmed.startsWith('+')) {
-    return trimmed
-  }
-  const digits = trimmed.replace(/\D/g, '')
-  if (digits.startsWith('61')) {
-    return `+${digits}`
-  }
-  if (digits.startsWith('0')) {
-    return `+61 ${digits.slice(1)}`
-  }
-  return `+61 ${digits}`
 }
 
 export function SmsLinkSuccessDialog({

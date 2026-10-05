@@ -4,6 +4,15 @@ import { HubbedLogo } from './HubbedLogo'
 
 const INTERACTIVE_NAV_IDS: NavItemId[] = ['returns', 'ppg']
 
+/** Bottom bar on small screens — must include interactive destinations (e.g. PPG). */
+const MOBILE_NAV_IDS: NavItemId[] = [
+  'collection',
+  'returns',
+  'manual-checkin',
+  'reports',
+  'ppg',
+]
+
 interface SidebarProps {
   activeId: NavItemId
   onNavigate: (id: NavItemId) => void
@@ -103,7 +112,9 @@ export function Sidebar({ activeId, onNavigate }: SidebarProps) {
         className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border-light bg-white md:hidden"
         aria-label="Main navigation"
       >
-        {navItems.slice(0, 5).map((item) => {
+        {MOBILE_NAV_IDS.map((id) => navItems.find((item) => item.id === id))
+          .filter((item): item is (typeof navItems)[number] => item !== undefined)
+          .map((item) => {
           const Icon = item.icon
           const active = item.id === activeId
           const interactive = INTERACTIVE_NAV_IDS.includes(item.id)

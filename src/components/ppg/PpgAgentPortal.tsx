@@ -1,5 +1,9 @@
 import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { PPG_HOME_PATH, PPG_ONLINE_SMS_FAILED_PATH } from '../../config/ppgRoutes'
+import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
+import { sendBookingLinkSms } from './ppgSmsUtils'
 import { ManualContentsStep } from './ManualContentsStep'
 import { ManualOfferAddonsStep } from './ManualOfferAddonsStep'
 import { ManualAwaitingPaymentStep } from './ManualAwaitingPaymentStep'
@@ -30,12 +34,30 @@ const ppgWhitePanelClassName =
 const ppgPortalPanelClassName = `${ppgWhitePanelClassName} mx-auto w-full max-w-xl`
 
 export function PpgAgentPortal() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [screen, setScreen] = useState<PortalScreen>('home')
   const [manualStep, setManualStep] = useState(1)
   const [bookingMode, setBookingMode] = useState<BookingMode>('online')
   const [mobile, setMobile] = useState('')
   const [smsLinkSentOpen, setSmsLinkSentOpen] = useState(false)
+  const [smsSending, setSmsSending] = useState(false)
+  const [smsErrorMessage, setSmsErrorMessage] = useState('')
   const [parcelValue, setParcelValue] = useState('')
+
+  const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
+
+  const handleSendSms = async () => {
+    setSmsSending(true)
+    const result = await sendBookingLinkSms(mobile)
+    setSmsSending(false)
+    if (result.ok) {
+      setSmsLinkSentOpen(true)
+      return
+    }
+    setSmsErrorMessage(result.error ?? 'Unable to send SMS.')
+    navigate(PPG_ONLINE_SMS_FAILED_PATH)
+  }
 
   const startManualFlow = () => {
     setManualStep(1)
@@ -102,6 +124,41 @@ export function PpgAgentPortal() {
     )
   }
 
+  if (isSmsFailedRoute) {
+    return (
+      <>
+        <SmsLinkSuccessDialog
+          open={smsLinkSentOpen}
+          mobileNumber={mobile}
+          onClose={() => {
+            setSmsLinkSentOpen(false)
+            navigate(PPG_HOME_PATH)
+          }}
+        />
+        <div className={`${ppgPageShellClassName} overflow-y-auto`}>
+          <PpgOnlineSmsFailedView
+            mobile={mobile}
+            errorMessage={smsErrorMessage}
+            sending={smsSending}
+            onMobileChange={setMobile}
+            onSendingChange={setSmsSending}
+            onSuccess={() => {
+              setSmsLinkSentOpen(true)
+              navigate(PPG_HOME_PATH)
+            }}
+            onFailure={setSmsErrorMessage}
+            onManualBooking={() => {
+              setBookingMode('manual')
+              navigate(PPG_HOME_PATH)
+              startManualFlow()
+            }}
+            onBackToHome={() => navigate(PPG_HOME_PATH)}
+          />
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <SmsLinkSuccessDialog
@@ -161,11 +218,14 @@ export function PpgAgentPortal() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setSmsLinkSentOpen(true)}
-                  className={`inline-flex items-center justify-center gap-2 ${manualPrimaryButtonClassName}`}
+                  disabled={smsSending}
+                  onClick={handleSendSms}
+                  className={`inline-flex items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
                 >
-                  Send SMS
-                  <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+                  {smsSending ? 'Sending…' : 'Send SMS'}
+                  {!smsSending && (
+                    <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+                  )}
                 </button>
               </div>
             </>
