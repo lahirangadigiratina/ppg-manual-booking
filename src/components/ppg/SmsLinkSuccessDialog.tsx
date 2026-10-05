@@ -7,6 +7,24 @@ interface SmsLinkSuccessDialogProps {
   onClose: () => void
 }
 
+function formatAustralianMobileDisplay(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return '—'
+  }
+  if (trimmed.startsWith('+')) {
+    return trimmed
+  }
+  const digits = trimmed.replace(/\D/g, '')
+  if (digits.startsWith('61')) {
+    return `+${digits}`
+  }
+  if (digits.startsWith('0')) {
+    return `+61 ${digits.slice(1)}`
+  }
+  return `+61 ${digits}`
+}
+
 export function SmsLinkSuccessDialog({
   open,
   mobileNumber,
@@ -56,10 +74,10 @@ export function SmsLinkSuccessDialog({
           Success
         </h2>
         <p id="sms-success-desc" className="mt-2 text-center text-sm leading-snug text-text-muted sm:text-base">
-          Sends a link to the booking form successfully to
-        </p>
-        <p className="mt-2 text-center text-base font-semibold tabular-nums text-black sm:text-lg">
-          {mobileNumber.trim() || '—'}
+          Link successfully sent to{' '}
+          <span className="font-semibold tabular-nums text-black">
+            {formatAustralianMobileDisplay(mobileNumber)}
+          </span>
         </p>
         <button
           ref={closeButtonRef}

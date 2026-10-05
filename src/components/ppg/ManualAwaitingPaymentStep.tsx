@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const TOTAL = '$17.66'
+const TOTAL = '$18.76'
 
 interface ManualAwaitingPaymentStepProps {
   onComplete?: () => void

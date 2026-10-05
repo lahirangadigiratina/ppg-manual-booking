@@ -1,12 +1,26 @@
-import { Check, MapPin, Package } from 'lucide-react'
+import { Check, Copy, MapPin, Package } from 'lucide-react'
+import { useState } from 'react'
 
-const TOTAL = '$17.66'
+const TOTAL = '$18.76'
+export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
 interface ManualBookingSuccessStepProps {
-  onBackToHome?: () => void
+  onNext?: () => void
 }
 
-export function ManualBookingSuccessStep({ onBackToHome }: ManualBookingSuccessStepProps) {
+export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepProps) {
+  const [trackingCopied, setTrackingCopied] = useState(false)
+
+  const copyTrackingNumber = async () => {
+    try {
+      await navigator.clipboard.writeText(BOOKING_TRACKING_NUMBER)
+      setTrackingCopied(true)
+      window.setTimeout(() => setTrackingCopied(false), 2000)
+    } catch {
+      setTrackingCopied(false)
+    }
+  }
+
   return (
     <div className="flex flex-col items-center py-4 text-center sm:py-6">
       <div className="relative mb-6 flex size-20 items-center justify-center sm:size-24">
@@ -57,17 +71,31 @@ export function ManualBookingSuccessStep({ onBackToHome }: ManualBookingSuccessS
           </div>
           <div className="flex items-center justify-between gap-4 text-sm">
             <span className="text-text-muted">Tracking</span>
-            <span className="font-bold text-black">MP8031920017</span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-black">{BOOKING_TRACKING_NUMBER}</span>
+              <button
+                type="button"
+                onClick={copyTrackingNumber}
+                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-gray-100 hover:text-black"
+                aria-label={trackingCopied ? 'Tracking number copied' : 'Copy tracking number'}
+              >
+                {trackingCopied ? (
+                  <Check className="size-4 text-green-600" strokeWidth={2.5} aria-hidden />
+                ) : (
+                  <Copy className="size-4" strokeWidth={2} aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </article>
 
       <button
         type="button"
-        onClick={onBackToHome}
+        onClick={onNext}
         className="mt-8 w-full rounded-md bg-black px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900 sm:text-base"
       >
-        Back to home
+        Next
       </button>
     </div>
   )

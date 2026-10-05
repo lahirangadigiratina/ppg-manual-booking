@@ -1,8 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-hubbed-orange: #ee9638;
-  --color-hubbed-orange-hover: #e08830;
+  --color-hubbed-orange: #f15a29;
+  --color-hubbed-orange-hover: #d94e22;
+  --color-hubbed-orange-tint: #fff5f1;
   --color-page-bg: #f3f4f6;
   --color-border-light: #e5e7eb;
   --color-text-muted: #6b7280;

@@ -107,31 +107,20 @@ function WhatsInsideSelect({
   )
 }
 
-export function ManualContentsStep() {
+interface ManualContentsStepProps {
+  parcelValue: string
+  onParcelValueChange: (value: string) => void
+}
+
+export function ManualContentsStep({
+  parcelValue,
+  onParcelValueChange,
+}: ManualContentsStepProps) {
   const [contentType, setContentType] = useState<string>(contentTypes[1].value)
-  const [parcelValue, setParcelValue] = useState('50')
   const [referenceNumber, setReferenceNumber] = useState('')
 
   return (
     <div>
-      <div className="mb-6 mt-4 flex items-start justify-between gap-4 sm:mt-5">
-        <div className="flex min-w-0 items-center gap-3">
-          <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
-            aria-hidden
-          >
-            5
-          </span>
-          <h2 className="text-xl font-bold text-black sm:text-2xl">Contents</h2>
-        </div>
-        <button
-          type="button"
-          className="shrink-0 pt-2 text-sm font-semibold text-hubbed-orange hover:text-hubbed-orange-hover"
-        >
-          Dangerous goods?
-        </button>
-      </div>
-
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
           <ManualFieldLabel htmlFor="whats-inside">What&apos;s inside?</ManualFieldLabel>
@@ -145,7 +134,7 @@ export function ManualContentsStep() {
             type="number"
             min={0}
             value={parcelValue}
-            onChange={(e) => setParcelValue(e.target.value)}
+            onChange={(e) => onParcelValueChange(e.target.value)}
             className={manualInputClassName}
           />
         </div>

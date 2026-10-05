@@ -11,7 +11,7 @@ export function PpgManualStepFooter({
   onBack,
   onNext,
 }: PpgManualStepFooterProps) {
-  if (manualStep < 1 || manualStep > 6) {
+  if (manualStep < 1 || manualStep > 7) {
     return null
   }
 

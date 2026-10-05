@@ -27,10 +27,9 @@ function App() {
       pageTitle={pageTitleForNav(activeNavId)}
       locationName={hubMeta.locationName}
       hubName={hubMeta.hubName}
-      showTopHeader={!isPpg}
       mainClassName={
         isPpg
-          ? 'flex min-h-0 flex-col overflow-hidden bg-white'
+          ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
           : 'overflow-y-auto bg-page-bg'
       }
     >

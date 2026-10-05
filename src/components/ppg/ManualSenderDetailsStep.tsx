@@ -1,14 +1,8 @@
-import {
-  ManualFieldLabel,
-  ManualStepHeading,
-  manualInputClassName,
-} from './manualFormShared'
+import { ManualFieldLabel, manualInputClassName } from './manualFormShared'
 
 export function ManualSenderDetailsStep() {
   return (
     <div>
-      <ManualStepHeading step={2} title="Sender Details" />
-
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
           <ManualFieldLabel htmlFor="sender-business-name">
@@ -59,6 +53,19 @@ export function ManualSenderDetailsStep() {
             placeholder="jane@example.com"
             className={manualInputClassName}
             autoComplete="email"
+          />
+        </div>
+
+        <div>
+          <ManualFieldLabel htmlFor="sender-mobile" required>
+            Mobile
+          </ManualFieldLabel>
+          <input
+            id="sender-mobile"
+            type="tel"
+            placeholder="+61 412 345 678"
+            className={manualInputClassName}
+            autoComplete="tel"
           />
         </div>
       </form>

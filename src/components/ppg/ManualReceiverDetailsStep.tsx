@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   ManualFieldLabel,
-  ManualStepHeading,
   manualInputClassName,
 } from './manualFormShared'
 
@@ -10,8 +9,6 @@ export function ManualReceiverDetailsStep() {
 
   return (
     <div>
-      <ManualStepHeading step={3} title="Receiver Details" />
-
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
           <ManualFieldLabel htmlFor="receiver-business-name">

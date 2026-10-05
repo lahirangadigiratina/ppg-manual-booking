@@ -9,6 +9,8 @@ interface AppLayoutProps {
   locationName: string
   hubName: string
   showTopHeader?: boolean
+  /** Background for the main content column (Returns: gray, PPG: white). */
+  contentShellClassName?: string
   mainClassName?: string
   children: React.ReactNode
 }
@@ -20,13 +22,16 @@ export function AppLayout({
   locationName,
   hubName,
   showTopHeader = true,
-  mainClassName = 'bg-page-bg',
+  contentShellClassName = 'bg-page-bg',
+  mainClassName = 'overflow-y-auto bg-page-bg',
   children,
 }: AppLayoutProps) {
   return (
-    <div className="flex h-svh min-h-0 overflow-hidden bg-white">
+    <div className="flex h-svh min-h-0 overflow-hidden bg-page-bg">
       <Sidebar activeId={activeNavId} onNavigate={onNavigate} />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col pb-16 md:pb-0">
+      <div
+        className={`flex min-h-0 min-w-0 flex-1 flex-col pb-16 md:pb-0 ${contentShellClassName}`}
+      >
         {showTopHeader && (
           <TopHeader
             pageTitle={pageTitle}
