@@ -64,28 +64,24 @@ export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepPro
           </div>
         </div>
 
-        <div className="space-y-2 border-t border-border-light px-4 py-3 sm:px-5">
-          <div className="flex items-center justify-between gap-4 text-sm">
-            <span className="text-text-muted">Booking Ref</span>
-            <span className="font-bold text-black">PPG-48213</span>
-          </div>
-          <div className="flex items-center justify-between gap-4 text-sm">
-            <span className="text-text-muted">Tracking</span>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-black">{BOOKING_TRACKING_NUMBER}</span>
-              <button
-                type="button"
-                onClick={copyTrackingNumber}
-                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-gray-100 hover:text-black"
-                aria-label={trackingCopied ? 'Tracking number copied' : 'Copy tracking number'}
-              >
-                {trackingCopied ? (
-                  <Check className="size-4 text-green-600" strokeWidth={2.5} aria-hidden />
-                ) : (
-                  <Copy className="size-4" strokeWidth={2} aria-hidden />
-                )}
-              </button>
-            </div>
+        <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 border-t border-border-light px-4 py-3 text-sm sm:px-5">
+          <span className="text-text-muted">Booking Ref</span>
+          <span className="justify-self-end font-bold text-black">PPG-48213</span>
+          <span className="text-text-muted">Tracking</span>
+          <div className="flex items-center justify-end gap-1 justify-self-end">
+            <span className="font-bold text-black">{BOOKING_TRACKING_NUMBER}</span>
+            <button
+              type="button"
+              onClick={copyTrackingNumber}
+              className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-gray-100 hover:text-black"
+              aria-label={trackingCopied ? 'Tracking number copied' : 'Copy tracking number'}
+            >
+              {trackingCopied ? (
+                <Check className="size-4 text-green-600" strokeWidth={2.5} aria-hidden />
+              ) : (
+                <Copy className="size-4" strokeWidth={2} aria-hidden />
+              )}
+            </button>
           </div>
         </div>
       </article>
@@ -95,7 +91,7 @@ export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepPro
         onClick={onNext}
         className="mt-8 w-full rounded-md bg-black px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900 sm:text-base"
       >
-        Next
+        Back to Returns
       </button>
     </div>
   )

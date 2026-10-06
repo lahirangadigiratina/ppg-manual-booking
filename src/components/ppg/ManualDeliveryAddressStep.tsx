@@ -1,7 +1,7 @@
 import { Check, Home, MapPin, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ManualFieldLabel, manualInputClassName } from './manualFormShared'
-import { ParcelPointCollectDialog } from './ParcelPointCollectDialog'
+import type { DeliveryMethod } from './manualBookingState'
 
 const mockAddresses = [
   '15/37 Nicholson St, Balmain East NSW 2041',
@@ -156,23 +156,10 @@ function AddressSearchInput({
   )
 }
 
-type DeliveryMethod = 'door' | 'parcelpoint'
-
 function DeliveryBadge({ children }: { children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f9fafb] px-3 py-1.5 text-xs font-normal text-gray-600 shadow-[0_1px_2px_rgba(15,23,42,0.06)]">
       {children}
-    </span>
-  )
-}
-
-function GreenCheckIcon() {
-  return (
-    <span
-      className="flex size-4 shrink-0 items-center justify-center rounded-[4px] bg-green-600"
-      aria-hidden
-    >
-      <Check className="size-2.5 text-white" strokeWidth={3} />
     </span>
   )
 }
@@ -206,11 +193,19 @@ function DeliveryOptionCard({
   )
 }
 
-export function ManualDeliveryAddressStep() {
-  const [address, setAddress] = useState('')
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('parcelpoint')
-  const [collectDialogOpen, setCollectDialogOpen] = useState(false)
+interface ManualDeliveryAddressStepProps {
+  address: string
+  onAddressChange: (value: string) => void
+  deliveryMethod: DeliveryMethod
+  onDeliveryMethodChange: (method: DeliveryMethod) => void
+}
 
+export function ManualDeliveryAddressStep({
+  address,
+  onAddressChange,
+  deliveryMethod,
+  onDeliveryMethodChange,
+}: ManualDeliveryAddressStepProps) {
   const doorFooterAddress =
     address.trim() || '12 Hall St, Bondi Beach NSW 2026'
 
@@ -218,16 +213,13 @@ export function ManualDeliveryAddressStep() {
     <div>
       <div className="mb-5">
         <ManualFieldLabel htmlFor="receiver-address">Receiver Address</ManualFieldLabel>
-        <AddressSearchInput value={address} onChange={setAddress} />
+        <AddressSearchInput value={address} onChange={onAddressChange} />
       </div>
 
       <div className="space-y-3" role="radiogroup" aria-label="Delivery method">
         <DeliveryOptionCard
           selected={deliveryMethod === 'door'}
-          onSelect={() => {
-            setDeliveryMethod('door')
-            setCollectDialogOpen(false)
-          }}
+          onSelect={() => onDeliveryMethodChange('door')}
         >
           <div className="flex items-start gap-3 sm:gap-4">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white">
@@ -244,12 +236,6 @@ export function ManualDeliveryAddressStep() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <DeliveryBadge>
                   <span className="text-sm leading-none" aria-hidden>
-                    ⭐
-                  </span>
-                  Popular choice
-                </DeliveryBadge>
-                <DeliveryBadge>
-                  <span className="text-sm leading-none" aria-hidden>
                     🏠
                   </span>
                   Straight to their door
@@ -264,53 +250,7 @@ export function ManualDeliveryAddressStep() {
             </span>
           </div>
         </DeliveryOptionCard>
-
-        <DeliveryOptionCard
-          selected={deliveryMethod === 'parcelpoint'}
-          onSelect={() => {
-            setDeliveryMethod('parcelpoint')
-            setCollectDialogOpen(true)
-          }}
-        >
-          <div className="flex items-start gap-3 sm:gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white">
-              <MapPin className="size-5 text-hubbed-orange" strokeWidth={1.75} aria-hidden />
-            </span>
-            <div className="min-w-0 flex-1 pr-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-base font-bold text-black">Collect from PARCELPOINT</p>
-                  <p className="mt-0.5 text-sm text-text-muted">They collect when they&apos;re ready</p>
-                </div>
-                <p className="shrink-0 text-base font-bold text-black sm:text-lg">$11.50</p>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <DeliveryBadge>
-                  <GreenCheckIcon />
-                  Held until collection
-                </DeliveryBadge>
-                <DeliveryBadge>
-                  <span className="text-sm leading-none" aria-hidden>
-                    💰
-                  </span>
-                  Often lower cost
-                </DeliveryBadge>
-                <DeliveryBadge>
-                  <span className="text-sm leading-none" aria-hidden>
-                    ⏱️
-                  </span>
-                  Hours that suit them
-                </DeliveryBadge>
-              </div>
-            </div>
-          </div>
-        </DeliveryOptionCard>
       </div>
-
-      <ParcelPointCollectDialog
-        open={collectDialogOpen}
-        onClose={() => setCollectDialogOpen(false)}
-      />
     </div>
   )
 }

@@ -3,18 +3,20 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { PPG_HOME_PATH, PPG_ONLINE_SMS_FAILED_PATH } from '../../config/ppgRoutes'
 import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
-import { sendBookingLinkSms } from './ppgSmsUtils'
+import {
+  applyAustralianMobileFieldChange,
+  focusAustralianMobileField,
+  sendBookingLinkSms,
+} from './ppgSmsUtils'
 import { ManualContentsStep } from './ManualContentsStep'
 import { ManualOfferAddonsStep } from './ManualOfferAddonsStep'
-import { ManualAwaitingPaymentStep } from './ManualAwaitingPaymentStep'
 import { ManualBookingSuccessStep } from './ManualBookingSuccessStep'
-import { ManualConfirmDropoffStep } from './ManualConfirmDropoffStep'
-import { BOOKING_TRACKING_NUMBER } from './ManualBookingSuccessStep'
 import { ManualPriceBreakdownStep } from './ManualPriceBreakdownStep'
 import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
 import { ManualParcelDetailsStep } from './ManualParcelDetailsStep'
 import { ManualReceiverDetailsStep } from './ManualReceiverDetailsStep'
 import { ManualSenderDetailsStep } from './ManualSenderDetailsStep'
+import { PpgBookingSummaryPanel } from './PpgBookingSummaryPanel'
 import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
@@ -22,6 +24,11 @@ import {
   manualPrimaryButtonClassName,
   manualSegmentButtonClassName,
 } from './manualFormShared'
+import {
+  isParcelValueProvided,
+  type DeliveryMethod,
+  type ManualBookingDraft,
+} from './manualBookingState'
 type BookingMode = 'online' | 'manual'
 type PortalScreen = 'home' | 'manual'
 
@@ -32,6 +39,8 @@ const ppgWhitePanelClassName =
   'flex w-full min-h-0 flex-col rounded-sm border border-border-light bg-white p-4 sm:p-6 lg:p-8'
 
 const ppgPortalPanelClassName = `${ppgWhitePanelClassName} mx-auto w-full max-w-xl`
+
+const ppgManualFormPanelClassName = `${ppgWhitePanelClassName} w-full max-w-xl lg:flex-none`
 
 export function PpgAgentPortal() {
   const navigate = useNavigate()
@@ -44,6 +53,12 @@ export function PpgAgentPortal() {
   const [smsSending, setSmsSending] = useState(false)
   const [smsErrorMessage, setSmsErrorMessage] = useState('')
   const [parcelValue, setParcelValue] = useState('')
+  const [parcelSizeId, setParcelSizeId] = useState('shoebox')
+  const [needsPackaging, setNeedsPackaging] = useState(true)
+  const [receiverAddress, setReceiverAddress] = useState('')
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('door')
+  const [contentType, setContentType] = useState('clothing-fashion')
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([])
 
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
 
@@ -65,60 +80,115 @@ export function PpgAgentPortal() {
   }
 
   if (screen === 'manual') {
+    const showBookingSummary = manualStep >= 1 && manualStep <= 7
+
+    const bookingDraft: ManualBookingDraft = {
+      manualStep,
+      parcelSizeId,
+      needsPackaging,
+      receiverAddress,
+      deliveryMethod,
+      parcelpointStoreId: null,
+      contentType,
+      parcelValue,
+      selectedAddons,
+    }
+
     return (
       <div className={`${ppgPageShellClassName} overflow-y-auto`}>
-        <div className={`${ppgPortalPanelClassName} min-h-0 flex-1`}>
-          <div className="flex h-full min-h-0 w-full flex-col">
-            <PpgManualFlowStepHeader manualStep={manualStep} />
-            <div
-              className={
-                manualStep === 1
-                  ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-4 pt-4'
-                  : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
-              }
-            >
-              {manualStep === 1 && <ManualParcelDetailsStep />}
-              {manualStep === 2 && <ManualSenderDetailsStep />}
-              {manualStep === 3 && <ManualReceiverDetailsStep />}
-              {manualStep === 4 && <ManualDeliveryAddressStep />}
-              {manualStep === 5 && (
-                <ManualContentsStep
-                  parcelValue={parcelValue}
-                  onParcelValueChange={setParcelValue}
-                />
-              )}
-              {manualStep === 6 && <ManualOfferAddonsStep parcelValue={parcelValue} />}
-              {manualStep === 7 && <ManualPriceBreakdownStep />}
-              {manualStep === 8 && (
-                <ManualAwaitingPaymentStep onComplete={() => setManualStep(9)} />
-              )}
-              {manualStep === 9 && (
-                <ManualBookingSuccessStep onNext={() => setManualStep(10)} />
-              )}
-              {manualStep === 10 && (
-                <ManualConfirmDropoffStep
-                  consignmentId={BOOKING_TRACKING_NUMBER}
-                  onConfirm={() => {
-                    setManualStep(1)
+        <div
+          className={`mx-auto flex w-full min-h-0 flex-1 flex-col gap-5 lg:flex-row lg:items-stretch lg:justify-center lg:gap-6 ${
+            showBookingSummary ? 'max-w-[920px]' : 'max-w-xl'
+          }`}
+        >
+          <div className={`${ppgManualFormPanelClassName} min-h-0 min-w-0`}>
+            <div className="flex h-full min-h-0 w-full flex-col">
+              <PpgManualFlowStepHeader manualStep={manualStep} />
+              <div
+                className={
+                  manualStep === 1
+                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-4 pt-4'
+                    : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
+                }
+              >
+                {manualStep === 1 && (
+                  <ManualParcelDetailsStep
+                    selectedSizeId={parcelSizeId}
+                    onSelectedSizeIdChange={setParcelSizeId}
+                    needsPackaging={needsPackaging}
+                    onNeedsPackagingChange={setNeedsPackaging}
+                  />
+                )}
+                {manualStep === 2 && <ManualSenderDetailsStep />}
+                {manualStep === 3 && <ManualReceiverDetailsStep />}
+                {manualStep === 4 && (
+                  <ManualDeliveryAddressStep
+                    address={receiverAddress}
+                    onAddressChange={setReceiverAddress}
+                    deliveryMethod={deliveryMethod}
+                    onDeliveryMethodChange={setDeliveryMethod}
+                  />
+                )}
+                {manualStep === 5 && (
+                  <ManualContentsStep
+                    parcelValue={parcelValue}
+                    onParcelValueChange={setParcelValue}
+                    contentType={contentType}
+                    onContentTypeChange={setContentType}
+                  />
+                )}
+                {manualStep === 6 && (
+                  <ManualOfferAddonsStep
+                    parcelValue={parcelValue}
+                    selectedAddons={selectedAddons}
+                    onSelectedAddonsChange={setSelectedAddons}
+                  />
+                )}
+                {manualStep === 7 && <ManualPriceBreakdownStep />}
+                {manualStep === 8 && (
+                  <ManualBookingSuccessStep
+                    onNext={() => {
+                      setManualStep(1)
+                      setBookingMode('online')
+                      setScreen('home')
+                      navigate('/returns')
+                    }}
+                  />
+                )}
+              </div>
+              <PpgManualStepFooter
+                manualStep={manualStep}
+                nextDisabled={
+                  manualStep === 5 && !isParcelValueProvided(parcelValue)
+                }
+                onBack={() => {
+                  if (manualStep === 1) {
                     setBookingMode('online')
                     setScreen('home')
-                  }}
-                />
-              )}
+                    return
+                  }
+                  if (manualStep === 8) {
+                    setManualStep(7)
+                    return
+                  }
+                  setManualStep(manualStep - 1)
+                }}
+                onNext={() => {
+                  if (manualStep === 7) {
+                    setManualStep(8)
+                    return
+                  }
+                  setManualStep(manualStep + 1)
+                }}
+              />
             </div>
-            <PpgManualStepFooter
-              manualStep={manualStep}
-              onBack={() => {
-                if (manualStep === 1) {
-                  setBookingMode('online')
-                  setScreen('home')
-                  return
-                }
-                setManualStep(manualStep - 1)
-              }}
-              onNext={() => setManualStep(manualStep + 1)}
-            />
           </div>
+
+          {showBookingSummary && (
+            <div className="flex min-h-0 w-full min-w-0 flex-col lg:w-[300px] lg:max-w-[300px] lg:flex-none">
+              <PpgBookingSummaryPanel draft={bookingDraft} className="h-full min-h-0 flex-1" />
+            </div>
+          )}
         </div>
       </div>
     )
@@ -152,7 +222,6 @@ export function PpgAgentPortal() {
               navigate(PPG_HOME_PATH)
               startManualFlow()
             }}
-            onBackToHome={() => navigate(PPG_HOME_PATH)}
           />
         </div>
       </>
@@ -204,18 +273,21 @@ export function PpgAgentPortal() {
                 <input
                   id="sender-mobile"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
+                  onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
+                  onChange={(e) =>
+                    setMobile((previous) =>
+                      applyAustralianMobileFieldChange(previous, e.target.value),
+                    )
+                  }
                   placeholder="+61 412 345 678"
                   className="w-full rounded-xl border border-border-light bg-white px-4 py-3.5 text-base text-black placeholder:text-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                 />
               </div>
 
-              <p className="mb-6 rounded-xl bg-[#eef2ff] px-4 py-4 text-center text-sm font-medium leading-snug text-[#3730a3] sm:text-base">
-                Sends a link to the booking form — no OTP required.
-              </p>
-
-              <div className="flex justify-end">
+              <div className="mt-6 flex justify-end">
                 <button
                   type="button"
                   disabled={smsSending}

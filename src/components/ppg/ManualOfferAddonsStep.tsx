@@ -61,10 +61,16 @@ function AddonRadioIndicator({ selected }: { selected: boolean }) {
 
 interface ManualOfferAddonsStepProps {
   parcelValue: string
+  selectedAddons: string[]
+  onSelectedAddonsChange: (ids: string[]) => void
 }
 
-export function ManualOfferAddonsStep({ parcelValue }: ManualOfferAddonsStepProps) {
-  const [selectedAddons, setSelectedAddons] = useState<Set<string>>(() => new Set())
+export function ManualOfferAddonsStep({
+  parcelValue,
+  selectedAddons,
+  onSelectedAddonsChange,
+}: ManualOfferAddonsStepProps) {
+  const selectedSet = new Set(selectedAddons)
   const [parcelProtectionOpen, setParcelProtectionOpen] = useState(false)
 
   const addonsEnabled = parcelValueEnablesAddons(parcelValue)
@@ -73,15 +79,13 @@ export function ManualOfferAddonsStep({ parcelValue }: ManualOfferAddonsStepProp
     if (!addonsEnabled) {
       return
     }
-    setSelectedAddons((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
+    const next = new Set(selectedAddons)
+    if (next.has(id)) {
+      next.delete(id)
+    } else {
+      next.add(id)
+    }
+    onSelectedAddonsChange([...next])
   }
 
   return (
@@ -93,7 +97,7 @@ export function ManualOfferAddonsStep({ parcelValue }: ManualOfferAddonsStepProp
       <div className="mb-6 space-y-3">
         {addonOptions.map((addon) => {
           const Icon = addon.icon
-          const selected = addonsEnabled && selectedAddons.has(addon.id)
+          const selected = addonsEnabled && selectedSet.has(addon.id)
 
           if (!addonsEnabled) {
             return (

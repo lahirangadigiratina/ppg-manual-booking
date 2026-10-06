@@ -154,10 +154,14 @@ export function ManualBackButton({ onBack }: { onBack?: () => void }) {
 export function ManualStepNav({
   onBack,
   onNext,
+  nextDisabled = false,
+  nextLabel = 'Next',
   className = '',
 }: {
   onBack?: () => void
   onNext?: () => void
+  nextDisabled?: boolean
+  nextLabel?: string
   className?: string
 }) {
   return (
@@ -166,9 +170,10 @@ export function ManualStepNav({
       <button
         type="button"
         onClick={onNext}
-        className={manualPrimaryButtonClassName}
+        disabled={nextDisabled}
+        className={`${manualPrimaryButtonClassName} disabled:cursor-not-allowed disabled:opacity-50`}
       >
-        Next
+        {nextLabel}
       </button>
     </div>
   )

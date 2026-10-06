@@ -1,5 +1,7 @@
 import { AlertCircle, ArrowRight } from 'lucide-react'
 import {
+  applyAustralianMobileFieldChange,
+  focusAustralianMobileField,
   formatAustralianMobileDisplay,
   sendBookingLinkSms,
 } from './ppgSmsUtils'
@@ -20,7 +22,6 @@ interface PpgOnlineSmsFailedViewProps {
   onSuccess: () => void
   onFailure: (message: string) => void
   onManualBooking: () => void
-  onBackToHome: () => void
 }
 
 export function PpgOnlineSmsFailedView({
@@ -32,7 +33,6 @@ export function PpgOnlineSmsFailedView({
   onSuccess,
   onFailure,
   onManualBooking,
-  onBackToHome,
 }: PpgOnlineSmsFailedViewProps) {
   const retrySend = async () => {
     onSendingChange(true)
@@ -72,8 +72,13 @@ export function PpgOnlineSmsFailedView({
         <input
           id="sender-mobile-retry"
           type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           value={mobile}
-          onChange={(e) => onMobileChange(e.target.value)}
+          onFocus={() => onMobileChange(focusAustralianMobileField(mobile))}
+          onChange={(e) =>
+            onMobileChange(applyAustralianMobileFieldChange(mobile, e.target.value))
+          }
           placeholder="+61 412 345 678"
           className="w-full rounded-xl border border-border-light bg-white px-4 py-3.5 text-base text-black placeholder:text-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
         />
@@ -91,13 +96,6 @@ export function PpgOnlineSmsFailedView({
         </button>
         <button type="button" onClick={onManualBooking} className={manualSecondaryButtonClassName}>
           Continue with manual booking
-        </button>
-        <button
-          type="button"
-          onClick={onBackToHome}
-          className="py-2 text-sm font-medium text-text-muted transition-colors hover:text-black"
-        >
-          Back to online booking
         </button>
       </div>
     </div>

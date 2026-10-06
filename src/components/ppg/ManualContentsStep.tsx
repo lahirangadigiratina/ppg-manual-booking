@@ -110,13 +110,16 @@ function WhatsInsideSelect({
 interface ManualContentsStepProps {
   parcelValue: string
   onParcelValueChange: (value: string) => void
+  contentType: string
+  onContentTypeChange: (value: string) => void
 }
 
 export function ManualContentsStep({
   parcelValue,
   onParcelValueChange,
+  contentType,
+  onContentTypeChange,
 }: ManualContentsStepProps) {
-  const [contentType, setContentType] = useState<string>(contentTypes[1].value)
   const [referenceNumber, setReferenceNumber] = useState('')
 
   return (
@@ -124,18 +127,23 @@ export function ManualContentsStep({
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
           <ManualFieldLabel htmlFor="whats-inside">What&apos;s inside?</ManualFieldLabel>
-          <WhatsInsideSelect value={contentType} onChange={setContentType} />
+          <WhatsInsideSelect value={contentType} onChange={onContentTypeChange} />
         </div>
 
         <div>
-          <ManualFieldLabel htmlFor="parcel-value">Parcel Value ($)</ManualFieldLabel>
+          <ManualFieldLabel htmlFor="parcel-value" required>
+            Parcel Value ($)
+          </ManualFieldLabel>
           <input
             id="parcel-value"
             type="number"
-            min={0}
+            min={0.01}
+            step={0.01}
+            required
             value={parcelValue}
             onChange={(e) => onParcelValueChange(e.target.value)}
             className={manualInputClassName}
+            aria-required="true"
           />
         </div>
 
