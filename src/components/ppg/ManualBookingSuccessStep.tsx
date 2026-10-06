@@ -1,14 +1,14 @@
 import { Check, Copy, MapPin, Package } from 'lucide-react'
 import { useState } from 'react'
 
-const TOTAL = '$18.76'
 export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
 interface ManualBookingSuccessStepProps {
+  totalLabel: string
   onNext?: () => void
 }
 
-export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepProps) {
+export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSuccessStepProps) {
   const [trackingCopied, setTrackingCopied] = useState(false)
 
   const copyTrackingNumber = async () => {
@@ -38,7 +38,7 @@ export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepPro
         Payment received — shipment is booked
       </p>
       <p className="mt-3 text-base font-bold text-black sm:text-lg">
-        1 shipment confirmed · {TOTAL}
+        1 shipment confirmed · {totalLabel}
       </p>
 
       <article className="mt-8 w-full rounded-xl border border-border-light bg-white text-left">
@@ -59,7 +59,7 @@ export function ManualBookingSuccessStep({ onNext }: ManualBookingSuccessStepPro
             <p className="mt-2 text-sm text-text-muted">Handbag · 1kg</p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-base font-bold text-black sm:text-lg">{TOTAL}</p>
+            <p className="text-base font-bold text-black sm:text-lg">{totalLabel}</p>
             <p className="text-xs text-text-muted">incl. GST</p>
           </div>
         </div>

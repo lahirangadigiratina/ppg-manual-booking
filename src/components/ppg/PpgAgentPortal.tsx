@@ -25,6 +25,8 @@ import {
   manualSegmentButtonClassName,
 } from './manualFormShared'
 import {
+  calculateBookingTotal,
+  formatBookingAmount,
   isParcelValueProvided,
   type DeliveryMethod,
   type ManualBookingDraft,
@@ -58,7 +60,7 @@ export function PpgAgentPortal() {
   const [receiverAddress, setReceiverAddress] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('door')
   const [contentType, setContentType] = useState('clothing-fashion')
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([])
+  const [selectedAddons, setSelectedAddons] = useState<string[]>(['signature'])
 
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
 
@@ -144,9 +146,12 @@ export function PpgAgentPortal() {
                     onSelectedAddonsChange={setSelectedAddons}
                   />
                 )}
-                {manualStep === 7 && <ManualPriceBreakdownStep />}
+                {manualStep === 7 && <ManualPriceBreakdownStep draft={bookingDraft} />}
                 {manualStep === 8 && (
                   <ManualBookingSuccessStep
+                    totalLabel={formatBookingAmount(
+                      calculateBookingTotal(bookingDraft) ?? 0,
+                    )}
                     onNext={() => {
                       setManualStep(1)
                       setBookingMode('online')

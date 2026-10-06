@@ -65,33 +65,72 @@ export function formatWeightForSummary(weight: string) {
   return weight
 }
 
-export function calculateBookingTotal(draft: ManualBookingDraft) {
-  let subtotal = 0
+const BOOKING_CHARGE_AMOUNTS = {
+  delivery: 10.85,
+  fuelSurcharge: 1.0,
+  packaging: 3.0,
+  signature: 2.2,
+  protection: 2.5,
+} as const
+
+export interface BookingPriceLineItem {
+  label: string
+  amount: number
+}
+
+export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
+  const items: BookingPriceLineItem[] = []
 
   if (draft.manualStep >= 4) {
-    subtotal += 10.85 + 1.0
+    items.push({ label: 'Delivery', amount: BOOKING_CHARGE_AMOUNTS.delivery })
+    items.push({ label: 'Fuel Surcharge', amount: BOOKING_CHARGE_AMOUNTS.fuelSurcharge })
   }
 
   if (draft.needsPackaging) {
-    subtotal += 3.0
+    items.push({ label: 'Packaging Fee', amount: BOOKING_CHARGE_AMOUNTS.packaging })
   }
 
   if (draft.manualStep >= 6) {
     if (draft.selectedAddons.includes('signature')) {
-      subtotal += 2.2
+      items.push({
+        label: 'Signature on Delivery',
+        amount: BOOKING_CHARGE_AMOUNTS.signature,
+      })
     }
     if (draft.selectedAddons.includes('protection')) {
-      subtotal += 2.5
+      items.push({
+        label: 'Parcel Protection',
+        amount: BOOKING_CHARGE_AMOUNTS.protection,
+      })
     }
   }
 
-  if (subtotal <= 0) {
+  const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
+  if (subtotal > 0) {
+    const gst = Math.round(subtotal * 0.1 * 100) / 100
+    items.push({ label: 'GST (10%)', amount: gst })
+  }
+
+  return items
+}
+
+export function calculateBookingTotal(draft: ManualBookingDraft) {
+  const items = buildBookingPriceLineItems(draft)
+  const subtotalBeforeGst = items
+    .filter((item) => item.label !== 'GST (10%)')
+    .reduce((sum, item) => sum + item.amount, 0)
+
+  if (subtotalBeforeGst <= 0) {
     return null
   }
 
-  const gst = Math.round(subtotal * 0.1 * 100) / 100
-  const total = Math.round((subtotal + gst) * 100) / 100
-  return total
+  const gstItem = items.find((item) => item.label === 'GST (10%)')
+  const gst = gstItem?.amount ?? 0
+  return Math.round((subtotalBeforeGst + gst) * 100) / 100
+}
+
+export function formatBookingAmount(amount: number) {
+  return `$${amount.toFixed(2)}`
 }
 
 export function isParcelValueProvided(parcelValue: string) {
