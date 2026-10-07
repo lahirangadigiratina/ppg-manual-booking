@@ -176,7 +176,7 @@ export function ManualOfferAddonsStep({
             type="checkbox"
             checked={dangerousGoodsConfirmed}
             onChange={(e) => onDangerousGoodsConfirmedChange(e.target.checked)}
-            className="mt-1 size-4 shrink-0 rounded border-gray-300"
+            className="mt-1 size-4 shrink-0 rounded border-gray-300 accent-hubbed-orange"
           />
           <div className="min-w-0">
             <label
