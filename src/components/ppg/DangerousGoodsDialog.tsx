@@ -7,38 +7,10 @@ import {
   PawPrint,
   Pill,
   Snowflake,
+  Swords,
   X,
 } from 'lucide-react'
-import type { SVGProps } from 'react'
 import { useEffect, useRef } from 'react'
-
-function FirecrackerIcon({
-  className,
-  strokeWidth = 1.75,
-  ...props
-}: SVGProps<SVGSVGElement> & { strokeWidth?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      {...props}
-    >
-      <path d="M12 2.5V6" />
-      <path d="M10 2.5c0-.8 2-.8 2 0" />
-      <path d="M9.5 2l1 2M14.5 2l-1 2" />
-      <path d="M9.5 7.5h5a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z" />
-      <path d="M9.5 11.5h5M9.5 15h5" />
-    </svg>
-  )
-}
 
 const RESTRICTED_ITEMS: {
   title: string
@@ -53,7 +25,7 @@ const RESTRICTED_ITEMS: {
   {
     title: 'Weapons & Explosives',
     description: 'Firearms, weapons, ammunition, explosives and fireworks',
-    icon: FirecrackerIcon as LucideIcon,
+    icon: Swords,
   },
   {
     title: 'Hazardous Materials',
