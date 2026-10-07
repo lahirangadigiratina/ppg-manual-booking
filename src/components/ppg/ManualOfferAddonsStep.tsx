@@ -97,10 +97,6 @@ export function ManualOfferAddonsStep({
 
   return (
     <div>
-      <p className="mb-4 text-sm text-text-muted">
-        Enhance your shipment with additional services.
-      </p>
-
       <div className="mb-6 space-y-3">
         {addonOptions.map((addon) => {
           const Icon = addon.icon
@@ -193,7 +189,7 @@ export function ManualOfferAddonsStep({
               onClick={() => setDangerousGoodsOpen(true)}
               className="mt-2 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"
             >
-              See what we can&apos;t accept
+              See What Cannot Be Sent
             </button>
           </div>
         </div>

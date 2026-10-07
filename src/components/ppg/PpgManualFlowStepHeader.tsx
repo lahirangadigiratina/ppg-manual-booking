@@ -10,7 +10,7 @@ const STEP_TITLES: Record<number, { step: number; title: string }> = {
   2: { step: 2, title: 'Sender Details' },
   3: { step: 3, title: 'Receiver Details' },
   4: { step: 4, title: 'Delivery Address' },
-  6: { step: 6, title: 'Add-ons' },
+  6: { step: 6, title: 'Offer Add-ons to Customer' },
 }
 
 export function PpgManualFlowStepHeader({ manualStep }: { manualStep: number }) {
