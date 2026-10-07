@@ -11,7 +11,7 @@ export function ManualSenderDetailsStep() {
           <input
             id="sender-business-name"
             type="text"
-            placeholder="e.g., Hubbed"
+            placeholder="Hubbed"
             className={manualInputClassName}
           />
         </div>
@@ -53,19 +53,6 @@ export function ManualSenderDetailsStep() {
             placeholder="jane@example.com"
             className={manualInputClassName}
             autoComplete="email"
-          />
-        </div>
-
-        <div>
-          <ManualFieldLabel htmlFor="sender-mobile" required>
-            Mobile
-          </ManualFieldLabel>
-          <input
-            id="sender-mobile"
-            type="tel"
-            placeholder="+61 412 345 678"
-            className={manualInputClassName}
-            autoComplete="tel"
           />
         </div>
       </form>

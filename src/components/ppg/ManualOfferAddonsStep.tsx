@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
-import { AlertTriangle, Check, PenLine, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { Check, PenLine, Shield } from 'lucide-react'
+import { useId, useState } from 'react'
+import { DangerousGoodsDialog } from './DangerousGoodsDialog'
 import { ParcelProtectionDialog } from './ParcelProtectionDialog'
 
 interface AddonOption {
@@ -63,15 +64,21 @@ interface ManualOfferAddonsStepProps {
   parcelValue: string
   selectedAddons: string[]
   onSelectedAddonsChange: (ids: string[]) => void
+  dangerousGoodsConfirmed: boolean
+  onDangerousGoodsConfirmedChange: (confirmed: boolean) => void
 }
 
 export function ManualOfferAddonsStep({
   parcelValue,
   selectedAddons,
   onSelectedAddonsChange,
+  dangerousGoodsConfirmed,
+  onDangerousGoodsConfirmedChange,
 }: ManualOfferAddonsStepProps) {
+  const dangerousGoodsFieldId = useId()
   const selectedSet = new Set(selectedAddons)
   const [parcelProtectionOpen, setParcelProtectionOpen] = useState(false)
+  const [dangerousGoodsOpen, setDangerousGoodsOpen] = useState(false)
 
   const addonsEnabled = parcelValueEnablesAddons(parcelValue)
 
@@ -145,7 +152,7 @@ export function ManualOfferAddonsStep({
                           setParcelProtectionOpen(true)
                         }}
                       >
-                        Parcel Protection
+                        Parcel Protection Conditions
                       </button>
                     </>
                   ) : (
@@ -162,23 +169,40 @@ export function ManualOfferAddonsStep({
         })}
       </div>
 
-      <div className="rounded-xl border border-hubbed-orange/40 bg-hubbed-orange-tint p-4 sm:p-5">
-        <div className="flex gap-3">
-          <AlertTriangle
-            className="size-5 shrink-0 text-amber-700"
-            strokeWidth={1.75}
-            aria-hidden
+      <div className="rounded-xl border border-border-light bg-white p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <input
+            id={dangerousGoodsFieldId}
+            type="checkbox"
+            checked={dangerousGoodsConfirmed}
+            onChange={(e) => onDangerousGoodsConfirmedChange(e.target.checked)}
+            className="mt-1 size-4 shrink-0 rounded border-gray-300"
           />
-          <div className="text-sm leading-snug text-[#5c4033] sm:text-base">
-            <p className="font-bold text-hubbed-orange">Tell the customer:</p>
-            <p className="mt-1">
-              &ldquo;Your parcel can&apos;t contain dangerous or prohibited goods.&rdquo; Confirm
-              verbally before continuing.
-            </p>
+          <div className="min-w-0">
+            <label
+              htmlFor={dangerousGoodsFieldId}
+              className="cursor-pointer text-sm font-semibold leading-snug text-black sm:text-base"
+            >
+              The sender confirms this parcel contains no dangerous or prohibited goods{' '}
+              <span className="text-red-600" aria-hidden>
+                *
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setDangerousGoodsOpen(true)}
+              className="mt-2 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"
+            >
+              See what we can&apos;t accept
+            </button>
           </div>
         </div>
       </div>
 
+      <DangerousGoodsDialog
+        open={dangerousGoodsOpen}
+        onClose={() => setDangerousGoodsOpen(false)}
+      />
       <ParcelProtectionDialog
         open={parcelProtectionOpen}
         onClose={() => setParcelProtectionOpen(false)}
