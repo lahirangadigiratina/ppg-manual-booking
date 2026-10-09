@@ -31,7 +31,7 @@ export const ADDON_SUMMARY_LABELS: Record<string, string> = {
 export interface ManualBookingDraft {
   manualStep: number
   parcelSizeId: string
-  needsPackaging: boolean
+  needsPackaging: boolean | null
   receiverAddress: string
   deliveryMethod: DeliveryMethod
   parcelpointStoreId: string | null
@@ -41,7 +41,10 @@ export interface ManualBookingDraft {
 }
 
 export function getParcelSizeById(id: string) {
-  return PARCEL_SIZE_CATALOG.find((size) => size.id === id) ?? PARCEL_SIZE_CATALOG[3]
+  if (!id) {
+    return undefined
+  }
+  return PARCEL_SIZE_CATALOG.find((size) => size.id === id)
 }
 
 export function getContentTypeLabel(value: string) {
@@ -78,7 +81,10 @@ export interface BookingPriceLineItem {
   amount: number
 }
 
-export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
+const PACKAGING_FEE_LABEL = 'Packaging Fee'
+
+/** Agent-quoted service lines (packaging is GST-inclusive; others ex-GST). */
+function getBookingChargeLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
   const items: BookingPriceLineItem[] = []
 
   if (draft.manualStep >= 4) {
@@ -86,8 +92,8 @@ export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPr
     items.push({ label: 'Fuel Surcharge', amount: BOOKING_CHARGE_AMOUNTS.fuelSurcharge })
   }
 
-  if (draft.needsPackaging) {
-    items.push({ label: 'Packaging Fee', amount: BOOKING_CHARGE_AMOUNTS.packaging })
+  if (draft.needsPackaging === true) {
+    items.push({ label: PACKAGING_FEE_LABEL, amount: BOOKING_CHARGE_AMOUNTS.packaging })
   }
 
   if (draft.manualStep >= 6) {
@@ -105,9 +111,33 @@ export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPr
     }
   }
 
-  const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
-  if (subtotal > 0) {
-    const gst = Math.round(subtotal * 0.1 * 100) / 100
+  return items
+}
+
+function splitPackagingFromTaxableCharges(charges: BookingPriceLineItem[]) {
+  const packagingTotal = charges
+    .filter((item) => item.label === PACKAGING_FEE_LABEL)
+    .reduce((sum, item) => sum + item.amount, 0)
+  const taxable = charges.filter((item) => item.label !== PACKAGING_FEE_LABEL)
+  const taxableTotal = taxable.reduce((sum, item) => sum + item.amount, 0)
+  return { packagingTotal, taxable, taxableTotal }
+}
+
+export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
+  const charges = getBookingChargeLineItems(draft)
+  const { packagingTotal, taxable, taxableTotal } = splitPackagingFromTaxableCharges(charges)
+
+  if (taxableTotal <= 0 && packagingTotal <= 0) {
+    return []
+  }
+
+  const items = [...taxable]
+  if (packagingTotal > 0) {
+    items.push({ label: PACKAGING_FEE_LABEL, amount: packagingTotal })
+  }
+
+  if (taxableTotal > 0) {
+    const gst = Math.round(taxableTotal * 0.1 * 100) / 100
     items.push({ label: 'GST (10%)', amount: gst })
   }
 
@@ -115,18 +145,15 @@ export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPr
 }
 
 export function calculateBookingTotal(draft: ManualBookingDraft) {
-  const items = buildBookingPriceLineItems(draft)
-  const subtotalBeforeGst = items
-    .filter((item) => item.label !== 'GST (10%)')
-    .reduce((sum, item) => sum + item.amount, 0)
+  const charges = getBookingChargeLineItems(draft)
+  const { packagingTotal, taxableTotal } = splitPackagingFromTaxableCharges(charges)
 
-  if (subtotalBeforeGst <= 0) {
+  if (taxableTotal <= 0 && packagingTotal <= 0) {
     return null
   }
 
-  const gstItem = items.find((item) => item.label === 'GST (10%)')
-  const gst = gstItem?.amount ?? 0
-  return Math.round((subtotalBeforeGst + gst) * 100) / 100
+  const gst = taxableTotal > 0 ? Math.round(taxableTotal * 0.1 * 100) / 100 : 0
+  return Math.round((taxableTotal + gst + packagingTotal) * 100) / 100
 }
 
 export function formatBookingAmount(amount: number) {

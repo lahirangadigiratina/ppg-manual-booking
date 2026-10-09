@@ -8,10 +8,7 @@ import {
   Package,
   ShoppingBag,
 } from 'lucide-react'
-import {
-  ManualFieldLabel,
-  manualSegmentButtonClassName,
-} from './manualFormShared'
+import { ManualFieldLabel } from './manualFormShared'
 import { PARCEL_SIZE_CATALOG } from './manualBookingState'
 
 const parcelSizeIcons: Record<string, LucideIcon> = {
@@ -23,14 +20,18 @@ const parcelSizeIcons: Record<string, LucideIcon> = {
   'carry-on': Boxes,
 }
 
-function formatDimensionsForDisplay(dimensions: string) {
-  return dimensions.replace(/×/g, ' × ')
+function compactSegmentButtonClassName(active: boolean) {
+  return `w-full rounded-md px-3 py-2 text-xs font-semibold transition-colors sm:py-2.5 sm:text-sm ${
+    active
+      ? 'bg-[#2b2f36] text-white'
+      : 'border border-border-light bg-white text-text-muted hover:border-gray-300'
+  }`
 }
 
 interface ManualParcelDetailsStepProps {
   selectedSizeId: string
   onSelectedSizeIdChange: (id: string) => void
-  needsPackaging: boolean
+  needsPackaging: boolean | null
   onNeedsPackagingChange: (value: boolean) => void
 }
 
@@ -42,15 +43,16 @@ export function ManualParcelDetailsStep({
 }: ManualParcelDetailsStepProps) {
   return (
     <div className="w-full">
-      <section className="shrink-0 pb-4" aria-labelledby="parcel-size-heading">
-        <ManualFieldLabel htmlFor="parcel-size-grid" id="parcel-size-heading">
+      <section className="shrink-0 pb-2" aria-labelledby="parcel-size-heading">
+        <ManualFieldLabel htmlFor="parcel-size-grid" id="parcel-size-heading" required>
           Size
         </ManualFieldLabel>
         <div
           id="parcel-size-grid"
-          className="grid grid-cols-3 gap-3"
+          className="grid grid-cols-3 gap-2"
           role="listbox"
           aria-label="Parcel size"
+          aria-required="true"
         >
           {PARCEL_SIZE_CATALOG.map((size) => {
             const Icon = parcelSizeIcons[size.id] ?? Package
@@ -61,34 +63,33 @@ export function ManualParcelDetailsStep({
                 type="button"
                 role="option"
                 aria-selected={selected}
+                aria-label={`${size.name}, ${size.dimensions}, up to ${size.weight}`}
+                title={`${size.dimensions} · up to ${size.weight}`}
                 onClick={() => onSelectedSizeIdChange(size.id)}
-                className={`relative flex w-full flex-col items-center rounded-2xl border px-3 py-4 text-center transition-colors ${
+                className={`relative flex min-h-[112px] w-full flex-col items-center justify-center rounded-xl border px-2.5 py-4 text-center transition-colors sm:min-h-[118px] ${
                   selected
                     ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
                     : 'border border-border-light bg-white hover:border-gray-300'
                 }`}
               >
                 {selected && (
-                  <span className="absolute right-2.5 top-2.5 flex size-5 items-center justify-center rounded-full bg-hubbed-orange text-white shadow-sm">
-                    <Check className="size-3" strokeWidth={3} aria-hidden />
+                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-hubbed-orange text-white">
+                    <Check className="size-2.5" strokeWidth={3} aria-hidden />
                   </span>
                 )}
                 <span
-                  className={`mb-3 flex size-12 items-center justify-center rounded-xl border bg-white ${
+                  className={`mb-2.5 flex size-11 items-center justify-center rounded-lg border bg-white ${
                     selected ? 'border-hubbed-orange' : 'border-border-light'
                   }`}
                 >
                   <Icon
-                    className={`size-6 ${selected ? 'text-hubbed-orange' : 'text-gray-800'}`}
+                    className={`size-5 ${selected ? 'text-hubbed-orange' : 'text-gray-800'}`}
                     strokeWidth={1.5}
                     aria-hidden
                   />
                 </span>
-                <span className="text-sm font-bold text-black">{size.name}</span>
-                <span className="mt-1 text-[11px] leading-snug text-text-muted">
-                  {formatDimensionsForDisplay(size.dimensions)}
-                </span>
-                <span className="mt-1 text-[11px] text-text-muted">
+                <span className="text-sm font-bold leading-tight text-black">{size.name}</span>
+                <span className="mt-1 text-xs leading-tight text-text-muted">
                   Up to <span className="font-bold text-black">{size.weight}</span>
                 </span>
               </button>
@@ -98,36 +99,41 @@ export function ManualParcelDetailsStep({
       </section>
 
       <section
-        className="mt-4 shrink-0 rounded-xl border border-border-light bg-white p-4 sm:p-5"
+        className="shrink-0 rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
         aria-labelledby="parcel-packaging-heading"
       >
-        <div
+        <p
           id="parcel-packaging-heading"
-          className="mb-3 space-y-1 text-sm font-medium leading-snug text-text-muted"
+          className="mb-2 text-xs font-medium leading-snug text-text-muted sm:text-sm"
         >
-          <p>Does the customer need packaging?</p>
-          <p className="font-normal">
-            (Adds a flat <span className="font-bold text-black">$3.00</span> packaging fee to the
-            total)
-          </p>
-        </div>
+          Does the customer need packaging?
+          <span className="text-red-600"> *</span>
+          <span className="mt-0.5 block font-normal">
+            (Adds a flat <span className="font-bold text-black">$3.00</span> packaging fee)
+          </span>
+        </p>
         <div
           id="packaging-choice"
-          className="grid grid-cols-2 gap-3"
+          className="grid grid-cols-2 gap-1.5"
           role="radiogroup"
           aria-label="Customer needs packaging"
+          aria-required="true"
         >
           <button
             type="button"
+            role="radio"
+            aria-checked={needsPackaging === true}
             onClick={() => onNeedsPackagingChange(true)}
-            className={manualSegmentButtonClassName(needsPackaging)}
+            className={compactSegmentButtonClassName(needsPackaging === true)}
           >
             Yes
           </button>
           <button
             type="button"
+            role="radio"
+            aria-checked={needsPackaging === false}
             onClick={() => onNeedsPackagingChange(false)}
-            className={manualSegmentButtonClassName(!needsPackaging)}
+            className={compactSegmentButtonClassName(needsPackaging === false)}
           >
             No
           </button>

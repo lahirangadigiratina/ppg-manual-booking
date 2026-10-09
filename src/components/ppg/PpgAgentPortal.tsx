@@ -55,12 +55,12 @@ export function PpgAgentPortal() {
   const [smsSending, setSmsSending] = useState(false)
   const [smsErrorMessage, setSmsErrorMessage] = useState('')
   const [parcelValue, setParcelValue] = useState('')
-  const [parcelSizeId, setParcelSizeId] = useState('shoebox')
-  const [needsPackaging, setNeedsPackaging] = useState(true)
+  const [parcelSizeId, setParcelSizeId] = useState('')
+  const [needsPackaging, setNeedsPackaging] = useState<boolean | null>(null)
   const [receiverAddress, setReceiverAddress] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('door')
   const [contentType, setContentType] = useState('clothing-fashion')
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(['signature'])
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([])
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
 
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
@@ -107,7 +107,13 @@ export function PpgAgentPortal() {
           <div className={`${ppgManualFormPanelClassName} min-h-0 min-w-0`}>
             <div className="flex h-full min-h-0 w-full flex-col">
               <PpgManualFlowStepHeader manualStep={manualStep} />
-              <div className="min-h-0 flex-1 overflow-y-auto pb-4 pt-4">
+              <div
+                className={
+                  manualStep === 1 || manualStep === 8
+                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-2 pt-1'
+                    : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
+                }
+              >
                 {manualStep === 1 && (
                   <ManualParcelDetailsStep
                     selectedSizeId={parcelSizeId}
@@ -161,6 +167,8 @@ export function PpgAgentPortal() {
               <PpgManualStepFooter
                 manualStep={manualStep}
                 nextDisabled={
+                  (manualStep === 1 &&
+                    (needsPackaging === null || !parcelSizeId)) ||
                   (manualStep === 5 && !isParcelValueProvided(parcelValue)) ||
                   (manualStep === 6 && !dangerousGoodsConfirmed)
                 }

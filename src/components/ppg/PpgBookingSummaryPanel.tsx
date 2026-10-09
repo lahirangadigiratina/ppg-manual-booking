@@ -51,6 +51,10 @@ interface PpgBookingSummaryPanelProps {
 
 export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSummaryPanelProps) {
   const parcel = getParcelSizeById(draft.parcelSizeId)
+  const parcelSizeLabel = parcel?.name ?? 'Select size in step 1'
+  const parcelSizeMeta = parcel
+    ? `${formatWeightForSummary(parcel.weight)} · ${parcel.dimensions.replace(/×/g, 'x')}`
+    : '—'
   const contentLabel =
     draft.manualStep >= 5 ? getContentTypeLabel(draft.contentType) : 'Add contents in step 5'
   const routeText = buildRouteSummary(draft)
@@ -66,10 +70,12 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
 
       <div className="mt-2">
         <SummaryBlock icon={Box} label="Parcel">
-          <p className="text-sm font-bold text-black">{parcel.name}</p>
-          <p className="text-sm text-[#94a3b8]">
-            {formatWeightForSummary(parcel.weight)} · {parcel.dimensions.replace(/×/g, 'x')}
+          <p
+            className={`text-sm font-bold ${parcel ? 'text-black' : 'text-text-muted italic'}`}
+          >
+            {parcelSizeLabel}
           </p>
+          <p className="text-sm text-[#94a3b8]">{parcelSizeMeta}</p>
           <p
             className={`text-sm ${
               draft.manualStep >= 5 ? 'text-[#94a3b8]' : 'text-text-muted italic'
