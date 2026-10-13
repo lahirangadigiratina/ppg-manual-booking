@@ -107,7 +107,7 @@ function AddressSearchInput({
             setOpen(false)
           }
         }}
-        placeholder="15/37 Nicholson St, Balmain East"
+        placeholder="Search address"
         autoComplete="off"
         className={`${manualInputClassName} py-3.5 pl-12`}
       />
@@ -164,63 +164,56 @@ function DeliveryBadge({ children }: { children: ReactNode }) {
   )
 }
 
-function DeliveryOptionCard({
-  selected,
-  onSelect,
-  children,
-}: {
-  selected: boolean
-  onSelect: () => void
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`relative w-full rounded-xl p-4 text-left transition-colors sm:p-5 ${
-        selected
-          ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
-          : 'border border-border-light bg-white hover:border-gray-300'
-      }`}
-    >
-      {selected && (
-        <span className="absolute right-3 top-3 flex size-5 items-center justify-center rounded-full bg-hubbed-orange text-white">
-          <Check className="size-3" strokeWidth={3} aria-hidden />
-        </span>
-      )}
-      {children}
-    </button>
-  )
-}
+const DOOR_DELIVERY_ROUTES = [
+  {
+    id: 'atl' as const,
+    title: 'ATL',
+    badge: 'ATL delivery',
+  },
+  {
+    id: 'atl-only' as const,
+    title: 'ATL only',
+    badge: 'Straight to door - ATL/Signature on Delivery available',
+  },
+]
 
 interface ManualDeliveryAddressStepProps {
   address: string
   onAddressChange: (value: string) => void
   deliveryMethod: DeliveryMethod
-  onDeliveryMethodChange: (method: DeliveryMethod) => void
 }
 
 export function ManualDeliveryAddressStep({
   address,
   onAddressChange,
   deliveryMethod,
-  onDeliveryMethodChange,
 }: ManualDeliveryAddressStepProps) {
   const doorFooterAddress =
     address.trim() || '12 Hall St, Bondi Beach NSW 2026'
+  const activeRoute =
+    DOOR_DELIVERY_ROUTES.find((route) => route.id === deliveryMethod) ??
+    DOOR_DELIVERY_ROUTES[0]
 
   return (
-    <div>
-      <div className="mb-5">
-        <ManualFieldLabel htmlFor="receiver-address">Receiver Address</ManualFieldLabel>
+    <div className="flex flex-col gap-3">
+      <section
+        className="rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
+        aria-labelledby="receiver-address-label"
+      >
+        <ManualFieldLabel htmlFor="receiver-address" id="receiver-address-label">
+          Receiver Address
+        </ManualFieldLabel>
         <AddressSearchInput value={address} onChange={onAddressChange} />
-      </div>
+      </section>
 
-      <div className="space-y-3" role="radiogroup" aria-label="Delivery method">
-        <DeliveryOptionCard
-          selected={deliveryMethod === 'door'}
-          onSelect={() => onDeliveryMethodChange('door')}
-        >
+      <section
+        className="rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
+        aria-label="Delivery method"
+      >
+        <div className="relative w-full rounded-xl border-2 border-hubbed-orange bg-hubbed-orange-tint p-4 sm:p-5">
+          <span className="absolute right-3 top-3 flex size-5 items-center justify-center rounded-full bg-hubbed-orange text-white">
+            <Check className="size-3" strokeWidth={3} aria-hidden />
+          </span>
           <div className="flex items-start gap-3 sm:gap-4">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white">
               <Home className="size-5 text-gray-700" strokeWidth={1.75} aria-hidden />
@@ -228,8 +221,10 @@ export function ManualDeliveryAddressStep({
             <div className="min-w-0 flex-1 pr-6">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-black">Deliver to Door</p>
-                  <p className="mt-0.5 text-sm text-text-muted">Bondi Beach 2026</p>
+                  <p className="text-base font-bold text-black">{activeRoute.title}</p>
+                  <p className="mt-0.5 text-sm text-text-muted">
+                    Deliver to Door · Bondi Beach 2026
+                  </p>
                 </div>
                 <p className="shrink-0 text-base font-bold text-black sm:text-lg">$11.50</p>
               </div>
@@ -238,7 +233,7 @@ export function ManualDeliveryAddressStep({
                   <span className="text-sm leading-none" aria-hidden>
                     🏠
                   </span>
-                  Straight to their door
+                  {activeRoute.badge}
                 </DeliveryBadge>
               </div>
             </div>
@@ -249,8 +244,8 @@ export function ManualDeliveryAddressStep({
               Delivered by <span className="font-bold text-black">Mon, 12 Oct</span>
             </span>
           </div>
-        </DeliveryOptionCard>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

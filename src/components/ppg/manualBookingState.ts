@@ -1,11 +1,15 @@
 import { PARCELPOINT_STORES } from './parcelPointStores'
 
-export type DeliveryMethod = 'door' | 'parcelpoint'
+export type DeliveryMethod = 'atl' | 'atl-only' | 'parcelpoint'
+
+export function isDoorDelivery(method: DeliveryMethod) {
+  return method === 'atl' || method === 'atl-only'
+}
+
+export const CARRY_ON_PARCEL_SIZE_ID = 'carry-on'
 
 export const PARCEL_SIZE_CATALOG = [
-  { id: 'pouch', name: 'Pouch', dimensions: '20×10×5 cm', weight: '250g' },
   { id: 'satchel', name: 'Satchel', dimensions: '25×15×5 cm', weight: '500g' },
-  { id: 'handbag', name: 'Handbag', dimensions: '25×15×10 cm', weight: '1kg' },
   { id: 'shoebox', name: 'Shoebox', dimensions: '30×25×15 cm', weight: '3kg' },
   { id: 'briefcase', name: 'Briefcase', dimensions: '40×30×15 cm', weight: '5kg' },
   { id: 'carry-on', name: 'Carry On', dimensions: '55×40×20 cm', weight: '12kg' },
@@ -69,9 +73,8 @@ export function formatWeightForSummary(weight: string) {
 }
 
 const BOOKING_CHARGE_AMOUNTS = {
-  delivery: 10.85,
-  fuelSurcharge: 1.0,
-  packaging: 3.0,
+  delivery: 11.85,
+  packaging: 2.0,
   signature: 2.2,
   protection: 2.5,
 } as const
@@ -87,26 +90,29 @@ const PACKAGING_FEE_LABEL = 'Packaging Fee'
 function getBookingChargeLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
   const items: BookingPriceLineItem[] = []
 
-  if (draft.manualStep >= 4) {
+  if (draft.manualStep >= 1) {
     items.push({ label: 'Delivery', amount: BOOKING_CHARGE_AMOUNTS.delivery })
-    items.push({ label: 'Fuel Surcharge', amount: BOOKING_CHARGE_AMOUNTS.fuelSurcharge })
   }
 
   if (draft.needsPackaging === true) {
     items.push({ label: PACKAGING_FEE_LABEL, amount: BOOKING_CHARGE_AMOUNTS.packaging })
   }
 
-  if (draft.manualStep >= 6) {
+  if (draft.manualStep >= 4) {
     if (draft.selectedAddons.includes('signature')) {
       items.push({
         label: 'Signature on Delivery',
         amount: BOOKING_CHARGE_AMOUNTS.signature,
       })
     }
-    if (draft.selectedAddons.includes('protection')) {
+    const protectionAmount = getParcelProtectionChargeAmount(
+      draft.parcelValue,
+      draft.selectedAddons,
+    )
+    if (protectionAmount !== null) {
       items.push({
         label: 'Parcel Protection',
-        amount: BOOKING_CHARGE_AMOUNTS.protection,
+        amount: protectionAmount,
       })
     }
   }
@@ -161,12 +167,57 @@ export function formatBookingAmount(amount: number) {
 }
 
 export function isParcelValueProvided(parcelValue: string) {
+  return getDeclaredParcelValueAmount(parcelValue) !== null
+}
+
+/** Declared value in dollars, or null if missing/invalid. */
+export function getDeclaredParcelValueAmount(parcelValue: string): number | null {
   const trimmed = parcelValue.trim()
   if (!trimmed) {
-    return false
+    return null
   }
   const amount = Number(trimmed)
-  return Number.isFinite(amount) && amount > 0
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return null
+  }
+  return amount
+}
+
+/** First $100 of cover is included (rate-card $0–$100 bracket). */
+export const PARCEL_PROTECTION_INCLUDED_MAX_VALUE = 100
+
+export function isParcelProtectionIncluded(parcelValue: string) {
+  const amount = getDeclaredParcelValueAmount(parcelValue)
+  return amount !== null && amount <= PARCEL_PROTECTION_INCLUDED_MAX_VALUE
+}
+
+export function isParcelProtectionApplied(draft: ManualBookingDraft) {
+  if (draft.manualStep < 4) {
+    return false
+  }
+  if (!getDeclaredParcelValueAmount(draft.parcelValue)) {
+    return false
+  }
+  if (isParcelProtectionIncluded(draft.parcelValue)) {
+    return true
+  }
+  return draft.selectedAddons.includes('protection')
+}
+
+export function getParcelProtectionChargeAmount(
+  parcelValue: string,
+  selectedAddons: readonly string[],
+): number | null {
+  if (!getDeclaredParcelValueAmount(parcelValue)) {
+    return null
+  }
+  if (isParcelProtectionIncluded(parcelValue)) {
+    return 0
+  }
+  if (selectedAddons.includes('protection')) {
+    return BOOKING_CHARGE_AMOUNTS.protection
+  }
+  return null
 }
 
 export function formatDeclaredValue(parcelValue: string) {
@@ -182,11 +233,7 @@ export function formatDeclaredValue(parcelValue: string) {
 }
 
 export function buildRouteSummary(draft: ManualBookingDraft) {
-  if (draft.manualStep < 4) {
-    return 'Add delivery details in step 4.'
-  }
-
-  if (draft.deliveryMethod === 'door') {
+  if (isDoorDelivery(draft.deliveryMethod)) {
     const address =
       draft.receiverAddress.trim() || '12 Hall St, Bondi Beach NSW 2026'
     return `Deliver to door · ${address}`
@@ -201,17 +248,21 @@ export function buildRouteSummary(draft: ManualBookingDraft) {
 }
 
 export function buildExtrasSummary(draft: ManualBookingDraft) {
-  if (draft.manualStep < 6) {
+  if (draft.manualStep < 4) {
     return { text: 'Not yet selected', faded: true }
   }
 
-  if (draft.selectedAddons.length === 0) {
-    return { text: 'Not yet selected', faded: true }
+  const labels: string[] = []
+  if (draft.selectedAddons.includes('signature')) {
+    labels.push(ADDON_SUMMARY_LABELS.signature)
+  }
+  if (isParcelProtectionApplied(draft)) {
+    labels.push(ADDON_SUMMARY_LABELS.protection)
   }
 
-  const labels = draft.selectedAddons
-    .map((id) => ADDON_SUMMARY_LABELS[id])
-    .filter(Boolean)
+  if (labels.length === 0) {
+    return { text: 'Not yet selected', faded: true }
+  }
 
   return { text: labels.join(', '), faded: false }
 }

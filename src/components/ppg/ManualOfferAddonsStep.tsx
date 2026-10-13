@@ -1,8 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
 import { Check, PenLine, Shield } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { DangerousGoodsDialog } from './DangerousGoodsDialog'
 import { ParcelProtectionDialog } from './ParcelProtectionDialog'
+import {
+  getDeclaredParcelValueAmount,
+  isParcelProtectionIncluded,
+} from './manualBookingState'
 
 interface AddonOption {
   id: string
@@ -13,8 +17,8 @@ interface AddonOption {
 }
 
 function formatParcelValueDisplay(parcelValue: string) {
-  const amount = Number(parcelValue.trim())
-  if (!Number.isFinite(amount)) {
+  const amount = getDeclaredParcelValueAmount(parcelValue)
+  if (amount === null) {
     return parcelValue.trim()
   }
   return Number.isInteger(amount) ? String(amount) : amount.toFixed(2)
@@ -37,12 +41,7 @@ const addonOptions: AddonOption[] = [
 ]
 
 function parcelValueEnablesAddons(parcelValue: string) {
-  const trimmed = parcelValue.trim()
-  if (!trimmed) {
-    return false
-  }
-  const amount = Number(trimmed)
-  return Number.isFinite(amount) && amount > 0
+  return getDeclaredParcelValueAmount(parcelValue) !== null
 }
 
 function AddonRadioIndicator({ selected }: { selected: boolean }) {
@@ -81,9 +80,20 @@ export function ManualOfferAddonsStep({
   const [dangerousGoodsOpen, setDangerousGoodsOpen] = useState(false)
 
   const addonsEnabled = parcelValueEnablesAddons(parcelValue)
+  const protectionIncluded = addonsEnabled && isParcelProtectionIncluded(parcelValue)
+
+  useEffect(() => {
+    if (!protectionIncluded || !selectedAddons.includes('protection')) {
+      return
+    }
+    onSelectedAddonsChange(selectedAddons.filter((id) => id !== 'protection'))
+  }, [protectionIncluded, selectedAddons, onSelectedAddonsChange])
 
   const toggleAddon = (id: string) => {
     if (!addonsEnabled) {
+      return
+    }
+    if (id === 'protection' && protectionIncluded) {
       return
     }
     const next = new Set(selectedAddons)
@@ -95,12 +105,29 @@ export function ManualOfferAddonsStep({
     onSelectedAddonsChange([...next])
   }
 
+  const renderProtectionBody = () => (
+    <>
+      <span>
+        Cover your parcel valued at ${formatParcelValueDisplay(parcelValue)}
+      </span>
+      <button
+        type="button"
+        className="mt-1 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"
+        onClick={(event) => {
+          event.stopPropagation()
+          setParcelProtectionOpen(true)
+        }}
+      >
+        Parcel Protection Conditions
+      </button>
+    </>
+  )
+
   return (
     <div>
       <div className="mb-6 space-y-3">
         {addonOptions.map((addon) => {
           const Icon = addon.icon
-          const selected = addonsEnabled && selectedSet.has(addon.id)
 
           if (!addonsEnabled) {
             return (
@@ -121,6 +148,31 @@ export function ManualOfferAddonsStep({
             )
           }
 
+          if (addon.id === 'protection' && protectionIncluded) {
+            return (
+              <div
+                key={addon.id}
+                className="flex w-full items-center gap-3 rounded-xl border-2 border-hubbed-orange bg-hubbed-orange-tint p-4 sm:gap-4 sm:p-5"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                  <Icon className="size-5 text-gray-700" strokeWidth={1.75} aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-bold text-black">{addon.label}</p>
+                  <div className="mt-0.5 text-sm text-text-muted">{renderProtectionBody()}</div>
+                </div>
+                <p className="shrink-0 text-base font-bold text-hubbed-orange sm:text-lg">
+                  Included
+                </p>
+              </div>
+            )
+          }
+
+          const selected =
+            addon.id === 'protection'
+              ? selectedSet.has('protection')
+              : selectedSet.has(addon.id)
+
           return (
             <button
               key={addon.id}
@@ -135,25 +187,7 @@ export function ManualOfferAddonsStep({
               <div className="min-w-0 flex-1">
                 <p className="text-base font-bold text-black">{addon.label}</p>
                 <div className="mt-0.5 text-sm text-text-muted">
-                  {addon.id === 'protection' ? (
-                    <>
-                      <span>
-                        Cover your parcel valued at ${formatParcelValueDisplay(parcelValue)}
-                      </span>
-                      <button
-                        type="button"
-                        className="mt-1 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          setParcelProtectionOpen(true)
-                        }}
-                      >
-                        Parcel Protection Conditions
-                      </button>
-                    </>
-                  ) : (
-                    addon.subtitle
-                  )}
+                  {addon.id === 'protection' ? renderProtectionBody() : addon.subtitle}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-3 sm:gap-4">

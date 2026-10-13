@@ -1,20 +1,15 @@
 import type { LucideIcon } from 'lucide-react'
-import {
-  Boxes,
-  Briefcase,
-  Check,
-  Handbag,
-  Mail,
-  Package,
-  ShoppingBag,
-} from 'lucide-react'
+import { Boxes, Briefcase, Check, Package, ShoppingBag } from 'lucide-react'
+import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
 import { ManualFieldLabel } from './manualFormShared'
-import { PARCEL_SIZE_CATALOG } from './manualBookingState'
+import {
+  CARRY_ON_PARCEL_SIZE_ID,
+  PARCEL_SIZE_CATALOG,
+  type DeliveryMethod,
+} from './manualBookingState'
 
 const parcelSizeIcons: Record<string, LucideIcon> = {
-  pouch: Mail,
   satchel: ShoppingBag,
-  handbag: Handbag,
   shoebox: Package,
   briefcase: Briefcase,
   'carry-on': Boxes,
@@ -32,7 +27,10 @@ interface ManualParcelDetailsStepProps {
   selectedSizeId: string
   onSelectedSizeIdChange: (id: string) => void
   needsPackaging: boolean | null
-  onNeedsPackagingChange: (value: boolean) => void
+  onNeedsPackagingChange: (value: boolean | null) => void
+  receiverAddress: string
+  onReceiverAddressChange: (value: string) => void
+  deliveryMethod: DeliveryMethod
 }
 
 export function ManualParcelDetailsStep({
@@ -40,16 +38,24 @@ export function ManualParcelDetailsStep({
   onSelectedSizeIdChange,
   needsPackaging,
   onNeedsPackagingChange,
+  receiverAddress,
+  onReceiverAddressChange,
+  deliveryMethod,
 }: ManualParcelDetailsStepProps) {
+  const showPackagingQuestion = selectedSizeId !== CARRY_ON_PARCEL_SIZE_ID
+
   return (
-    <div className="w-full">
-      <section className="shrink-0 pb-2" aria-labelledby="parcel-size-heading">
+    <div className="flex w-full flex-col gap-3">
+      <section
+        className="shrink-0 rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
+        aria-labelledby="parcel-size-heading"
+      >
         <ManualFieldLabel htmlFor="parcel-size-grid" id="parcel-size-heading" required>
           Size
         </ManualFieldLabel>
         <div
           id="parcel-size-grid"
-          className="grid grid-cols-3 gap-2"
+          className="grid grid-cols-2 gap-2"
           role="listbox"
           aria-label="Parcel size"
           aria-required="true"
@@ -65,7 +71,14 @@ export function ManualParcelDetailsStep({
                 aria-selected={selected}
                 aria-label={`${size.name}, ${size.dimensions}, up to ${size.weight}`}
                 title={`${size.dimensions} · up to ${size.weight}`}
-                onClick={() => onSelectedSizeIdChange(size.id)}
+                onClick={() => {
+                  onSelectedSizeIdChange(size.id)
+                  if (size.id === CARRY_ON_PARCEL_SIZE_ID) {
+                    onNeedsPackagingChange(false)
+                  } else if (selectedSizeId === CARRY_ON_PARCEL_SIZE_ID) {
+                    onNeedsPackagingChange(null)
+                  }
+                }}
                 className={`relative flex min-h-[112px] w-full flex-col items-center justify-center rounded-xl border px-2.5 py-4 text-center transition-colors sm:min-h-[118px] ${
                   selected
                     ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
@@ -98,47 +111,55 @@ export function ManualParcelDetailsStep({
         </div>
       </section>
 
-      <section
-        className="shrink-0 rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
-        aria-labelledby="parcel-packaging-heading"
-      >
-        <p
-          id="parcel-packaging-heading"
-          className="mb-2 text-xs font-medium leading-snug text-text-muted sm:text-sm"
+      {showPackagingQuestion ? (
+        <section
+          className="shrink-0 rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
+          aria-labelledby="parcel-packaging-heading"
         >
-          Does the customer need packaging?
-          <span className="text-red-600"> *</span>
-          <span className="mt-0.5 block font-normal">
-            (Adds a flat <span className="font-bold text-black">$3.00</span> packaging fee)
-          </span>
-        </p>
-        <div
-          id="packaging-choice"
-          className="grid grid-cols-2 gap-1.5"
-          role="radiogroup"
-          aria-label="Customer needs packaging"
-          aria-required="true"
-        >
-          <button
-            type="button"
-            role="radio"
-            aria-checked={needsPackaging === true}
-            onClick={() => onNeedsPackagingChange(true)}
-            className={compactSegmentButtonClassName(needsPackaging === true)}
+          <p
+            id="parcel-packaging-heading"
+            className="mb-2 text-xs font-medium leading-snug text-text-muted sm:text-sm"
           >
-            Yes
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={needsPackaging === false}
-            onClick={() => onNeedsPackagingChange(false)}
-            className={compactSegmentButtonClassName(needsPackaging === false)}
+            Does the customer need packaging?
+            <span className="text-red-600"> *</span>
+            <span className="mt-0.5 block font-normal">
+              (Adds a flat <span className="font-bold text-black">$2.00</span> packaging fee)
+            </span>
+          </p>
+          <div
+            id="packaging-choice"
+            className="grid grid-cols-2 gap-1.5"
+            role="radiogroup"
+            aria-label="Customer needs packaging"
+            aria-required="true"
           >
-            No
-          </button>
-        </div>
-      </section>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={needsPackaging === true}
+              onClick={() => onNeedsPackagingChange(true)}
+              className={compactSegmentButtonClassName(needsPackaging === true)}
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={needsPackaging === false}
+              onClick={() => onNeedsPackagingChange(false)}
+              className={compactSegmentButtonClassName(needsPackaging === false)}
+            >
+              No
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      <ManualDeliveryAddressStep
+        address={receiverAddress}
+        onAddressChange={onReceiverAddressChange}
+        deliveryMethod={deliveryMethod}
+      />
     </div>
   )
 }

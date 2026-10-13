@@ -1,5 +1,6 @@
-import { Check, Copy, MapPin, Package } from 'lucide-react'
+import { Check, Copy, MapPin, Package, Printer } from 'lucide-react'
 import { useState } from 'react'
+import { manualSecondaryButtonClassName } from './manualFormShared'
 
 export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
@@ -97,13 +98,23 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
         </div>
       </article>
 
-      <button
-        type="button"
-        onClick={() => void proceedToDropoff()}
-        className="mt-4 w-full shrink-0 rounded-md bg-hubbed-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:mt-5"
-      >
-        Proceed to Dropoff
-      </button>
+      <div className="mt-4 flex w-full shrink-0 flex-col gap-3 sm:mt-5">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className={`inline-flex w-full items-center justify-center gap-2 ${manualSecondaryButtonClassName}`}
+        >
+          <Printer className="size-4" strokeWidth={2} aria-hidden />
+          Print Label
+        </button>
+        <button
+          type="button"
+          onClick={() => void proceedToDropoff()}
+          className="w-full rounded-md bg-hubbed-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:py-3.5 sm:text-base"
+        >
+          Proceed to Dropoff
+        </button>
+      </div>
     </div>
   )
 }

@@ -13,7 +13,7 @@ export function PpgManualStepFooter({
   onNext,
   nextDisabled = false,
 }: PpgManualStepFooterProps) {
-  if (manualStep < 1 || manualStep > 7) {
+  if (manualStep < 1 || manualStep > 5) {
     return null
   }
 
@@ -23,7 +23,7 @@ export function PpgManualStepFooter({
         onBack={onBack}
         onNext={onNext}
         nextDisabled={nextDisabled}
-        nextLabel={manualStep === 7 ? 'Pay' : 'Next'}
+        nextLabel={manualStep === 5 ? 'Pay' : 'Next'}
       />
     </div>
   )

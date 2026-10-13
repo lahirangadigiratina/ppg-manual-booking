@@ -60,31 +60,35 @@ export function ManualCheckStepHeading({ title }: { title: string }) {
 export function ManualStepHeading({
   step,
   title,
+  helperText,
   pinned = false,
 }: {
   step: number
   title: string
+  helperText?: string
   /** When true, heading sits in fixed chrome above scrolling step body */
   pinned?: boolean
 }) {
   return (
-    <div
-      className={
-        pinned
-          ? 'mb-4 flex items-center gap-3'
-          : 'mb-6 mt-4 flex items-center gap-3 sm:mt-5'
-      }
-    >
-      <span
-        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
-        aria-hidden
-      >
-        {step}
-      </span>
-      <h2 className="text-xl font-bold text-black sm:text-2xl">{title}</h2>
+    <div className={pinned ? 'mb-4' : 'mb-6 mt-4 sm:mt-5'}>
+      <div className="flex items-center gap-3">
+        <span
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
+          aria-hidden
+        >
+          {step}
+        </span>
+        <h2 className="text-xl font-bold text-black sm:text-2xl">{title}</h2>
+      </div>
+      {helperText ? (
+        <p className="mt-2 text-sm leading-relaxed text-text-muted">{helperText}</p>
+      ) : null}
     </div>
   )
 }
+
+const MANUAL_CONTENTS_STEP_HELPER =
+  'Describe what is inside the parcel and its value, offer optional add-ons, and confirm dangerous goods rules.'
 
 export function ManualContentsStepHeading({
   pinned = false,
@@ -94,29 +98,28 @@ export function ManualContentsStepHeading({
   onDangerousGoodsClick?: () => void
 }) {
   return (
-    <div
-      className={
-        pinned
-          ? 'mb-4 flex items-start justify-between gap-4'
-          : 'mb-6 mt-4 flex items-start justify-between gap-4 sm:mt-5'
-      }
-    >
-      <div className="flex min-w-0 items-center gap-3">
-        <span
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
-          aria-hidden
-        >
-          5
+    <div className={pinned ? 'mb-4' : 'mb-6 mt-4 sm:mt-5'}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
+            aria-hidden
+          >
+          4
         </span>
-        <h2 className="text-xl font-bold text-black sm:text-2xl">Contents</h2>
+        <h2 className="text-xl font-bold text-black sm:text-2xl">Contents &amp; Add-ons</h2>
+        </div>
+        <button
+          type="button"
+          onClick={onDangerousGoodsClick}
+          className="shrink-0 pt-2 text-sm font-semibold text-hubbed-orange hover:text-hubbed-orange-hover"
+        >
+          Dangerous goods?
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={onDangerousGoodsClick}
-        className="shrink-0 pt-2 text-sm font-semibold text-hubbed-orange hover:text-hubbed-orange-hover"
-      >
-        Dangerous goods?
-      </button>
+      <p className="mt-2 text-sm leading-relaxed text-text-muted">
+        {MANUAL_CONTENTS_STEP_HELPER}
+      </p>
     </div>
   )
 }

@@ -1,7 +1,12 @@
 import { ArrowRight } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { PPG_HOME_PATH, PPG_ONLINE_SMS_FAILED_PATH } from '../../config/ppgRoutes'
+import {
+  deliveryMethodFromPpgPath,
+  PPG_HOME_PATH,
+  PPG_ONLINE_SMS_FAILED_PATH,
+  ppgPathForDeliveryMethod,
+} from '../../config/ppgRoutes'
 import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
 import {
   applyAustralianMobileFieldChange,
@@ -12,7 +17,6 @@ import { ManualContentsStep } from './ManualContentsStep'
 import { ManualOfferAddonsStep } from './ManualOfferAddonsStep'
 import { ManualBookingSuccessStep } from './ManualBookingSuccessStep'
 import { ManualPriceBreakdownStep } from './ManualPriceBreakdownStep'
-import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
 import { ManualParcelDetailsStep } from './ManualParcelDetailsStep'
 import { ManualReceiverDetailsStep } from './ManualReceiverDetailsStep'
 import { ManualSenderDetailsStep } from './ManualSenderDetailsStep'
@@ -28,6 +32,8 @@ import {
   calculateBookingTotal,
   formatBookingAmount,
   isParcelValueProvided,
+  CARRY_ON_PARCEL_SIZE_ID,
+  isDoorDelivery,
   type DeliveryMethod,
   type ManualBookingDraft,
 } from './manualBookingState'
@@ -58,12 +64,25 @@ export function PpgAgentPortal() {
   const [parcelSizeId, setParcelSizeId] = useState('')
   const [needsPackaging, setNeedsPackaging] = useState<boolean | null>(null)
   const [receiverAddress, setReceiverAddress] = useState('')
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('door')
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(
+    () => deliveryMethodFromPpgPath(location.pathname) ?? 'atl',
+  )
   const [contentType, setContentType] = useState('clothing-fashion')
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
 
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
+
+  useEffect(() => {
+    const methodFromPath = deliveryMethodFromPpgPath(location.pathname)
+    if (!methodFromPath) {
+      return
+    }
+    setDeliveryMethod(methodFromPath)
+    setBookingMode('manual')
+    setScreen('manual')
+    setManualStep(1)
+  }, [location.pathname])
 
   const handleSendSms = async () => {
     setSmsSending(true)
@@ -80,10 +99,13 @@ export function PpgAgentPortal() {
   const startManualFlow = () => {
     setManualStep(1)
     setScreen('manual')
+    if (isDoorDelivery(deliveryMethod)) {
+      navigate(ppgPathForDeliveryMethod(deliveryMethod), { replace: true })
+    }
   }
 
   if (screen === 'manual') {
-    const showBookingSummary = manualStep >= 1 && manualStep <= 7
+    const showBookingSummary = manualStep >= 1 && manualStep <= 5
 
     const bookingDraft: ManualBookingDraft = {
       manualStep,
@@ -109,7 +131,7 @@ export function PpgAgentPortal() {
               <PpgManualFlowStepHeader manualStep={manualStep} />
               <div
                 className={
-                  manualStep === 1 || manualStep === 8
+                  manualStep === 6
                     ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-2 pt-1'
                     : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
                 }
@@ -120,37 +142,32 @@ export function PpgAgentPortal() {
                     onSelectedSizeIdChange={setParcelSizeId}
                     needsPackaging={needsPackaging}
                     onNeedsPackagingChange={setNeedsPackaging}
+                    receiverAddress={receiverAddress}
+                    onReceiverAddressChange={setReceiverAddress}
+                    deliveryMethod={deliveryMethod}
                   />
                 )}
                 {manualStep === 2 && <ManualSenderDetailsStep />}
                 {manualStep === 3 && <ManualReceiverDetailsStep />}
                 {manualStep === 4 && (
-                  <ManualDeliveryAddressStep
-                    address={receiverAddress}
-                    onAddressChange={setReceiverAddress}
-                    deliveryMethod={deliveryMethod}
-                    onDeliveryMethodChange={setDeliveryMethod}
-                  />
+                  <div className="flex flex-col gap-8">
+                    <ManualContentsStep
+                      parcelValue={parcelValue}
+                      onParcelValueChange={setParcelValue}
+                      contentType={contentType}
+                      onContentTypeChange={setContentType}
+                    />
+                    <ManualOfferAddonsStep
+                      parcelValue={parcelValue}
+                      selectedAddons={selectedAddons}
+                      onSelectedAddonsChange={setSelectedAddons}
+                      dangerousGoodsConfirmed={dangerousGoodsConfirmed}
+                      onDangerousGoodsConfirmedChange={setDangerousGoodsConfirmed}
+                    />
+                  </div>
                 )}
-                {manualStep === 5 && (
-                  <ManualContentsStep
-                    parcelValue={parcelValue}
-                    onParcelValueChange={setParcelValue}
-                    contentType={contentType}
-                    onContentTypeChange={setContentType}
-                  />
-                )}
+                {manualStep === 5 && <ManualPriceBreakdownStep draft={bookingDraft} />}
                 {manualStep === 6 && (
-                  <ManualOfferAddonsStep
-                    parcelValue={parcelValue}
-                    selectedAddons={selectedAddons}
-                    onSelectedAddonsChange={setSelectedAddons}
-                    dangerousGoodsConfirmed={dangerousGoodsConfirmed}
-                    onDangerousGoodsConfirmedChange={setDangerousGoodsConfirmed}
-                  />
-                )}
-                {manualStep === 7 && <ManualPriceBreakdownStep draft={bookingDraft} />}
-                {manualStep === 8 && (
                   <ManualBookingSuccessStep
                     totalLabel={formatBookingAmount(
                       calculateBookingTotal(bookingDraft) ?? 0,
@@ -168,25 +185,28 @@ export function PpgAgentPortal() {
                 manualStep={manualStep}
                 nextDisabled={
                   (manualStep === 1 &&
-                    (needsPackaging === null || !parcelSizeId)) ||
-                  (manualStep === 5 && !isParcelValueProvided(parcelValue)) ||
-                  (manualStep === 6 && !dangerousGoodsConfirmed)
+                    (!parcelSizeId ||
+                      (parcelSizeId !== CARRY_ON_PARCEL_SIZE_ID &&
+                        needsPackaging === null))) ||
+                  (manualStep === 4 &&
+                    (!isParcelValueProvided(parcelValue) || !dangerousGoodsConfirmed))
                 }
                 onBack={() => {
                   if (manualStep === 1) {
                     setBookingMode('online')
                     setScreen('home')
+                    navigate(PPG_HOME_PATH, { replace: true })
                     return
                   }
-                  if (manualStep === 8) {
-                    setManualStep(7)
+                  if (manualStep === 6) {
+                    setManualStep(5)
                     return
                   }
                   setManualStep(manualStep - 1)
                 }}
                 onNext={() => {
-                  if (manualStep === 7) {
-                    setManualStep(8)
+                  if (manualStep === 5) {
+                    setManualStep(6)
                     return
                   }
                   setManualStep(manualStep + 1)
@@ -248,9 +268,13 @@ export function PpgAgentPortal() {
       />
       <div className={`${ppgPageShellClassName} overflow-y-auto`}>
         <div className={ppgPortalPanelClassName}>
-          <h2 className="mb-4 text-xl font-bold text-black sm:text-2xl">
+          <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
             How is the customer booking?
           </h2>
+          <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">
+            Select how the booking will be made by the customer online using their phone, or
+            manually by you as the agent on their behalf.
+          </p>
 
           <div className="mb-8 grid grid-cols-2 gap-3">
             <button

@@ -56,7 +56,7 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
     ? `${formatWeightForSummary(parcel.weight)} · ${parcel.dimensions.replace(/×/g, 'x')}`
     : '—'
   const contentLabel =
-    draft.manualStep >= 5 ? getContentTypeLabel(draft.contentType) : 'Add contents in step 5'
+    draft.manualStep >= 4 ? getContentTypeLabel(draft.contentType) : 'Add contents in step 4'
   const routeText = buildRouteSummary(draft)
   const extras = buildExtrasSummary(draft)
   const total = calculateBookingTotal(draft)
@@ -78,7 +78,7 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
           <p className="text-sm text-[#94a3b8]">{parcelSizeMeta}</p>
           <p
             className={`text-sm ${
-              draft.manualStep >= 5 ? 'text-[#94a3b8]' : 'text-text-muted italic'
+              draft.manualStep >= 4 ? 'text-[#94a3b8]' : 'text-text-muted italic'
             }`}
           >
             {contentLabel}
@@ -91,7 +91,7 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
         <SummaryBlock icon={Route} label="Route">
           <p
             className={`text-sm leading-snug ${
-              draft.manualStep >= 4 ? 'text-[#334155]' : 'text-[#94a3b8]'
+              'text-[#334155]'
             }`}
           >
             {routeText}

@@ -55,6 +55,18 @@ export function ManualSenderDetailsStep() {
             autoComplete="email"
           />
         </div>
+
+        <div>
+          <ManualFieldLabel htmlFor="sender-phone">Phone number (optional)</ManualFieldLabel>
+          <input
+            id="sender-phone"
+            type="tel"
+            inputMode="tel"
+            placeholder="+61 412 345 678"
+            className={manualInputClassName}
+            autoComplete="tel"
+          />
+        </div>
       </form>
     </div>
   )
