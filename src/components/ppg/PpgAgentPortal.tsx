@@ -132,7 +132,7 @@ export function PpgAgentPortal() {
               <div
                 className={
                   manualStep === 6
-                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-2 pt-1'
+                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-0 pt-1'
                     : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
                 }
               >

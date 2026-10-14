@@ -1,4 +1,4 @@
-import { Check, Home, MapPin, Search } from 'lucide-react'
+import { MapPin, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ManualFieldLabel, manualInputClassName } from './manualFormShared'
 import type { DeliveryMethod } from './manualBookingState'
@@ -167,15 +167,17 @@ function DeliveryBadge({ children }: { children: ReactNode }) {
 const DOOR_DELIVERY_ROUTES = [
   {
     id: 'atl' as const,
-    title: 'ATL',
-    badge: 'ATL delivery',
+    areaLabel: 'Bondi Junction 2022',
+    badge: 'Straight to door - ATL delivery',
+    defaultAddress: '25 Spring St, Bondi Junction NSW 2022',
   },
   {
     id: 'atl-only' as const,
-    title: 'ATL only',
+    areaLabel: 'Bondi Beach 2026',
     badge: 'Straight to door - ATL/Signature on Delivery available',
+    defaultAddress: '12 Hall St, Bondi Beach NSW 2026',
   },
-]
+] as const
 
 interface ManualDeliveryAddressStepProps {
   address: string
@@ -188,11 +190,10 @@ export function ManualDeliveryAddressStep({
   onAddressChange,
   deliveryMethod,
 }: ManualDeliveryAddressStepProps) {
-  const doorFooterAddress =
-    address.trim() || '12 Hall St, Bondi Beach NSW 2026'
   const activeRoute =
     DOOR_DELIVERY_ROUTES.find((route) => route.id === deliveryMethod) ??
     DOOR_DELIVERY_ROUTES[0]
+  const doorFooterAddress = address.trim() || activeRoute.defaultAddress
 
   return (
     <div className="flex flex-col gap-3">
@@ -207,24 +208,21 @@ export function ManualDeliveryAddressStep({
       </section>
 
       <section
-        className="rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
         aria-label="Delivery method"
+        className="relative w-full rounded-xl border-2 border-hubbed-orange bg-hubbed-orange-tint p-4 sm:p-5"
       >
-        <div className="relative w-full rounded-xl border-2 border-hubbed-orange bg-hubbed-orange-tint p-4 sm:p-5">
-          <span className="absolute right-3 top-3 flex size-5 items-center justify-center rounded-full bg-hubbed-orange text-white">
-            <Check className="size-3" strokeWidth={3} aria-hidden />
-          </span>
           <div className="flex items-start gap-3 sm:gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white">
-              <Home className="size-5 text-gray-700" strokeWidth={1.75} aria-hidden />
+            <span
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white text-xl leading-none"
+              aria-hidden
+            >
+              🏠
             </span>
-            <div className="min-w-0 flex-1 pr-6">
+            <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-black">{activeRoute.title}</p>
-                  <p className="mt-0.5 text-sm text-text-muted">
-                    Deliver to Door · Bondi Beach 2026
-                  </p>
+                  <p className="text-base font-bold text-black">Deliver to Door</p>
+                  <p className="mt-0.5 text-sm text-text-muted">{activeRoute.areaLabel}</p>
                 </div>
                 <p className="shrink-0 text-base font-bold text-black sm:text-lg">$11.50</p>
               </div>
@@ -238,13 +236,12 @@ export function ManualDeliveryAddressStep({
               </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2 border-t border-border-light pt-3 text-sm text-text-muted sm:flex-row sm:items-center sm:justify-between">
-            <span className="min-w-0 truncate">{doorFooterAddress}</span>
+          <div className="mt-4 flex flex-col gap-2 border-t border-border-light pt-3 text-sm text-text-muted sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <span className="min-w-0 text-left leading-snug">{doorFooterAddress}</span>
             <span className="shrink-0 sm:text-right">
               Delivered by <span className="font-bold text-black">Mon, 12 Oct</span>
             </span>
           </div>
-        </div>
       </section>
     </div>
   )

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Boxes, Briefcase, Check, Package, ShoppingBag } from 'lucide-react'
+import { Box, Boxes, Briefcase, Check, Luggage, Package, ShoppingBag } from 'lucide-react'
 import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
 import { ManualFieldLabel } from './manualFormShared'
 import {
@@ -13,6 +13,9 @@ const parcelSizeIcons: Record<string, LucideIcon> = {
   shoebox: Package,
   briefcase: Briefcase,
   'carry-on': Boxes,
+  'large-box': Box,
+  suitcase: Luggage,
+  'heavy-crate': Boxes,
 }
 
 function compactSegmentButtonClassName(active: boolean) {
@@ -55,7 +58,7 @@ export function ManualParcelDetailsStep({
         </ManualFieldLabel>
         <div
           id="parcel-size-grid"
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-3 gap-2"
           role="listbox"
           aria-label="Parcel size"
           aria-required="true"

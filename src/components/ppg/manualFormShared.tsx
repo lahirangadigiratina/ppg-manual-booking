@@ -99,22 +99,24 @@ export function ManualContentsStepHeading({
 }) {
   return (
     <div className={pinned ? 'mb-4' : 'mb-6 mt-4 sm:mt-5'}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <span
             className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-base font-bold text-white"
             aria-hidden
           >
-          4
-        </span>
-        <h2 className="text-xl font-bold text-black sm:text-2xl">Contents &amp; Add-ons</h2>
+            4
+          </span>
+          <h2 className="shrink-0 whitespace-nowrap text-xl font-bold text-black sm:text-2xl">
+            Contents &amp; Add-ons
+          </h2>
         </div>
         <button
           type="button"
           onClick={onDangerousGoodsClick}
-          className="shrink-0 pt-2 text-sm font-semibold text-hubbed-orange hover:text-hubbed-orange-hover"
+          className="shrink-0 text-left text-[11px] font-semibold leading-snug text-hubbed-orange hover:text-hubbed-orange-hover sm:text-xs"
         >
-          Dangerous goods?
+          Prohibited or dangerous goods?
         </button>
       </div>
       <p className="mt-2 text-sm leading-relaxed text-text-muted">

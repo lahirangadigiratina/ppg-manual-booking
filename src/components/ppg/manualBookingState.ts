@@ -13,6 +13,9 @@ export const PARCEL_SIZE_CATALOG = [
   { id: 'shoebox', name: 'Shoebox', dimensions: '30×25×15 cm', weight: '3kg' },
   { id: 'briefcase', name: 'Briefcase', dimensions: '40×30×15 cm', weight: '5kg' },
   { id: 'carry-on', name: 'Carry On', dimensions: '55×40×20 cm', weight: '12kg' },
+  { id: 'large-box', name: 'Large Box', dimensions: '60×45×30 cm', weight: '15kg' },
+  { id: 'suitcase', name: 'Suitcase', dimensions: '65×45×25 cm', weight: '18kg' },
+  { id: 'heavy-crate', name: 'Heavy Crate', dimensions: '80×50×50 cm', weight: '25kg' },
 ] as const
 
 export const CONTENT_TYPE_OPTIONS = [
