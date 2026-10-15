@@ -58,7 +58,8 @@ export function ManualParcelDetailsStep({
         </ManualFieldLabel>
         <div
           id="parcel-size-grid"
-          className="grid grid-cols-3 gap-2"
+          className="grid w-full grid-cols-3 gap-1.5 sm:gap-2"
+          style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}
           role="listbox"
           aria-label="Parcel size"
           aria-required="true"
@@ -82,7 +83,7 @@ export function ManualParcelDetailsStep({
                     onNeedsPackagingChange(null)
                   }
                 }}
-                className={`relative flex min-h-[112px] w-full flex-col items-center justify-center rounded-xl border px-2.5 py-4 text-center transition-colors sm:min-h-[118px] ${
+                className={`relative flex min-h-[96px] w-full flex-col items-center justify-center rounded-xl border px-2 py-3 text-center transition-colors sm:min-h-[104px] sm:px-2.5 sm:py-3.5 ${
                   selected
                     ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
                     : 'border border-border-light bg-white hover:border-gray-300'
