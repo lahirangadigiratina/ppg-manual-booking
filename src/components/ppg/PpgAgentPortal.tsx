@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CreditCard, Store } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -23,11 +23,9 @@ import { ManualSenderDetailsStep } from './ManualSenderDetailsStep'
 import { PpgBookingSummaryPanel } from './PpgBookingSummaryPanel'
 import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
+import { PpgHomeTabBar, PpgHomeTabPanel, type PpgHomeTabId } from './PpgHomeTabs'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
-import {
-  manualPrimaryButtonClassName,
-  manualSegmentButtonClassName,
-} from './manualFormShared'
+import { manualInputClassName, manualPrimaryButtonClassName } from './manualFormShared'
 import {
   calculateBookingTotal,
   formatBookingAmount,
@@ -50,6 +48,71 @@ const ppgPortalPanelClassName = `${ppgWhitePanelClassName} mx-auto w-full max-w-
 
 const ppgManualFormPanelClassName = `${ppgWhitePanelClassName} w-full max-w-xl lg:flex-none`
 
+const ppgManualStepScrollClassName =
+  'min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-4 pt-4 pe-3 sm:pe-4 [scrollbar-gutter:stable]'
+
+function BookingModeOption({
+  selected,
+  title,
+  description,
+  paymentLabel,
+  paymentIcon: PaymentIcon,
+  onClick,
+}: {
+  selected: boolean
+  title: string
+  description: string
+  paymentLabel: string
+  paymentIcon: typeof CreditCard
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`relative flex min-h-[168px] flex-col rounded-2xl border p-4 text-left transition-colors sm:min-h-[176px] sm:p-5 ${
+        selected
+          ? 'border-[#2b2f36] bg-[#2b2f36] text-white shadow-sm'
+          : 'border-border-light bg-white text-black hover:border-gray-300'
+      }`}
+    >
+      <span
+        className={`absolute right-3 top-3 flex size-5 items-center justify-center rounded-full border-2 sm:right-4 sm:top-4 ${
+          selected ? 'border-white' : 'border-gray-300'
+        }`}
+        aria-hidden
+      >
+        {selected ? <span className="size-2 rounded-full bg-white" /> : null}
+      </span>
+
+      <span className="pe-8 text-base font-bold leading-snug sm:text-lg">{title}</span>
+      <span
+        className={`mt-2 text-sm leading-snug ${
+          selected ? 'text-white/85' : 'text-text-muted'
+        }`}
+      >
+        {description}
+      </span>
+
+      <div
+        className={`mt-auto border-t pt-3 sm:pt-3.5 ${
+          selected ? 'border-white/20' : 'border-border-light'
+        }`}
+      >
+        <span
+          className={`flex items-center gap-2 text-xs font-medium sm:text-sm ${
+            selected ? 'text-white/90' : 'text-text-muted'
+          }`}
+        >
+          <PaymentIcon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          {paymentLabel}
+        </span>
+      </div>
+    </button>
+  )
+}
+
 export function PpgAgentPortal() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -70,6 +133,8 @@ export function PpgAgentPortal() {
   const [contentType, setContentType] = useState('clothing-fashion')
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
+  const [paymentReceived, setPaymentReceived] = useState(false)
+  const [ppgHomeTab, setPpgHomeTab] = useState<PpgHomeTabId>('booking')
 
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
 
@@ -133,7 +198,7 @@ export function PpgAgentPortal() {
                 className={
                   manualStep === 6
                     ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-0 pt-1'
-                    : 'min-h-0 flex-1 overflow-y-auto pb-4 pt-4'
+                    : ppgManualStepScrollClassName
                 }
               >
                 {manualStep === 1 && (
@@ -166,7 +231,13 @@ export function PpgAgentPortal() {
                     />
                   </div>
                 )}
-                {manualStep === 5 && <ManualPriceBreakdownStep draft={bookingDraft} />}
+                {manualStep === 5 && (
+                  <ManualPriceBreakdownStep
+                    draft={bookingDraft}
+                    paymentReceived={paymentReceived}
+                    onPaymentReceivedChange={setPaymentReceived}
+                  />
+                )}
                 {manualStep === 6 && (
                   <ManualBookingSuccessStep
                     totalLabel={formatBookingAmount(
@@ -189,7 +260,8 @@ export function PpgAgentPortal() {
                       (parcelSizeId !== CARRY_ON_PARCEL_SIZE_ID &&
                         needsPackaging === null))) ||
                   (manualStep === 4 &&
-                    (!isParcelValueProvided(parcelValue) || !dangerousGoodsConfirmed))
+                    (!isParcelValueProvided(parcelValue) || !dangerousGoodsConfirmed)) ||
+                  (manualStep === 5 && !paymentReceived)
                 }
                 onBack={() => {
                   if (manualStep === 1) {
@@ -201,6 +273,9 @@ export function PpgAgentPortal() {
                   if (manualStep === 6) {
                     setManualStep(5)
                     return
+                  }
+                  if (manualStep === 5) {
+                    setPaymentReceived(false)
                   }
                   setManualStep(manualStep - 1)
                 }}
@@ -268,75 +343,85 @@ export function PpgAgentPortal() {
       />
       <div className={`${ppgPageShellClassName} overflow-y-auto`}>
         <div className={ppgPortalPanelClassName}>
-          <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
-            How is the customer booking?
-          </h2>
-          <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">
-            Select how the booking will be made by the customer online using their phone, or
-            manually by you as the agent on their behalf.
-          </p>
+          <PpgHomeTabBar activeTab={ppgHomeTab} onTabChange={setPpgHomeTab} />
 
-          <div className="mb-8 grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setBookingMode('online')}
-              className={manualSegmentButtonClassName(bookingMode === 'online')}
-            >
-              Online Booking
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setBookingMode('manual')
-                startManualFlow()
-              }}
-              className={manualSegmentButtonClassName(bookingMode === 'manual')}
-            >
-              Manual Booking
-            </button>
-          </div>
+          <PpgHomeTabPanel
+            activeTab={ppgHomeTab}
+            bookingContent={
+              <>
+                <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
+                  How is the customer booking?
+                </h2>
+                <p className="mb-5 text-sm leading-relaxed text-text-muted sm:mb-6 sm:text-base">
+                  Select how the booking will be made. The payment method depends on your choice.
+                </p>
 
-          {bookingMode === 'online' && (
-            <>
-              <div className="mb-6">
-                <label
-                  htmlFor="sender-mobile"
-                  className="mb-2 block text-sm font-medium text-text-muted"
-                >
-                  Sender&apos;s mobile number
-                </label>
-                <input
-                  id="sender-mobile"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  value={mobile}
-                  onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
-                  onChange={(e) =>
-                    setMobile((previous) =>
-                      applyAustralianMobileFieldChange(previous, e.target.value),
-                    )
-                  }
-                  placeholder="+61 412 345 678"
-                  className="w-full rounded-xl border border-border-light bg-white px-4 py-3.5 text-base text-black placeholder:text-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                />
-              </div>
+                <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                  <BookingModeOption
+                    selected={bookingMode === 'online'}
+                    title="Online Booking"
+                    description="Customer books online using their phone"
+                    paymentLabel="Online payment only"
+                    paymentIcon={CreditCard}
+                    onClick={() => setBookingMode('online')}
+                  />
+                  <BookingModeOption
+                    selected={bookingMode === 'manual'}
+                    title="Manual Booking"
+                    description="You book on the customer's behalf as the agent"
+                    paymentLabel="Payment in store"
+                    paymentIcon={Store}
+                    onClick={() => {
+                      setBookingMode('manual')
+                      startManualFlow()
+                    }}
+                  />
+                </div>
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="button"
-                  disabled={smsSending}
-                  onClick={handleSendSms}
-                  className={`inline-flex items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
-                >
-                  {smsSending ? 'Sending…' : 'Send SMS'}
-                  {!smsSending && (
-                    <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
-                  )}
-                </button>
-              </div>
-            </>
-          )}
+                {bookingMode === 'online' && (
+                  <>
+                    <div className="mb-6">
+                      <label
+                        htmlFor="sender-mobile"
+                        className="mb-2 block text-sm font-medium text-text-muted"
+                      >
+                        Sender&apos;s mobile number
+                      </label>
+                      <input
+                        id="sender-mobile"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        value={mobile}
+                        onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
+                        onChange={(e) =>
+                          setMobile((previous) =>
+                            applyAustralianMobileFieldChange(previous, e.target.value),
+                          )
+                        }
+                        placeholder="+61 412 345 678"
+                        className={manualInputClassName}
+                      />
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        type="button"
+                        disabled={smsSending}
+                        onClick={handleSendSms}
+                        className={`inline-flex items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
+                      >
+                        {smsSending ? 'Sending…' : 'Send SMS'}
+                        {!smsSending && (
+                          <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+                        )}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </>
+            }
+          />
         </div>
       </div>
     </>

@@ -93,6 +93,53 @@ export function focusAustralianMobileField(current: string) {
   return current.trim() ? current : AU_MOBILE_MIN_INPUT
 }
 
+export function isCompleteAustralianMobile(value: string) {
+  const key = australianMobileKey(value)
+  return key.length === 9 && key.startsWith('4')
+}
+
+export function validateAustralianMobile(value: string): string | null {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return 'Enter a mobile number.'
+  }
+  const key = australianMobileKey(trimmed)
+  if (key.length < 9) {
+    return 'Enter a valid Australian mobile (9 digits starting with 4).'
+  }
+  if (!key.startsWith('4')) {
+    return 'Australian mobiles start with 04 (or +61 4…).'
+  }
+  return null
+}
+
+export interface SenderProfile {
+  email: string
+  businessName: string
+  firstName: string
+  lastName: string
+}
+
+const DEMO_SENDER_PROFILES: Record<string, SenderProfile> = {
+  [australianMobileKey(DEMO_SMS_SUCCESS_MOBILE)]: {
+    email: 'jane@example.com',
+    businessName: 'Hubbed',
+    firstName: 'Jane',
+    lastName: 'Smith',
+  },
+}
+
+/** Demo lookup — returns a profile for the SMS success demo number. */
+export async function lookupSenderProfileByMobile(
+  mobile: string,
+): Promise<SenderProfile | null> {
+  await new Promise((resolve) => window.setTimeout(resolve, 450))
+  if (!isCompleteAustralianMobile(mobile)) {
+    return null
+  }
+  return DEMO_SENDER_PROFILES[australianMobileKey(mobile)] ?? null
+}
+
 /** Mock send — use demo success/failure numbers above. */
 export async function sendBookingLinkSms(mobile: string): Promise<{ ok: boolean; error?: string }> {
   await new Promise((resolve) => window.setTimeout(resolve, 600))

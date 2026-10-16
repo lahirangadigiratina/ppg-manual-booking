@@ -13,10 +13,27 @@ export const PARCEL_SIZE_CATALOG = [
   { id: 'shoebox', name: 'Shoebox', dimensions: '30×25×15 cm', weight: '3kg' },
   { id: 'briefcase', name: 'Briefcase', dimensions: '40×30×15 cm', weight: '5kg' },
   { id: 'carry-on', name: 'Carry On', dimensions: '55×40×20 cm', weight: '12kg' },
-  { id: 'large-box', name: 'Largebox', dimensions: '60×45×30 cm', weight: '15kg' },
-  { id: 'suitcase', name: 'Suitcase', dimensions: '65×45×25 cm', weight: '18kg' },
-  { id: 'heavy-crate', name: 'Heavy crate', dimensions: '80×50×50 cm', weight: '25kg' },
 ] as const
+
+/** Largest weight offered on manual booking step 1. */
+export const MANUAL_PARCEL_MAX_WEIGHT_KG = 12
+
+function parcelCatalogWeightKg(weight: string): number {
+  if (weight.endsWith('kg')) {
+    return Number.parseFloat(weight.slice(0, -2))
+  }
+  if (weight.endsWith('g')) {
+    return Number.parseFloat(weight.slice(0, -1)) / 1000
+  }
+  return Number.POSITIVE_INFINITY
+}
+
+/** Sizes shown in the step 1 grid (excludes anything above 12 kg). */
+export function getManualParcelSizesForBooking() {
+  return PARCEL_SIZE_CATALOG.filter(
+    (size) => parcelCatalogWeightKg(size.weight) <= MANUAL_PARCEL_MAX_WEIGHT_KG,
+  )
+}
 
 export const CONTENT_TYPE_OPTIONS = [
   { value: 'electronics', label: 'Electronics' },
@@ -189,6 +206,33 @@ export function getDeclaredParcelValueAmount(parcelValue: string): number | null
 /** First $100 of cover is included (rate-card $0–$100 bracket). */
 export const PARCEL_PROTECTION_INCLUDED_MAX_VALUE = 100
 
+/** Fee per additional $100 of declared value above the included $100. */
+export const PARCEL_PROTECTION_FEE_PER_100 = BOOKING_CHARGE_AMOUNTS.protection
+
+export function getParcelProtectionBracketCount(declaredValue: number) {
+  if (declaredValue <= PARCEL_PROTECTION_INCLUDED_MAX_VALUE) {
+    return 0
+  }
+  const excess = declaredValue - PARCEL_PROTECTION_INCLUDED_MAX_VALUE
+  return Math.ceil(excess / 100)
+}
+
+export function calculateParcelProtectionFee(declaredValue: number) {
+  return getParcelProtectionBracketCount(declaredValue) * PARCEL_PROTECTION_FEE_PER_100
+}
+
+export function formatParcelProtectionAddonPrice(parcelValue: string) {
+  const amount = getDeclaredParcelValueAmount(parcelValue)
+  if (amount === null) {
+    return null
+  }
+  if (amount <= PARCEL_PROTECTION_INCLUDED_MAX_VALUE) {
+    return null
+  }
+  const fee = calculateParcelProtectionFee(amount)
+  return `+$${fee.toFixed(2)}`
+}
+
 export function isParcelProtectionIncluded(parcelValue: string) {
   const amount = getDeclaredParcelValueAmount(parcelValue)
   return amount !== null && amount <= PARCEL_PROTECTION_INCLUDED_MAX_VALUE
@@ -218,7 +262,11 @@ export function getParcelProtectionChargeAmount(
     return 0
   }
   if (selectedAddons.includes('protection')) {
-    return BOOKING_CHARGE_AMOUNTS.protection
+    const declared = getDeclaredParcelValueAmount(parcelValue)
+    if (declared === null) {
+      return null
+    }
+    return calculateParcelProtectionFee(declared)
   }
   return null
 }

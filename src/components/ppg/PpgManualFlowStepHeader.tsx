@@ -15,7 +15,8 @@ const STEP_TITLES: Record<number, { step: number; title: string; helperText: str
   2: {
     step: 2,
     title: 'Sender Details',
-    helperText: 'Enter the sender’s contact and business details for this shipment.',
+    helperText:
+      'Enter the sender’s mobile first. If we recognize the number, we’ll fill in their details.',
   },
   3: {
     step: 3,

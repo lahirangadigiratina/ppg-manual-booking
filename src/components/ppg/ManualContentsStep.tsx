@@ -120,8 +120,6 @@ export function ManualContentsStep({
   contentType,
   onContentTypeChange,
 }: ManualContentsStepProps) {
-  const [referenceNumber, setReferenceNumber] = useState('')
-
   return (
     <div>
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
@@ -144,20 +142,6 @@ export function ManualContentsStep({
             onChange={(e) => onParcelValueChange(e.target.value)}
             className={manualInputClassName}
             aria-required="true"
-          />
-        </div>
-
-        <div>
-          <ManualFieldLabel htmlFor="reference-number">
-            Reference number (optional)
-          </ManualFieldLabel>
-          <input
-            id="reference-number"
-            type="text"
-            value={referenceNumber}
-            onChange={(e) => setReferenceNumber(e.target.value)}
-            placeholder="e.g. REF2026ORDER001"
-            className={manualInputClassName}
           />
         </div>
       </form>

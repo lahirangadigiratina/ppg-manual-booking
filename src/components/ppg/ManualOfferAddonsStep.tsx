@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from 'react'
 import { DangerousGoodsDialog } from './DangerousGoodsDialog'
 import { ParcelProtectionDialog } from './ParcelProtectionDialog'
 import {
+  formatParcelProtectionAddonPrice,
   getDeclaredParcelValueAmount,
   isParcelProtectionIncluded,
 } from './manualBookingState'
@@ -35,7 +36,7 @@ const addonOptions: AddonOption[] = [
   {
     id: 'protection',
     label: 'Parcel Protection',
-    price: '+$2.50',
+    price: '',
     icon: Shield,
   },
 ]
@@ -81,6 +82,8 @@ export function ManualOfferAddonsStep({
 
   const addonsEnabled = parcelValueEnablesAddons(parcelValue)
   const protectionIncluded = addonsEnabled && isParcelProtectionIncluded(parcelValue)
+  const protectionAddonPrice =
+    formatParcelProtectionAddonPrice(parcelValue) ?? '+$2.50 per $100 above $100'
 
   useEffect(() => {
     if (!protectionIncluded || !selectedAddons.includes('protection')) {
@@ -191,7 +194,9 @@ export function ManualOfferAddonsStep({
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-                <p className="text-base font-bold text-black">{addon.price}</p>
+                <p className="text-base font-bold text-black">
+                  {addon.id === 'protection' ? protectionAddonPrice : addon.price}
+                </p>
                 <AddonRadioIndicator selected={selected} />
               </div>
             </button>
