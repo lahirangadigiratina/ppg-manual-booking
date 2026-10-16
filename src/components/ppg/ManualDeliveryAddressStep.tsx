@@ -66,7 +66,7 @@ function AddressSearchInput({
   return (
     <div ref={rootRef} className="relative">
       <Search
-        className="pointer-events-none absolute left-4 top-1/2 z-10 size-5 -translate-y-1/2 text-gray-500"
+        className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-gray-500 sm:left-3.5 sm:size-5"
         strokeWidth={1.75}
         aria-hidden
       />
@@ -109,7 +109,7 @@ function AddressSearchInput({
         }}
         placeholder="Search address"
         autoComplete="off"
-        className={`${manualInputClassName} py-3.5 pl-12`}
+        className={`${manualInputClassName} py-2.5 !pl-11 !pr-3.5 text-sm sm:!pl-12 sm:!pr-4 sm:text-base`}
       />
 
       {showDropdown && (
@@ -158,7 +158,7 @@ function AddressSearchInput({
 
 function DeliveryBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f9fafb] px-3 py-1.5 text-xs font-normal text-gray-600 shadow-[0_1px_2px_rgba(15,23,42,0.06)]">
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#f9fafb] px-2 py-0.5 text-[11px] font-normal leading-snug text-gray-600 shadow-[0_1px_2px_rgba(15,23,42,0.06)] sm:px-2.5 sm:py-1 sm:text-xs">
       {children}
     </span>
   )
@@ -196,37 +196,34 @@ export function ManualDeliveryAddressStep({
   const doorFooterAddress = address.trim() || activeRoute.defaultAddress
 
   return (
-    <div className="flex flex-col gap-3">
-      <section
-        className="rounded-lg border border-border-light bg-white p-2.5 sm:p-3"
-        aria-labelledby="receiver-address-label"
-      >
+    <div className="flex flex-col gap-4">
+      <div aria-labelledby="receiver-address-label">
         <ManualFieldLabel htmlFor="receiver-address" id="receiver-address-label">
           Receiver Address
         </ManualFieldLabel>
         <AddressSearchInput value={address} onChange={onAddressChange} />
-      </section>
+      </div>
 
       <section
         aria-label="Delivery method"
-        className="relative w-full rounded-xl border-2 border-hubbed-orange bg-hubbed-orange-tint p-4 sm:p-5"
+        className="relative w-full rounded-lg border-2 border-hubbed-orange bg-hubbed-orange-tint p-2.5 sm:p-3"
       >
-          <div className="flex items-start gap-3 sm:gap-4">
+          <div className="flex items-start gap-2.5">
             <span
-              className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-light bg-white text-xl leading-none"
+              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border-light bg-white text-lg leading-none"
               aria-hidden
             >
               🏠
             </span>
             <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-black">Deliver to Door</p>
-                  <p className="mt-0.5 text-sm text-text-muted">{activeRoute.areaLabel}</p>
+                  <p className="text-sm font-bold text-black sm:text-base">Deliver to Door</p>
+                  <p className="text-xs text-text-muted sm:text-sm">{activeRoute.areaLabel}</p>
                 </div>
-                <p className="shrink-0 text-base font-bold text-black sm:text-lg">$11.50</p>
+                <p className="shrink-0 text-sm font-bold text-black sm:text-base">$11.50</p>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-1.5">
                 <DeliveryBadge>
                   <span className="text-sm leading-none" aria-hidden>
                     🏠
@@ -236,7 +233,7 @@ export function ManualDeliveryAddressStep({
               </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2 border-t border-border-light pt-3 text-sm text-text-muted sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="mt-2.5 flex flex-col gap-1 border-t border-border-light pt-2 text-xs text-text-muted sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:text-sm">
             <span className="min-w-0 text-left leading-snug">{doorFooterAddress}</span>
             <span className="shrink-0 sm:text-right">
               Delivered by <span className="font-bold text-black">Mon, 12 Oct</span>

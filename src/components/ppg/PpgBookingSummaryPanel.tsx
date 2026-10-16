@@ -1,6 +1,7 @@
 import { Box, CircleDollarSign, Route, Shield } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { manualFlowStepTitleClassName } from './manualFormShared'
 import {
   buildExtrasSummary,
   buildRouteSummary,
@@ -25,12 +26,12 @@ function SummaryBlock({
 }) {
   return (
     <div
-      className={`flex gap-3 border-b border-border-light py-4 last:border-b-0 ${
+      className={`flex gap-2 border-b border-border-light py-2 last:border-b-0 sm:gap-2.5 sm:py-2.5 ${
         faded ? 'opacity-45' : ''
       }`}
     >
       <span
-        className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
+        className={`flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10 ${
           faded ? 'bg-gray-50' : 'bg-gray-100'
         }`}
       >
@@ -63,12 +64,12 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
 
   return (
     <aside
-      className={`flex flex-col rounded-sm border border-border-light bg-white p-5 sm:p-6 ${className}`}
+      className={`flex flex-col rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:sticky lg:top-0 ${className}`}
       aria-label="Booking summary"
     >
-      <h2 className="text-base font-bold text-black sm:text-lg">Booking Summary</h2>
+      <h2 className={manualFlowStepTitleClassName}>Booking Summary</h2>
 
-      <div className="mt-2">
+      <div className="mt-1.5">
         <SummaryBlock icon={Box} label="Parcel">
           <p
             className={`text-sm font-bold ${parcel ? 'text-black' : 'text-text-muted italic'}`}
@@ -104,7 +105,7 @@ export function PpgBookingSummaryPanel({ draft, className = '' }: PpgBookingSumm
 
         <SummaryBlock icon={CircleDollarSign} label="Estimated Price">
           <p
-            className={`text-2xl font-bold tracking-tight ${
+            className={`text-xl font-bold tracking-tight sm:text-2xl ${
               total === null ? 'text-gray-300' : 'text-black'
             }`}
           >

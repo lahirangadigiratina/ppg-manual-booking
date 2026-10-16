@@ -76,7 +76,7 @@ export function ManualSenderDetailsStep() {
 
   return (
     <div>
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()} noValidate>
+      <form className="space-y-3.5 sm:space-y-4" onSubmit={(e) => e.preventDefault()} noValidate>
         <div>
           <ManualFieldLabel htmlFor="sender-phone" required>
             Phone number
@@ -152,7 +152,7 @@ export function ManualSenderDetailsStep() {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div>
             <ManualFieldLabel htmlFor="sender-first-name" required>
               First Name

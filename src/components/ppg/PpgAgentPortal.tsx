@@ -41,12 +41,16 @@ type PortalScreen = 'home' | 'manual'
 const ppgPageShellClassName =
   'mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8'
 
+const ppgManualPageShellClassName =
+  'mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4'
+
 const ppgWhitePanelClassName =
   'flex w-full min-h-0 flex-col rounded-sm border border-border-light bg-white p-4 sm:p-6 lg:p-8'
 
 const ppgPortalPanelClassName = `${ppgWhitePanelClassName} mx-auto w-full max-w-xl`
 
-const ppgManualFormPanelClassName = `${ppgWhitePanelClassName} w-full max-w-xl lg:flex-none`
+const ppgManualFormPanelClassName =
+  'flex w-full max-w-xl min-h-0 flex-1 flex-col rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:p-5'
 
 const ppgManualStepScrollClassName =
   'min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-4 pt-4 pe-3 sm:pe-4 [scrollbar-gutter:stable]'
@@ -185,14 +189,20 @@ export function PpgAgentPortal() {
     }
 
     return (
-      <div className={`${ppgPageShellClassName} overflow-y-auto`}>
+      <div
+        className={`${ppgManualPageShellClassName} flex h-full min-h-0 flex-1 flex-col overflow-hidden`}
+      >
         <div
-          className={`mx-auto flex w-full min-h-0 flex-1 flex-col gap-5 lg:flex-row lg:items-stretch lg:justify-center lg:gap-6 ${
+          className={`mx-auto flex w-full min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-stretch lg:justify-center lg:gap-5 ${
             showBookingSummary ? 'max-w-[920px]' : 'max-w-xl'
           }`}
         >
-          <div className={`${ppgManualFormPanelClassName} min-h-0 min-w-0`}>
-            <div className="flex h-full min-h-0 w-full flex-col">
+          <div className={`${ppgManualFormPanelClassName} min-w-0`}>
+            <div
+              className={`flex w-full flex-col ${
+                manualStep === 6 ? '' : 'h-full min-h-0 flex-1'
+              }`}
+            >
               <PpgManualFlowStepHeader manualStep={manualStep} />
               <div
                 className={

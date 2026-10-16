@@ -1,6 +1,10 @@
 import { Check, Copy, MapPin, Package, Printer } from 'lucide-react'
 import { useState } from 'react'
-import { manualSecondaryButtonClassName } from './manualFormShared'
+import {
+  manualFlowStepHelperClassName,
+  manualFlowStepTitleClassName,
+  manualSecondaryButtonClassName,
+} from './manualFormShared'
 
 export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
@@ -41,11 +45,9 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
           </span>
         </div>
 
-        <h2 className="text-lg font-bold text-black sm:text-xl">All Booked!</h2>
-        <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
-          Payment received — shipment is booked
-        </p>
-        <p className="text-xs text-text-muted sm:text-sm">
+        <h2 className={manualFlowStepTitleClassName}>All Booked!</h2>
+        <p className={manualFlowStepHelperClassName}>Payment received — shipment is booked</p>
+        <p className={`${manualFlowStepHelperClassName} mt-0 line-clamp-none`}>
           Digital Receipt has been sent to the Customer
         </p>
         <p className="mt-1 text-xs font-bold text-black sm:text-sm">

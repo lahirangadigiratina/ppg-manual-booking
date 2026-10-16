@@ -18,7 +18,7 @@ export function PpgManualStepFooter({
   }
 
   return (
-    <div className="shrink-0 border-t border-border-light bg-white pt-4">
+    <div className="shrink-0 border-t border-border-light bg-white pt-2">
       <ManualStepNav
         onBack={onBack}
         onNext={onNext}

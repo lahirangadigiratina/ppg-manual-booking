@@ -9,8 +9,7 @@ const STEP_TITLES: Record<number, { step: number; title: string; helperText: str
   1: {
     step: 1,
     title: 'Parcel Details',
-    helperText:
-      'Select parcel size and packaging, then enter the receiver’s address and confirm door delivery.',
+    helperText: 'Size, packaging, receiver address, and door delivery.',
   },
   2: {
     step: 2,
@@ -35,7 +34,7 @@ export function PpgManualFlowStepHeader({ manualStep }: { manualStep: number }) 
   if (manualStep === 4) {
     return (
       <>
-        <div className="shrink-0 border-b border-border-light bg-white pb-4">
+        <div className="shrink-0 border-b border-border-light bg-white pb-2">
           <ManualContentsStepHeading
             pinned
             onDangerousGoodsClick={() => setDangerousGoodsOpen(true)}
@@ -55,7 +54,7 @@ export function PpgManualFlowStepHeader({ manualStep }: { manualStep: number }) 
   }
 
   return (
-    <div className="shrink-0 border-b border-border-light bg-white pb-4">
+    <div className="shrink-0 border-b border-border-light bg-white pb-1.5">
       <ManualStepHeading
         step={meta.step}
         title={meta.title}

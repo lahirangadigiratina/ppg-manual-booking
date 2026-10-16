@@ -9,7 +9,7 @@ export function ManualReceiverDetailsStep() {
 
   return (
     <div>
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-3.5 sm:space-y-4" onSubmit={(e) => e.preventDefault()}>
         <div>
           <ManualFieldLabel htmlFor="receiver-business-name">
             Business Name (optional)
@@ -22,7 +22,7 @@ export function ManualReceiverDetailsStep() {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div>
             <ManualFieldLabel htmlFor="receiver-first-name" required>
               First Name

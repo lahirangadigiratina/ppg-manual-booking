@@ -4,7 +4,11 @@ import {
   formatBookingAmount,
   type ManualBookingDraft,
 } from './manualBookingState'
-import { ManualCheckStepHeading } from './manualFormShared'
+import {
+  ManualCheckStepHeading,
+  manualFlowStepHelperClassName,
+  manualFlowStepTitleClassName,
+} from './manualFormShared'
 
 function PriceRow({ label, amount, bold }: { label: string; amount: string; bold?: boolean }) {
   return (
@@ -58,11 +62,11 @@ export function ManualPriceBreakdownStep({
         className="mt-6 rounded-xl border border-border-light bg-white p-4 sm:p-5"
         aria-labelledby="payment-required-heading"
       >
-        <h3 id="payment-required-heading" className="text-base font-bold text-black sm:text-lg">
+        <h3 id="payment-required-heading" className={manualFlowStepTitleClassName}>
           Payment required
         </h3>
 
-        <p className="mt-3 text-sm leading-snug text-text-muted sm:text-base">
+        <p className={`${manualFlowStepHelperClassName} mt-2 line-clamp-none`}>
           Collect {totalLabel} from the customer via EFTPOS or cash. This booking cannot be
           completed until payment is confirmed.
         </p>
