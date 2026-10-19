@@ -12,6 +12,14 @@ export const manualPrimaryButtonClassName = `rounded-md bg-black px-6 text-white
 
 export const manualSecondaryButtonClassName = `rounded-md border border-border-light bg-white px-6 text-black transition-colors hover:bg-gray-50 ${manualButtonSizeClassName}`
 
+/** User-facing label for agent-led (in-store) booking — not the code “manual” mode id */
+export const IN_STORE_BOOKING_TITLE = 'In Store Booking'
+
+export const IN_STORE_BOOKING_INTRO_SUFFIX =
+  'In store payment can be collected through EFTPOS or Cash.'
+
+export const CONTINUE_IN_STORE_BOOKING_LABEL = 'Continue with in store booking'
+
 /** Manual booking flow — consistent step titles and helper copy */
 export const manualFlowStepTitleClassName =
   'text-base font-bold text-black sm:text-lg'
@@ -21,6 +29,9 @@ export const manualFlowStepHelperClassName =
 
 export const manualFlowStepBadgeClassName =
   'flex size-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white'
+
+export const manualFieldLabelClassName =
+  'block text-xs font-bold text-black sm:text-sm'
 
 export function manualSegmentButtonClassName(active: boolean) {
   return `w-full rounded-md px-4 transition-colors ${manualButtonSizeClassName} ${
@@ -45,7 +56,7 @@ export function ManualFieldLabel({
     <label
       htmlFor={htmlFor}
       id={id}
-      className="mb-0.5 block text-xs font-medium text-text-muted"
+      className={`mb-0.5 ${manualFieldLabelClassName}`}
     >
       {children}
       {required && <span className="text-red-600"> *</span>}

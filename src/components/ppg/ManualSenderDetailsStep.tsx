@@ -1,15 +1,19 @@
+import { ArrowRight } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { ManualFieldLabel, manualInputClassName } from './manualFormShared'
 import {
   applyAustralianMobileFieldChange,
+  australianMobileKey,
   focusAustralianMobileField,
   isCompleteAustralianMobile,
   lookupSenderProfileByMobile,
   validateAustralianMobile,
 } from './ppgSmsUtils'
 
-function fieldClassName(hasError: boolean) {
+function fieldClassName(hasError: boolean, withTrailingAction: boolean) {
   return `${manualInputClassName}${
+    withTrailingAction ? ' !pr-11 sm:!pr-12' : ''
+  }${
     hasError
       ? ' border-red-500 focus:border-red-500 focus:ring-red-100'
       : ''
@@ -74,6 +78,17 @@ export function ManualSenderDetailsStep() {
     }
   }
 
+  function submitPhoneLookup() {
+    if (!phone.trim()) {
+      setPhoneError('Enter a mobile number.')
+      setPhoneHint(null)
+      return
+    }
+    void runPhoneValidationAndLookup(phone)
+  }
+
+  const showPhoneLookupAction = australianMobileKey(phone).length > 1
+
   return (
     <div>
       <form className="space-y-3.5 sm:space-y-4" onSubmit={(e) => e.preventDefault()} noValidate>
@@ -81,26 +96,45 @@ export function ManualSenderDetailsStep() {
           <ManualFieldLabel htmlFor="sender-phone" required>
             Phone number
           </ManualFieldLabel>
-          <input
-            id="sender-phone"
-            type="tel"
-            inputMode="tel"
-            placeholder="+61 412 345 678"
-            className={fieldClassName(Boolean(phoneError))}
-            autoComplete="tel"
-            value={phone}
-            aria-invalid={phoneError ? true : undefined}
-            aria-describedby={
-              phoneError
-                ? 'sender-phone-error'
-                : phoneHint
-                  ? 'sender-phone-hint'
-                  : undefined
-            }
-            onFocus={() => setPhone((current) => focusAustralianMobileField(current))}
-            onChange={(e) => handlePhoneChange(e.target.value)}
-            onBlur={handlePhoneBlur}
-          />
+          <div className="relative">
+            <input
+              id="sender-phone"
+              type="tel"
+              inputMode="tel"
+              placeholder="+61 412 345 678"
+              className={fieldClassName(Boolean(phoneError), showPhoneLookupAction)}
+              autoComplete="tel"
+              value={phone}
+              aria-invalid={phoneError ? true : undefined}
+              aria-describedby={
+                phoneError
+                  ? 'sender-phone-error'
+                  : phoneHint
+                    ? 'sender-phone-hint'
+                    : undefined
+              }
+              onFocus={() => setPhone((current) => focusAustralianMobileField(current))}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              onBlur={handlePhoneBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && showPhoneLookupAction) {
+                  e.preventDefault()
+                  submitPhoneLookup()
+                }
+              }}
+            />
+            {showPhoneLookupAction ? (
+              <button
+                type="button"
+                onClick={submitPhoneLookup}
+                disabled={lookupPending}
+                className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md bg-black text-white transition-colors hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50 sm:right-2.5"
+                aria-label="Look up sender by phone number"
+              >
+                <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+              </button>
+            ) : null}
+          </div>
           {phoneError ? (
             <p id="sender-phone-error" className="mt-1.5 text-sm text-red-600" role="alert">
               {phoneError}

@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { Boxes, Briefcase, Package, ShoppingBag } from 'lucide-react'
 import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
-import { ManualFieldLabel } from './manualFormShared'
+import { ManualFieldLabel, manualFieldLabelClassName } from './manualFormShared'
 import {
   CARRY_ON_PARCEL_SIZE_ID,
   getManualParcelSizesForBooking,
@@ -17,10 +17,10 @@ const parcelSizeIcons: Record<string, LucideIcon> = {
   'carry-on': Boxes,
 }
 
-function compactSegmentButtonClassName(active: boolean) {
-  return `w-full rounded-md px-3 py-1.5 text-xs font-semibold transition-colors sm:py-2 sm:text-sm ${
+function packagingChoiceButtonClassName(active: boolean) {
+  return `w-full rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors sm:py-2 sm:text-sm ${
     active
-      ? 'bg-[#2b2f36] text-white'
+      ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint text-black'
       : 'border border-border-light bg-white text-text-muted hover:border-gray-300'
   }`
 }
@@ -63,7 +63,7 @@ export function ManualParcelDetailsStep({
         </ManualFieldLabel>
         <div
           id="parcel-size-grid"
-          className="grid w-full grid-cols-2 gap-1.5 sm:gap-2"
+          className="grid w-full grid-cols-4 gap-1 sm:gap-1.5"
           role="listbox"
           aria-label="Parcel size"
           aria-required="true"
@@ -79,21 +79,23 @@ export function ManualParcelDetailsStep({
                 aria-selected={selected}
                 aria-label={`${size.name}, ${size.dimensions}, up to ${size.weight}`}
                 onClick={() => selectSize(size.id)}
-                className={`relative flex w-full flex-col items-center rounded-lg border px-1.5 py-2 text-center transition-colors sm:px-2 sm:py-2.5 ${
+                className={`relative flex min-h-[108px] min-w-0 w-full flex-col items-center justify-center rounded-lg border px-1.5 py-3 text-center transition-colors sm:min-h-[116px] sm:px-2 sm:py-3.5 ${
                   selected
                     ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
                     : 'border border-border-light bg-white hover:border-gray-300'
                 }`}
               >
                 <span
-                  className={`mb-1 flex size-8 items-center justify-center rounded-md border bg-white sm:size-9 ${
+                  className={`mb-1.5 flex size-9 items-center justify-center rounded-md border bg-white sm:mb-2 sm:size-10 ${
                     selected ? 'border-hubbed-orange' : 'border-border-light'
                   }`}
                 >
-                  <Icon className="size-4 text-gray-900" strokeWidth={1.5} aria-hidden />
+                  <Icon className="size-[18px] text-gray-900 sm:size-5" strokeWidth={1.5} aria-hidden />
                 </span>
-                <span className="text-xs font-bold leading-tight text-black">{size.name}</span>
-                <span className="mt-0.5 text-[10px] leading-tight text-text-muted sm:text-xs">
+                <span className="w-full truncate text-[10px] font-bold leading-tight text-black sm:text-xs">
+                  {size.name}
+                </span>
+                <span className="mt-1 w-full truncate text-[9px] leading-tight text-text-muted sm:text-[10px]">
                   Up to <span className="font-bold text-black">{size.weight}</span>
                 </span>
               </button>
@@ -106,7 +108,7 @@ export function ManualParcelDetailsStep({
         <div className="shrink-0" aria-labelledby="parcel-packaging-heading">
           <p
             id="parcel-packaging-heading"
-            className="mb-1.5 text-xs font-medium leading-snug text-text-muted"
+            className={`mb-1.5 leading-snug ${manualFieldLabelClassName}`}
           >
             Does the customer need packaging?
             <span className="text-red-600"> *</span>{' '}
@@ -126,7 +128,7 @@ export function ManualParcelDetailsStep({
               role="radio"
               aria-checked={needsPackaging === true}
               onClick={() => onNeedsPackagingChange(true)}
-              className={compactSegmentButtonClassName(needsPackaging === true)}
+              className={packagingChoiceButtonClassName(needsPackaging === true)}
             >
               Yes
             </button>
@@ -135,7 +137,7 @@ export function ManualParcelDetailsStep({
               role="radio"
               aria-checked={needsPackaging === false}
               onClick={() => onNeedsPackagingChange(false)}
-              className={compactSegmentButtonClassName(needsPackaging === false)}
+              className={packagingChoiceButtonClassName(needsPackaging === false)}
             >
               No
             </button>

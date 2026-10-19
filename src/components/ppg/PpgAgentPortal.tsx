@@ -25,7 +25,11 @@ import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
 import {
+  IN_STORE_BOOKING_INTRO_SUFFIX,
+  IN_STORE_BOOKING_TITLE,
   ManualFieldLabel,
+  manualFlowStepHelperClassName,
+  manualFlowStepTitleClassName,
   manualInputClassName,
   manualPrimaryButtonClassName,
 } from './manualFormShared'
@@ -47,13 +51,11 @@ const ppgPageShellClassName =
 const ppgManualPageShellClassName =
   'mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4'
 
-const ppgWhitePanelClassName =
-  'flex w-full min-h-0 flex-col rounded-sm border border-border-light bg-white p-4 sm:p-6 lg:p-8'
-
-const ppgPortalPanelClassName = `${ppgWhitePanelClassName} mx-auto w-full max-w-xl`
-
 const ppgManualFormPanelClassName =
   'flex w-full max-w-xl min-h-0 flex-1 flex-col rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:p-5'
+
+const ppgPortalPanelClassName =
+  'mx-auto flex w-full max-w-xl shrink-0 flex-col rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:p-5'
 
 const ppgManualStepScrollClassName =
   'min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-4 pt-4 pe-3 sm:pe-4 [scrollbar-gutter:stable]'
@@ -78,14 +80,14 @@ function BookingModeOption({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`relative flex min-h-[168px] flex-col rounded-2xl border p-4 text-left transition-colors sm:min-h-[176px] sm:p-5 ${
+      className={`relative flex flex-col rounded-lg border p-3 text-left transition-colors sm:p-3.5 ${
         selected
           ? 'border-[#2b2f36] bg-[#2b2f36] text-white shadow-sm'
           : 'border-border-light bg-white text-black hover:border-gray-300'
       }`}
     >
       <span
-        className={`absolute right-3 top-3 flex size-5 items-center justify-center rounded-full border-2 sm:right-4 sm:top-4 ${
+        className={`absolute right-2.5 top-2.5 flex size-4 items-center justify-center rounded-full border-2 sm:right-3 sm:top-3 ${
           selected ? 'border-white' : 'border-gray-300'
         }`}
         aria-hidden
@@ -93,9 +95,9 @@ function BookingModeOption({
         {selected ? <span className="size-2 rounded-full bg-white" /> : null}
       </span>
 
-      <span className="pe-8 text-base font-bold leading-snug sm:text-lg">{title}</span>
+      <span className="pe-7 text-sm font-bold leading-snug sm:text-base">{title}</span>
       <span
-        className={`mt-2 text-sm leading-snug ${
+        className={`mt-1.5 text-xs leading-snug sm:text-sm ${
           selected ? 'text-white/85' : 'text-text-muted'
         }`}
       >
@@ -103,16 +105,16 @@ function BookingModeOption({
       </span>
 
       <div
-        className={`mt-auto border-t pt-3 sm:pt-3.5 ${
+        className={`mt-2 border-t pt-2 sm:mt-2.5 sm:pt-2 ${
           selected ? 'border-white/20' : 'border-border-light'
         }`}
       >
         <span
-          className={`flex items-center gap-2 text-xs font-medium sm:text-sm ${
+          className={`flex items-center gap-1.5 text-[11px] font-medium sm:text-xs ${
             selected ? 'text-white/90' : 'text-text-muted'
           }`}
         >
-          <PaymentIcon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          <PaymentIcon className="size-3.5 shrink-0 sm:size-4" strokeWidth={1.75} aria-hidden />
           {paymentLabel}
         </span>
       </div>
@@ -199,16 +201,12 @@ export function PpgAgentPortal() {
           }`}
         >
           <div className={`${ppgManualFormPanelClassName} min-w-0`}>
-            <div
-              className={`flex w-full flex-col ${
-                manualStep === 6 ? '' : 'h-full min-h-0 flex-1'
-              }`}
-            >
+            <div className="flex h-full min-h-0 flex-1 w-full flex-col">
               <PpgManualFlowStepHeader manualStep={manualStep} />
               <div
                 className={
                   manualStep === 6
-                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-0 pt-1'
+                    ? 'flex min-h-0 flex-1 flex-col overflow-hidden pb-0 pt-0'
                     : ppgManualStepScrollClassName
                 }
               >
@@ -251,6 +249,7 @@ export function PpgAgentPortal() {
                 )}
                 {manualStep === 6 && (
                   <ManualBookingSuccessStep
+                    draft={bookingDraft}
                     totalLabel={formatBookingAmount(
                       calculateBookingTotal(bookingDraft) ?? 0,
                     )}
@@ -352,17 +351,17 @@ export function PpgAgentPortal() {
         mobileNumber={mobile}
         onClose={() => setSmsLinkSentOpen(false)}
       />
-      <div className={`${ppgPageShellClassName} overflow-y-auto`}>
+      <div className={`${ppgManualPageShellClassName} items-start overflow-y-auto`}>
         <div className={ppgPortalPanelClassName}>
-          <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
-            How is the customer booking?
-          </h2>
-          <p className="mb-5 text-sm leading-relaxed text-text-muted sm:mb-6 sm:text-base">
-            Select how the booking will be made. Online payment is via payment gateway while
-            Manual can be collected through EFTPOS or Cash.
+          <h2 className={manualFlowStepTitleClassName}>How is the customer booking?</h2>
+          <p className={`${manualFlowStepHelperClassName} mb-3 line-clamp-none sm:mb-4`}>
+            Select how the booking will be made. Online payment is via payment gateway while{' '}
+            {IN_STORE_BOOKING_INTRO_SUFFIX}
           </p>
 
-          <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          <div
+            className={`grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 ${bookingMode === 'online' ? 'mb-3 sm:mb-4' : 'mb-0'}`}
+          >
             <BookingModeOption
               selected={bookingMode === 'online'}
               title="Online Booking"
@@ -373,7 +372,7 @@ export function PpgAgentPortal() {
             />
             <BookingModeOption
               selected={bookingMode === 'manual'}
-              title="Manual Booking"
+              title={IN_STORE_BOOKING_TITLE}
               description="You book on the customer's behalf as the agent"
               paymentLabel="Payment in store"
               paymentIcon={Store}
@@ -385,7 +384,7 @@ export function PpgAgentPortal() {
           </div>
 
           {bookingMode === 'online' && (
-            <section className="flex flex-col gap-4 pt-1">
+            <section className="flex flex-col gap-3 pt-0 sm:gap-3.5">
               <div>
                 <ManualFieldLabel htmlFor="sender-mobile">
                   Sender&apos;s mobile number

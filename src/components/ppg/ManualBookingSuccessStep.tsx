@@ -1,4 +1,9 @@
-import { Check, Copy, MapPin, Package, Printer } from 'lucide-react'
+import { Check, Copy, Package, Printer } from 'lucide-react'
+import type { ManualBookingDraft } from './manualBookingState'
+import {
+  buildSuccessParcelSubtitle,
+  buildSuccessRouteHeadline,
+} from './manualBookingState'
 import { useState } from 'react'
 import {
   manualFlowStepHelperClassName,
@@ -11,11 +16,18 @@ const successFooterButtonClassName =
 export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
 interface ManualBookingSuccessStepProps {
+  draft: ManualBookingDraft
   totalLabel: string
   onNext?: () => void
 }
 
-export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSuccessStepProps) {
+export function ManualBookingSuccessStep({
+  draft,
+  totalLabel,
+  onNext,
+}: ManualBookingSuccessStepProps) {
+  const routeHeadline = buildSuccessRouteHeadline(draft)
+  const parcelSubtitle = buildSuccessParcelSubtitle(draft)
   const [trackingCopied, setTrackingCopied] = useState(false)
 
   const copyTrackingNumber = async () => {
@@ -39,7 +51,8 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden py-0.5 text-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-0.5 py-3 sm:py-4">
+        <div className="flex w-full flex-col items-center text-center">
         <div className="relative mb-2 flex size-12 shrink-0 items-center justify-center sm:mb-2.5 sm:size-14">
           <span className="absolute inset-0 rounded-full bg-green-100" aria-hidden />
           <span className="relative flex size-9 items-center justify-center rounded-full bg-green-600 sm:size-10">
@@ -62,20 +75,8 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
               <Package className="size-4 text-amber-800/80 sm:size-5" strokeWidth={1.75} aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="flex flex-wrap items-center gap-1 text-xs font-semibold text-black">
-                <MapPin className="size-3 shrink-0 text-red-500" strokeWidth={2} aria-hidden />
-                <span>Kavanaghs Pharmacy</span>
-                <span className="font-normal text-text-muted">→</span>
-              </p>
-              <p className="mt-0.5 flex items-start gap-1 text-xs font-semibold text-black">
-                <MapPin
-                  className="mt-0.5 size-3 shrink-0 text-red-500"
-                  strokeWidth={2}
-                  aria-hidden
-                />
-                <span>15/37 Nicholson St, Balmain East</span>
-              </p>
-              <p className="mt-0.5 text-xs text-text-muted">Handbag · 1kg</p>
+              <p className="text-sm font-semibold leading-snug text-black">{routeHeadline}</p>
+              <p className="mt-0.5 text-xs text-text-muted sm:text-sm">{parcelSubtitle}</p>
             </div>
             <div className="shrink-0 text-right">
               <p className="text-xs font-bold text-black sm:text-sm">{totalLabel}</p>
@@ -83,31 +84,29 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
             </div>
           </div>
 
-          <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1 border-t border-border-light px-2.5 py-2 text-xs sm:px-3">
+          <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5 border-t border-border-light px-2.5 py-2.5 text-sm sm:px-3 sm:py-3">
             <span className="text-text-muted">Booking Ref</span>
             <span className="justify-self-end font-bold text-black">PPG-48213</span>
             <span className="text-text-muted">Tracking</span>
-            <div className="flex items-center justify-end gap-1 justify-self-end">
+            <div className="flex items-center justify-end gap-1.5 justify-self-end">
               <span className="font-bold text-black">{BOOKING_TRACKING_NUMBER}</span>
               <button
                 type="button"
                 onClick={copyTrackingNumber}
-                className="rounded-md p-0.5 text-text-muted transition-colors hover:bg-gray-100 hover:text-black"
+                className="rounded-md p-1 text-text-muted transition-colors hover:bg-gray-100 hover:text-black"
                 aria-label={trackingCopied ? 'Tracking number copied' : 'Copy tracking number'}
               >
                 {trackingCopied ? (
-                  <Check className="size-3.5 text-green-600" strokeWidth={2.5} aria-hidden />
+                  <Check className="size-4 text-green-600" strokeWidth={2.5} aria-hidden />
                 ) : (
-                  <Copy className="size-3.5" strokeWidth={2} aria-hidden />
+                  <Copy className="size-4" strokeWidth={2} aria-hidden />
                 )}
               </button>
             </div>
           </div>
         </article>
-      </div>
 
-      <div className="shrink-0 bg-white pt-2.5 pb-0.5">
-        <div className="flex w-full flex-col gap-2">
+        <div className="mt-3 flex w-full shrink-0 flex-col gap-2 sm:mt-4">
           <button
             type="button"
             onClick={() => window.print()}
@@ -121,8 +120,9 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
             onClick={() => void proceedToDropoff()}
             className={`${successFooterButtonClassName} bg-hubbed-orange text-white transition-colors hover:bg-hubbed-orange-hover`}
           >
-            Proceed to Dropoff
+            <span className="inline-block translate-x-1">Proceed to Dropoff</span>
           </button>
+        </div>
         </div>
       </div>
     </div>

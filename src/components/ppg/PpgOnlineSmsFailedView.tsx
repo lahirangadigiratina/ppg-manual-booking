@@ -6,6 +6,7 @@ import {
   sendBookingLinkSms,
 } from './ppgSmsUtils'
 import {
+  CONTINUE_IN_STORE_BOOKING_LABEL,
   manualPrimaryButtonClassName,
   manualSecondaryButtonClassName,
 } from './manualFormShared'
@@ -95,7 +96,7 @@ export function PpgOnlineSmsFailedView({
           {!sending && <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />}
         </button>
         <button type="button" onClick={onManualBooking} className={manualSecondaryButtonClassName}>
-          Continue with manual booking
+          {CONTINUE_IN_STORE_BOOKING_LABEL}
         </button>
       </div>
     </div>

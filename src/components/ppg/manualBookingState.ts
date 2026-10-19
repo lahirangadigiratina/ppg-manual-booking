@@ -298,6 +298,47 @@ export function buildRouteSummary(draft: ManualBookingDraft) {
   return 'Collect from PARCELPOINT · Select a location'
 }
 
+function shortenAddressForSuccessRoute(address: string) {
+  const trimmed = address.trim()
+  if (!trimmed) {
+    return ''
+  }
+  return trimmed.split(',')[0]?.trim() ?? trimmed
+}
+
+/** Single-line route on the booking success card (e.g. Bondi Beach → 25 Spring St). */
+export function buildSuccessRouteHeadline(draft: ManualBookingDraft) {
+  let origin: string
+  if (draft.deliveryMethod === 'atl') {
+    origin = 'Bondi Junction'
+  } else if (draft.deliveryMethod === 'atl-only') {
+    origin = 'Bondi Beach'
+  } else {
+    origin = getParcelpointStoreName(draft.parcelpointStoreId) ?? 'Hubbed'
+  }
+
+  const fallbackDestination =
+    draft.deliveryMethod === 'atl'
+      ? '25 Spring St'
+      : draft.deliveryMethod === 'atl-only'
+        ? '12 Hall St'
+        : 'Destination'
+
+  const destination =
+    shortenAddressForSuccessRoute(draft.receiverAddress) || fallbackDestination
+
+  return `${origin} → ${destination}`
+}
+
+export function buildSuccessParcelSubtitle(draft: ManualBookingDraft) {
+  const size = getParcelSizeById(draft.parcelSizeId)
+  const content = getContentTypeLabel(draft.contentType)
+  if (size) {
+    return `${size.name} · ${size.weight}`
+  }
+  return content
+}
+
 export function buildExtrasSummary(draft: ManualBookingDraft) {
   if (draft.manualStep < 4) {
     return { text: 'Not yet selected', faded: true }

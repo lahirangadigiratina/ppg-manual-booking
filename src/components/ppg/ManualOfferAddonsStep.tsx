@@ -17,8 +17,7 @@ interface AddonOption {
   subtitle?: string
 }
 
-const PARCEL_PROTECTION_SUBTITLE =
-  'Included for your parcel valued at $100, additional charge for parcels above the value.'
+const PARCEL_PROTECTION_SUBTITLE = '$100 cover included; Extra charge above'
 
 const addonOptions: AddonOption[] = [
   {
