@@ -23,9 +23,12 @@ import { ManualSenderDetailsStep } from './ManualSenderDetailsStep'
 import { PpgBookingSummaryPanel } from './PpgBookingSummaryPanel'
 import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
-import { PpgHomeTabBar, PpgHomeTabPanel, type PpgHomeTabId } from './PpgHomeTabs'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
-import { manualInputClassName, manualPrimaryButtonClassName } from './manualFormShared'
+import {
+  ManualFieldLabel,
+  manualInputClassName,
+  manualPrimaryButtonClassName,
+} from './manualFormShared'
 import {
   calculateBookingTotal,
   formatBookingAmount,
@@ -138,8 +141,6 @@ export function PpgAgentPortal() {
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
   const [paymentReceived, setPaymentReceived] = useState(false)
-  const [ppgHomeTab, setPpgHomeTab] = useState<PpgHomeTabId>('booking')
-
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
 
   useEffect(() => {
@@ -353,85 +354,74 @@ export function PpgAgentPortal() {
       />
       <div className={`${ppgPageShellClassName} overflow-y-auto`}>
         <div className={ppgPortalPanelClassName}>
-          <PpgHomeTabBar activeTab={ppgHomeTab} onTabChange={setPpgHomeTab} />
+          <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
+            How is the customer booking?
+          </h2>
+          <p className="mb-5 text-sm leading-relaxed text-text-muted sm:mb-6 sm:text-base">
+            Select how the booking will be made. Online payment is via payment gateway while
+            Manual can be collected through EFTPOS or Cash.
+          </p>
 
-          <PpgHomeTabPanel
-            activeTab={ppgHomeTab}
-            bookingContent={
-              <>
-                <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl">
-                  How is the customer booking?
-                </h2>
-                <p className="mb-5 text-sm leading-relaxed text-text-muted sm:mb-6 sm:text-base">
-                  Select how the booking will be made. The payment method depends on your choice.
-                </p>
+          <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <BookingModeOption
+              selected={bookingMode === 'online'}
+              title="Online Booking"
+              description="Customer books online using their phone"
+              paymentLabel="Online payment only"
+              paymentIcon={CreditCard}
+              onClick={() => setBookingMode('online')}
+            />
+            <BookingModeOption
+              selected={bookingMode === 'manual'}
+              title="Manual Booking"
+              description="You book on the customer's behalf as the agent"
+              paymentLabel="Payment in store"
+              paymentIcon={Store}
+              onClick={() => {
+                setBookingMode('manual')
+                startManualFlow()
+              }}
+            />
+          </div>
 
-                <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                  <BookingModeOption
-                    selected={bookingMode === 'online'}
-                    title="Online Booking"
-                    description="Customer books online using their phone"
-                    paymentLabel="Online payment only"
-                    paymentIcon={CreditCard}
-                    onClick={() => setBookingMode('online')}
-                  />
-                  <BookingModeOption
-                    selected={bookingMode === 'manual'}
-                    title="Manual Booking"
-                    description="You book on the customer's behalf as the agent"
-                    paymentLabel="Payment in store"
-                    paymentIcon={Store}
-                    onClick={() => {
-                      setBookingMode('manual')
-                      startManualFlow()
-                    }}
-                  />
-                </div>
+          {bookingMode === 'online' && (
+            <section className="flex flex-col gap-4 pt-1">
+              <div>
+                <ManualFieldLabel htmlFor="sender-mobile">
+                  Sender&apos;s mobile number
+                </ManualFieldLabel>
+                <input
+                  id="sender-mobile"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={mobile}
+                  onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
+                  onChange={(e) =>
+                    setMobile((previous) =>
+                      applyAustralianMobileFieldChange(previous, e.target.value),
+                    )
+                  }
+                  placeholder="+61 412 345 678"
+                  className={manualInputClassName}
+                />
+              </div>
 
-                {bookingMode === 'online' && (
-                  <>
-                    <div className="mb-6">
-                      <label
-                        htmlFor="sender-mobile"
-                        className="mb-2 block text-sm font-medium text-text-muted"
-                      >
-                        Sender&apos;s mobile number
-                      </label>
-                      <input
-                        id="sender-mobile"
-                        type="tel"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        value={mobile}
-                        onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
-                        onChange={(e) =>
-                          setMobile((previous) =>
-                            applyAustralianMobileFieldChange(previous, e.target.value),
-                          )
-                        }
-                        placeholder="+61 412 345 678"
-                        className={manualInputClassName}
-                      />
-                    </div>
-
-                    <div className="mt-6 flex justify-end">
-                      <button
-                        type="button"
-                        disabled={smsSending}
-                        onClick={handleSendSms}
-                        className={`inline-flex items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
-                      >
-                        {smsSending ? 'Sending…' : 'Send SMS'}
-                        {!smsSending && (
-                          <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
-                        )}
-                      </button>
-                    </div>
-                  </>
-                )}
-              </>
-            }
-          />
+              <div className="flex w-full justify-end">
+                <button
+                  type="button"
+                  disabled={smsSending}
+                  onClick={handleSendSms}
+                  className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
+                >
+                  {smsSending ? 'Sending…' : 'Send SMS'}
+                  {!smsSending && (
+                    <ArrowRight className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                  )}
+                </button>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>

@@ -17,13 +17,8 @@ interface AddonOption {
   subtitle?: string
 }
 
-function formatParcelValueDisplay(parcelValue: string) {
-  const amount = getDeclaredParcelValueAmount(parcelValue)
-  if (amount === null) {
-    return parcelValue.trim()
-  }
-  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2)
-}
+const PARCEL_PROTECTION_SUBTITLE =
+  'Included for your parcel valued at $100, additional charge for parcels above the value.'
 
 const addonOptions: AddonOption[] = [
   {
@@ -110,9 +105,7 @@ export function ManualOfferAddonsStep({
 
   const renderProtectionBody = () => (
     <>
-      <span>
-        Cover your parcel valued at ${formatParcelValueDisplay(parcelValue)}
-      </span>
+      <span>{PARCEL_PROTECTION_SUBTITLE}</span>
       <button
         type="button"
         className="mt-1 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"

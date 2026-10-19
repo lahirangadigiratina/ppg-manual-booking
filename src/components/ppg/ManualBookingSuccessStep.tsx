@@ -3,8 +3,10 @@ import { useState } from 'react'
 import {
   manualFlowStepHelperClassName,
   manualFlowStepTitleClassName,
-  manualSecondaryButtonClassName,
 } from './manualFormShared'
+
+const successFooterButtonClassName =
+  'flex w-full min-h-[52px] items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold sm:text-base'
 
 export const BOOKING_TRACKING_NUMBER = 'MP8031920017'
 
@@ -104,20 +106,20 @@ export function ManualBookingSuccessStep({ totalLabel, onNext }: ManualBookingSu
         </article>
       </div>
 
-      <div className="shrink-0 border-t border-border-light bg-white pt-2.5 pb-0.5">
+      <div className="shrink-0 bg-white pt-2.5 pb-0.5">
         <div className="flex w-full flex-col gap-2">
           <button
             type="button"
             onClick={() => window.print()}
-            className={`inline-flex w-full items-center justify-center gap-2 ${manualSecondaryButtonClassName}`}
+            className={`${successFooterButtonClassName} border border-border-light bg-white text-black transition-colors hover:bg-gray-50`}
           >
-            <Printer className="size-4" strokeWidth={2} aria-hidden />
+            <Printer className="size-4 shrink-0" strokeWidth={2} aria-hidden />
             Print Label
           </button>
           <button
             type="button"
             onClick={() => void proceedToDropoff()}
-            className="w-full rounded-md bg-hubbed-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:py-3.5 sm:text-base"
+            className={`${successFooterButtonClassName} bg-hubbed-orange text-white transition-colors hover:bg-hubbed-orange-hover`}
           >
             Proceed to Dropoff
           </button>
