@@ -24,3 +24,15 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@keyframes hubbed-bar-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}

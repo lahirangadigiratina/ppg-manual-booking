@@ -10,8 +10,10 @@ import {
   isHubProfilePath,
   PAYTO_AGREEMENT_DETAILS_PATH,
   PAYTO_AGREEMENT_PATH,
+  REPORTS_PATH,
 } from './config/appRoutes'
 import { HubProfileRouter } from './pages/HubProfileRouter'
+import { ReportsContent } from './pages/ReportsContent'
 import { ReturnParcelContent } from './pages/ReturnParcelContent'
 
 const hubMeta = {
@@ -21,6 +23,7 @@ const hubMeta = {
 
 function pageTitleForNav(id: NavItemId): string {
   if (id === 'returns') return 'Return Parcel'
+  if (id === 'reports') return 'Transaction History'
   if (id === 'ppg') return 'PPG Agent Portal'
   return 'Return Parcel'
 }
@@ -42,7 +45,13 @@ function pageTitleForPath(pathname: string, navId: NavItemId): string {
 }
 
 function navIdFromPath(pathname: string): NavItemId {
-  return pathname.startsWith(PPG_HOME_PATH) ? 'ppg' : 'returns'
+  if (pathname.startsWith(PPG_HOME_PATH)) {
+    return 'ppg'
+  }
+  if (pathname.startsWith(REPORTS_PATH)) {
+    return 'reports'
+  }
+  return 'returns'
 }
 
 function App() {
@@ -58,7 +67,15 @@ function App() {
 
   const handleNavigate = (id: NavItemId) => {
     setActiveNavId(id)
-    navigate(id === 'ppg' ? PPG_HOME_PATH : '/returns')
+    if (id === 'ppg') {
+      navigate(PPG_HOME_PATH)
+      return
+    }
+    if (id === 'reports') {
+      navigate(REPORTS_PATH)
+      return
+    }
+    navigate('/returns')
   }
 
   const isHubProfile = isHubProfilePath(location.pathname)
@@ -66,6 +83,10 @@ function App() {
     activeNavId === 'ppg' &&
     !isHubProfile &&
     location.pathname.startsWith(PPG_HOME_PATH)
+  const isReportsMain =
+    activeNavId === 'reports' &&
+    !isHubProfile &&
+    location.pathname.startsWith(REPORTS_PATH)
 
   return (
     <Routes>
@@ -81,7 +102,7 @@ function App() {
             hubName={hubMeta.hubName}
             showNotificationPanel={!isPpgMain}
             mainClassName={
-              isPpgMain
+              isPpgMain || isReportsMain
                 ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
                 : 'overflow-y-auto bg-page-bg'
             }
@@ -90,6 +111,8 @@ function App() {
               <HubProfileRouter />
             ) : activeNavId === 'ppg' ? (
               <PpgAgentPortal />
+            ) : activeNavId === 'reports' ? (
+              <ReportsContent />
             ) : (
               <ReturnParcelContent />
             )}

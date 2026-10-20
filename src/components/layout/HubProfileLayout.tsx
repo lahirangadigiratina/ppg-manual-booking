@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { HubProfileTabs } from './HubProfileTabs'
+
 export function HubProfileLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
@@ -17,7 +17,6 @@ export function HubProfileLayout({ children }: { children: ReactNode }) {
           Back
         </button>
 
-        <HubProfileTabs />
         {children}
       </div>
     </div>

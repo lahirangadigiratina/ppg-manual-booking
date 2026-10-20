@@ -1,3 +1,5 @@
+export const REPORTS_PATH = '/reports'
+
 export const HUB_PERSONAL_STORE_PATH = '/hub/personal-store'
 export const HUB_OPERATING_HOURS_PATH = '/hub/operating-hours'
 export const PAYTO_AGREEMENT_PATH = '/payto-agreement'

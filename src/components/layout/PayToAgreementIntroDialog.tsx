@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { PayToAgreementIntroContent } from '../../payto/PayToAgreementIntroContent'
 import { manualPrimaryButtonClassName } from '../ppg/manualFormShared'
 
 interface PayToAgreementIntroDialogProps {
@@ -69,22 +70,8 @@ export function PayToAgreementIntroDialog({
           </button>
         </div>
 
-        <div className="min-h-0 overflow-y-auto px-4 py-4 text-sm leading-relaxed text-gray-700 sm:px-5 sm:py-5 sm:text-[15px]">
-          <p>
-            <strong className="font-bold text-black">PayTo</strong> is an Australian payment service
-            that lets businesses collect payments directly from a customer&apos;s bank account when
-            the customer has given approval in advance.
-          </p>
-          <p className="mt-4">
-            A <strong className="font-bold text-black">PayTo agreement</strong> is the authorisation
-            your hub sets up with its nominated account. Once you request an agreement and approve
-            it in your banking app, Hubbed can collect eligible hub payments through PayTo without
-            needing card details for each transaction.
-          </p>
-          <p className="mt-4">
-            You stay in control: you review the payment terms in your bank before approving, and
-            you can manage or cancel the agreement through your bank at any time.
-          </p>
+        <div className="min-h-0 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
+          <PayToAgreementIntroContent />
         </div>
 
         <div className="shrink-0 border-t border-border-light px-4 py-3 sm:px-5 sm:py-4">

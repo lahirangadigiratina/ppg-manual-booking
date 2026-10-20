@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PAYTO_AGREEMENT_DETAILS_PATH } from '../config/appRoutes'
 import { HubProfileLayout } from '../components/layout/HubProfileLayout'
 import { PayToAgreementIntroDialog } from '../components/layout/PayToAgreementIntroDialog'
+import { PayToAgreementTitleTooltip } from '../components/layout/PayToAgreementTitleTooltip'
+import { FullScreenBlockingLoader } from '../components/layout/FullScreenBlockingLoader'
 import { PayToInstructionsDialog } from '../components/layout/PayToInstructionsDialog'
 import {
   buildPayToRecordFromForm,
@@ -12,7 +14,6 @@ import { usePayToIntroGate } from '../payto/usePayToIntroGate'
 import {
   ManualFieldLabel,
   manualFlowStepHelperClassName,
-  manualFlowStepTitleClassName,
   manualInputClassName,
   manualPrimaryButtonClassName,
 } from '../components/ppg/manualFormShared'
@@ -25,6 +26,9 @@ export function PayToAgreementPage() {
   const [accountNumber, setAccountNumber] = useState('')
   const { introOpen, dismissIntro, flowReady } = usePayToIntroGate()
   const [instructionsOpen, setInstructionsOpen] = useState(false)
+  const [submitLoading, setSubmitLoading] = useState(false)
+
+  const PAYTO_SUBMIT_LOADING_MS = 2200
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -43,13 +47,26 @@ export function PayToAgreementPage() {
 
   const handleInstructionsClose = () => {
     setInstructionsOpen(false)
-    navigate(PAYTO_AGREEMENT_DETAILS_PATH)
+    setSubmitLoading(true)
   }
+
+  useEffect(() => {
+    if (!submitLoading) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      navigate(PAYTO_AGREEMENT_DETAILS_PATH)
+      setSubmitLoading(false)
+    }, PAYTO_SUBMIT_LOADING_MS)
+
+    return () => window.clearTimeout(timer)
+  }, [submitLoading, navigate])
 
   return (
     <HubProfileLayout>
-      <div className="relative overflow-hidden rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:p-5">
-        <h1 className={manualFlowStepTitleClassName}>Request PayTo Agreement</h1>
+      <div className="relative rounded-sm border border-border-light bg-white p-3 sm:p-4 lg:p-5">
+        <PayToAgreementTitleTooltip />
         <p className={`${manualFlowStepHelperClassName} line-clamp-none`}>
           Please provide the account details to request PayTo agreement
         </p>
@@ -109,10 +126,14 @@ export function PayToAgreementPage() {
 
         <PayToInstructionsDialog
           anchor
-          open={instructionsOpen && flowReady}
+          open={instructionsOpen && flowReady && !submitLoading}
           onClose={handleInstructionsClose}
         />
       </div>
+
+      {submitLoading ? (
+        <FullScreenBlockingLoader label="Submitting PayTo agreement request" />
+      ) : null}
     </HubProfileLayout>
   )
 }
