@@ -4,6 +4,9 @@ import { useEffect, useId, useState } from 'react'
 import { DangerousGoodsDialog } from './DangerousGoodsDialog'
 import { ParcelProtectionDialog } from './ParcelProtectionDialog'
 import {
+  BOOKING_CHARGE_AMOUNTS,
+  formatBookingAmount,
+  formatDeclaredValue,
   formatParcelProtectionAddonPrice,
   getDeclaredParcelValueAmount,
   isParcelProtectionIncluded,
@@ -17,13 +20,11 @@ interface AddonOption {
   subtitle?: string
 }
 
-const PARCEL_PROTECTION_SUBTITLE = '$100 cover included; Extra charge above'
-
 const addonOptions: AddonOption[] = [
   {
     id: 'signature',
     label: 'Signature on Delivery',
-    price: '+$3.50',
+    price: `+${formatBookingAmount(BOOKING_CHARGE_AMOUNTS.signature)}`,
     icon: PenLine,
     subtitle: 'Recipient must sign upon delivery',
   },
@@ -104,7 +105,7 @@ export function ManualOfferAddonsStep({
 
   const renderProtectionBody = () => (
     <>
-      <span>{PARCEL_PROTECTION_SUBTITLE}</span>
+      <span>Covers your parcel valued at {formatDeclaredValue(parcelValue)}</span>
       <button
         type="button"
         className="mt-1 block text-sm font-medium text-hubbed-orange underline hover:text-hubbed-orange-hover"

@@ -3,7 +3,9 @@ import { Boxes, Briefcase, Package, ShoppingBag } from 'lucide-react'
 import { ManualDeliveryAddressStep } from './ManualDeliveryAddressStep'
 import { ManualFieldLabel, manualFieldLabelClassName } from './manualFormShared'
 import {
+  BOOKING_CHARGE_AMOUNTS,
   CARRY_ON_PARCEL_SIZE_ID,
+  formatBookingAmount,
   getManualParcelSizesForBooking,
   type DeliveryMethod,
 } from './manualBookingState'
@@ -113,7 +115,9 @@ export function ManualParcelDetailsStep({
             Does the customer need packaging?
             <span className="text-red-600"> *</span>{' '}
             <span className="font-normal">
-              (Adds <span className="font-bold text-black">$2.00</span>)
+              (Adds <span className="font-bold text-black">
+                {formatBookingAmount(BOOKING_CHARGE_AMOUNTS.packaging)}
+              </span>)
             </span>
           </p>
           <div

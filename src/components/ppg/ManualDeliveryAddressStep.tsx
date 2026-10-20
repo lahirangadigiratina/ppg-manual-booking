@@ -1,7 +1,11 @@
 import { MapPin, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ManualFieldLabel, manualInputClassName } from './manualFormShared'
-import type { DeliveryMethod } from './manualBookingState'
+import {
+  BOOKING_CHARGE_AMOUNTS,
+  formatBookingAmount,
+  type DeliveryMethod,
+} from './manualBookingState'
 
 const mockAddresses = [
   '15/37 Nicholson St, Balmain East NSW 2041',
@@ -221,7 +225,9 @@ export function ManualDeliveryAddressStep({
                   <p className="text-sm font-bold text-black sm:text-base">Deliver to Door</p>
                   <p className="text-xs text-text-muted sm:text-sm">{activeRoute.areaLabel}</p>
                 </div>
-                <p className="shrink-0 text-sm font-bold text-black sm:text-base">$11.50</p>
+                <p className="shrink-0 text-sm font-bold text-black sm:text-base">
+                  {formatBookingAmount(BOOKING_CHARGE_AMOUNTS.delivery)}
+                </p>
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <DeliveryBadge>

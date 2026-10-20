@@ -92,10 +92,10 @@ export function formatWeightForSummary(weight: string) {
   return weight
 }
 
-const BOOKING_CHARGE_AMOUNTS = {
-  delivery: 11.85,
+export const BOOKING_CHARGE_AMOUNTS = {
+  delivery: 11.5,
   packaging: 2.0,
-  signature: 2.2,
+  signature: 3.5,
   protection: 2.5,
 } as const
 
@@ -106,8 +106,7 @@ export interface BookingPriceLineItem {
 
 const PACKAGING_FEE_LABEL = 'Packaging Fee'
 
-/** Agent-quoted service lines (packaging is GST-inclusive; others ex-GST). */
-function getBookingChargeLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
+export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
   const items: BookingPriceLineItem[] = []
 
   if (draft.manualStep >= 1) {
@@ -140,46 +139,13 @@ function getBookingChargeLineItems(draft: ManualBookingDraft): BookingPriceLineI
   return items
 }
 
-function splitPackagingFromTaxableCharges(charges: BookingPriceLineItem[]) {
-  const packagingTotal = charges
-    .filter((item) => item.label === PACKAGING_FEE_LABEL)
-    .reduce((sum, item) => sum + item.amount, 0)
-  const taxable = charges.filter((item) => item.label !== PACKAGING_FEE_LABEL)
-  const taxableTotal = taxable.reduce((sum, item) => sum + item.amount, 0)
-  return { packagingTotal, taxable, taxableTotal }
-}
-
-export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
-  const charges = getBookingChargeLineItems(draft)
-  const { packagingTotal, taxable, taxableTotal } = splitPackagingFromTaxableCharges(charges)
-
-  if (taxableTotal <= 0 && packagingTotal <= 0) {
-    return []
-  }
-
-  const items = [...taxable]
-  if (packagingTotal > 0) {
-    items.push({ label: PACKAGING_FEE_LABEL, amount: packagingTotal })
-  }
-
-  if (taxableTotal > 0) {
-    const gst = Math.round(taxableTotal * 0.1 * 100) / 100
-    items.push({ label: 'GST (10%)', amount: gst })
-  }
-
-  return items
-}
-
 export function calculateBookingTotal(draft: ManualBookingDraft) {
-  const charges = getBookingChargeLineItems(draft)
-  const { packagingTotal, taxableTotal } = splitPackagingFromTaxableCharges(charges)
-
-  if (taxableTotal <= 0 && packagingTotal <= 0) {
+  const items = buildBookingPriceLineItems(draft)
+  if (items.length === 0) {
     return null
   }
-
-  const gst = taxableTotal > 0 ? Math.round(taxableTotal * 0.1 * 100) / 100 : 0
-  return Math.round((taxableTotal + gst + packagingTotal) * 100) / 100
+  const total = items.reduce((sum, item) => sum + item.amount, 0)
+  return Math.round(total * 100) / 100
 }
 
 export function formatBookingAmount(amount: number) {

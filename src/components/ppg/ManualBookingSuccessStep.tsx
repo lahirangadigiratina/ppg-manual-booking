@@ -79,9 +79,7 @@ export function ManualBookingSuccessStep({
               <p className="mt-0.5 text-xs text-text-muted sm:text-sm">{parcelSubtitle}</p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-xs font-bold text-black sm:text-sm">{totalLabel}</p>
-              <p className="text-[10px] text-text-muted">incl. GST</p>
-            </div>
+              <p className="text-xs font-bold text-black sm:text-sm">{totalLabel}</p>            </div>
           </div>
 
           <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5 border-t border-border-light px-2.5 py-2.5 text-sm sm:px-3 sm:py-3">
