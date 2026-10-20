@@ -4,6 +4,14 @@ import { AppLayout } from './components/layout/AppLayout'
 import { PpgAgentPortal } from './components/ppg/PpgAgentPortal'
 import type { NavItemId } from './config/navigation'
 import { PPG_HOME_PATH } from './config/ppgRoutes'
+import {
+  HUB_OPERATING_HOURS_PATH,
+  HUB_PERSONAL_STORE_PATH,
+  isHubProfilePath,
+  PAYTO_AGREEMENT_DETAILS_PATH,
+  PAYTO_AGREEMENT_PATH,
+} from './config/appRoutes'
+import { HubProfileRouter } from './pages/HubProfileRouter'
 import { ReturnParcelContent } from './pages/ReturnParcelContent'
 
 const hubMeta = {
@@ -15,6 +23,22 @@ function pageTitleForNav(id: NavItemId): string {
   if (id === 'returns') return 'Return Parcel'
   if (id === 'ppg') return 'PPG Agent Portal'
   return 'Return Parcel'
+}
+
+function pageTitleForPath(pathname: string, navId: NavItemId): string {
+  if (pathname.startsWith(PAYTO_AGREEMENT_DETAILS_PATH)) {
+    return 'PayTo Agreement Details'
+  }
+  if (pathname.startsWith(PAYTO_AGREEMENT_PATH)) {
+    return 'PayTo Agreement'
+  }
+  if (pathname.startsWith(HUB_PERSONAL_STORE_PATH)) {
+    return 'Location Details'
+  }
+  if (pathname.startsWith(HUB_OPERATING_HOURS_PATH)) {
+    return 'Operating Hours'
+  }
+  return pageTitleForNav(navId)
 }
 
 function navIdFromPath(pathname: string): NavItemId {
@@ -37,6 +61,12 @@ function App() {
     navigate(id === 'ppg' ? PPG_HOME_PATH : '/returns')
   }
 
+  const isHubProfile = isHubProfilePath(location.pathname)
+  const isPpgMain =
+    activeNavId === 'ppg' &&
+    !isHubProfile &&
+    location.pathname.startsWith(PPG_HOME_PATH)
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/returns" replace />} />
@@ -46,16 +76,23 @@ function App() {
           <AppLayout
             activeNavId={activeNavId}
             onNavigate={handleNavigate}
-            pageTitle={pageTitleForNav(activeNavId)}
+            pageTitle={pageTitleForPath(location.pathname, activeNavId)}
             locationName={hubMeta.locationName}
             hubName={hubMeta.hubName}
+            showNotificationPanel={!isPpgMain}
             mainClassName={
-              activeNavId === 'ppg'
+              isPpgMain
                 ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
                 : 'overflow-y-auto bg-page-bg'
             }
           >
-            {activeNavId === 'ppg' ? <PpgAgentPortal /> : <ReturnParcelContent />}
+            {isHubProfile ? (
+              <HubProfileRouter />
+            ) : activeNavId === 'ppg' ? (
+              <PpgAgentPortal />
+            ) : (
+              <ReturnParcelContent />
+            )}
           </AppLayout>
         }
       />

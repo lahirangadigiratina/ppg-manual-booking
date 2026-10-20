@@ -1,10 +1,13 @@
 import { Bell, User } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { HUB_PERSONAL_STORE_PATH } from '../../config/appRoutes'
 
 interface TopHeaderProps {
   pageTitle: string
   locationName: string
   hubName: string
   notificationCount?: number
+  onNotificationClick?: () => void
 }
 
 export function TopHeader({
@@ -12,7 +15,10 @@ export function TopHeader({
   locationName,
   hubName,
   notificationCount = 0,
+  onNotificationClick,
 }: TopHeaderProps) {
+  const navigate = useNavigate()
+
   return (
     <header className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border-light bg-white px-4 py-3 sm:px-6 lg:px-8">
       <h1 className="text-lg font-bold text-black sm:text-xl">{pageTitle}</h1>
@@ -24,6 +30,7 @@ export function TopHeader({
       <div className="ml-auto flex items-center gap-3 sm:gap-4">
         <button
           type="button"
+          onClick={onNotificationClick}
           className="relative rounded p-1 text-black hover:bg-gray-100"
           aria-label={`Notifications, ${notificationCount} unread`}
         >
@@ -39,9 +46,14 @@ export function TopHeader({
           <span className="max-w-[140px] truncate text-xs font-semibold text-black lg:max-w-none lg:text-sm">
             {hubName}
           </span>
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border-light bg-gray-100">
-            <User className="size-5 text-gray-700" strokeWidth={1.75} />
-          </div>
+          <button
+            type="button"
+            onClick={() => navigate(HUB_PERSONAL_STORE_PATH)}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border-light bg-gray-100 transition-colors hover:bg-gray-200"
+            aria-label="View location details"
+          >
+            <User className="size-5 text-gray-700" strokeWidth={1.75} aria-hidden />
+          </button>
         </div>
       </div>
 
