@@ -10,8 +10,11 @@ import {
 const DROPOFF_PARCEL = {
   name: 'Jordan Kumar',
   retailer: 'PPG Drop-off',
+  listRetailer: 'AU SHEIN Returns',
   consignmentId: 'MP8032101040',
   itemId: 'HCJDGZZG9',
+  status: 'Awaiting consumer dropoff',
+  carrier: 'Aramex-Bulk',
 }
 
 const CONFIRMED_PARCEL = {
@@ -120,29 +123,49 @@ export function ReturnDropoffContent() {
             </h2>
             <div className="overflow-hidden rounded-sm border border-border-light">
               <article className="flex flex-col gap-4 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-                <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
+                <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-black">{DROPOFF_PARCEL.name}</p>
-                    <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
-                      {DROPOFF_PARCEL.retailer}
+                    <p className="mt-0.5 text-xs text-text-muted">
+                      {DROPOFF_PARCEL.listRetailer}
                     </p>
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-black">
                       {DROPOFF_PARCEL.consignmentId}
                     </p>
-                    <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
+                    <p className="mt-0.5 text-xs font-bold text-black">
                       Item: {DROPOFF_PARCEL.itemId}
                     </p>
                   </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-black">{DROPOFF_PARCEL.status}</p>
+                    <p className="mt-0.5 text-xs text-black">{DROPOFF_PARCEL.carrier}</p>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setConfirmOpen(true)}
-                  className="rounded-md bg-hubbed-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:px-6 sm:py-3"
-                >
-                  Confirm Dropoff
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex size-10 items-center justify-center rounded border border-border-light bg-white text-black hover:bg-gray-50"
+                    aria-label="Print label"
+                  >
+                    <Printer className="size-5" strokeWidth={1.75} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmOpen(true)}
+                    className="rounded-md bg-hubbed-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:px-5"
+                  >
+                    Confirm Dropoff
+                  </button>
+                  <button
+                    type="button"
+                    className="flex size-10 items-center justify-center rounded border border-border-light bg-white text-black hover:bg-gray-50"
+                    aria-label="More actions"
+                  >
+                    <MoreVertical className="size-5" strokeWidth={1.75} />
+                  </button>
+                </div>
               </article>
             </div>
           </section>
