@@ -187,12 +187,16 @@ interface ManualDeliveryAddressStepProps {
   address: string
   onAddressChange: (value: string) => void
   deliveryMethod: DeliveryMethod
+  deliverySelected: boolean
+  onDeliverySelectedChange: (selected: boolean) => void
 }
 
 export function ManualDeliveryAddressStep({
   address,
   onAddressChange,
   deliveryMethod,
+  deliverySelected,
+  onDeliverySelectedChange,
 }: ManualDeliveryAddressStepProps) {
   const activeRoute =
     DOOR_DELIVERY_ROUTES.find((route) => route.id === deliveryMethod) ??
@@ -208,44 +212,51 @@ export function ManualDeliveryAddressStep({
         <AddressSearchInput value={address} onChange={onAddressChange} />
       </div>
 
-      <section
+      <button
+        type="button"
         aria-label="Delivery method"
-        className="relative w-full rounded-lg border-2 border-hubbed-orange bg-hubbed-orange-tint p-2.5 sm:p-3"
+        aria-pressed={deliverySelected}
+        onClick={() => onDeliverySelectedChange(true)}
+        className={`relative w-full rounded-lg p-2.5 text-left transition-colors sm:p-3 ${
+          deliverySelected
+            ? 'border-2 border-hubbed-orange bg-hubbed-orange-tint'
+            : 'border border-border-light bg-white hover:border-gray-300'
+        }`}
       >
-          <div className="flex items-start gap-2.5">
-            <span
-              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border-light bg-white text-lg leading-none"
-              aria-hidden
-            >
-              🏠
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-black sm:text-base">Deliver to Door</p>
-                  <p className="text-xs text-text-muted sm:text-sm">{activeRoute.areaLabel}</p>
-                </div>
-                <p className="shrink-0 text-sm font-bold text-black sm:text-base">
-                  {formatBookingAmount(BOOKING_CHARGE_AMOUNTS.delivery)}
-                </p>
+        <div className="flex items-start gap-2.5">
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border-light bg-white text-lg leading-none"
+            aria-hidden
+          >
+            🏠
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-black sm:text-base">Deliver to Door</p>
+                <p className="text-xs text-text-muted sm:text-sm">{activeRoute.areaLabel}</p>
               </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <DeliveryBadge>
-                  <span className="text-sm leading-none" aria-hidden>
-                    🏠
-                  </span>
-                  {activeRoute.badge}
-                </DeliveryBadge>
-              </div>
+              <p className="shrink-0 text-sm font-bold text-black sm:text-base">
+                {formatBookingAmount(BOOKING_CHARGE_AMOUNTS.delivery)}
+              </p>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <DeliveryBadge>
+                <span className="text-sm leading-none" aria-hidden>
+                  🏠
+                </span>
+                {activeRoute.badge}
+              </DeliveryBadge>
             </div>
           </div>
-          <div className="mt-2.5 flex flex-col gap-1 border-t border-border-light pt-2 text-xs text-text-muted sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:text-sm">
-            <span className="min-w-0 text-left leading-snug">{doorFooterAddress}</span>
-            <span className="shrink-0 sm:text-right">
-              Delivered by <span className="font-bold text-black">Mon, 12 Oct</span>
-            </span>
-          </div>
-      </section>
+        </div>
+        <div className="mt-2.5 flex flex-col gap-1 border-t border-border-light pt-2 text-xs text-text-muted sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:text-sm">
+          <span className="min-w-0 text-left leading-snug">{doorFooterAddress}</span>
+          <span className="shrink-0 sm:text-right">
+            Delivered by <span className="font-bold text-black">Mon, 12 Oct</span>
+          </span>
+        </div>
+      </button>
     </div>
   )
 }

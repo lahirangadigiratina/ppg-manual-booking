@@ -139,6 +139,7 @@ export function PpgAgentPortal() {
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(
     () => deliveryMethodFromPpgPath(location.pathname) ?? 'atl',
   )
+  const [deliverySelected, setDeliverySelected] = useState(false)
   const [contentType, setContentType] = useState('clothing-fashion')
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
@@ -151,6 +152,7 @@ export function PpgAgentPortal() {
       return
     }
     setDeliveryMethod(methodFromPath)
+    setDeliverySelected(false)
     setBookingMode('manual')
     setScreen('manual')
     setManualStep(1)
@@ -170,6 +172,7 @@ export function PpgAgentPortal() {
 
   const startManualFlow = () => {
     setManualStep(1)
+    setDeliverySelected(false)
     setScreen('manual')
     if (isDoorDelivery(deliveryMethod)) {
       navigate(ppgPathForDeliveryMethod(deliveryMethod), { replace: true })
@@ -185,6 +188,7 @@ export function PpgAgentPortal() {
       needsPackaging,
       receiverAddress,
       deliveryMethod,
+      deliverySelected,
       parcelpointStoreId: null,
       contentType,
       parcelValue,
@@ -219,6 +223,8 @@ export function PpgAgentPortal() {
                     receiverAddress={receiverAddress}
                     onReceiverAddressChange={setReceiverAddress}
                     deliveryMethod={deliveryMethod}
+                    deliverySelected={deliverySelected}
+                    onDeliverySelectedChange={setDeliverySelected}
                   />
                 )}
                 {manualStep === 2 && <ManualSenderDetailsStep />}
@@ -267,6 +273,7 @@ export function PpgAgentPortal() {
                 nextDisabled={
                   (manualStep === 1 &&
                     (!parcelSizeId ||
+                      !deliverySelected ||
                       (parcelSizeId !== CARRY_ON_PARCEL_SIZE_ID &&
                         needsPackaging === null))) ||
                   (manualStep === 4 &&

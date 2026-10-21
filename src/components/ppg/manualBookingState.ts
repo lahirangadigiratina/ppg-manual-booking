@@ -58,6 +58,7 @@ export interface ManualBookingDraft {
   needsPackaging: boolean | null
   receiverAddress: string
   deliveryMethod: DeliveryMethod
+  deliverySelected: boolean
   parcelpointStoreId: string | null
   contentType: string
   parcelValue: string
@@ -109,7 +110,7 @@ const PACKAGING_FEE_LABEL = 'Packaging Fee'
 export function buildBookingPriceLineItems(draft: ManualBookingDraft): BookingPriceLineItem[] {
   const items: BookingPriceLineItem[] = []
 
-  if (draft.manualStep >= 1) {
+  if (draft.deliverySelected) {
     items.push({ label: 'Delivery', amount: BOOKING_CHARGE_AMOUNTS.delivery })
   }
 
@@ -251,6 +252,9 @@ export function formatDeclaredValue(parcelValue: string) {
 
 export function buildRouteSummary(draft: ManualBookingDraft) {
   if (isDoorDelivery(draft.deliveryMethod)) {
+    if (!draft.deliverySelected) {
+      return 'Select a delivery method'
+    }
     const address =
       draft.receiverAddress.trim() || '12 Hall St, Bondi Beach NSW 2026'
     return `Deliver to door · ${address}`

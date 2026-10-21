@@ -35,6 +35,8 @@ interface ManualParcelDetailsStepProps {
   receiverAddress: string
   onReceiverAddressChange: (value: string) => void
   deliveryMethod: DeliveryMethod
+  deliverySelected: boolean
+  onDeliverySelectedChange: (selected: boolean) => void
 }
 
 export function ManualParcelDetailsStep({
@@ -45,6 +47,8 @@ export function ManualParcelDetailsStep({
   receiverAddress,
   onReceiverAddressChange,
   deliveryMethod,
+  deliverySelected,
+  onDeliverySelectedChange,
 }: ManualParcelDetailsStepProps) {
   const showPackagingQuestion = selectedSizeId !== CARRY_ON_PARCEL_SIZE_ID
 
@@ -153,6 +157,8 @@ export function ManualParcelDetailsStep({
         address={receiverAddress}
         onAddressChange={onReceiverAddressChange}
         deliveryMethod={deliveryMethod}
+        deliverySelected={deliverySelected}
+        onDeliverySelectedChange={onDeliverySelectedChange}
       />
     </div>
   )
