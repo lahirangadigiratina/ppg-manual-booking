@@ -7,8 +7,8 @@ import { PayToAgreementTitleTooltip } from '../components/layout/PayToAgreementT
 import { FullScreenBlockingLoader } from '../components/layout/FullScreenBlockingLoader'
 import { PayToInstructionsDialog } from '../components/layout/PayToInstructionsDialog'
 import {
+  addPayToAgreement,
   buildPayToRecordFromForm,
-  savePayToAgreement,
 } from '../payto/paytoAgreementStorage'
 import { usePayToIntroGate } from '../payto/usePayToIntroGate'
 import {
@@ -40,7 +40,7 @@ export function PayToAgreementPage() {
       bsb,
       accountNumber,
     })
-    savePayToAgreement(record)
+    addPayToAgreement(record)
     // PayTo request API to be wired when backend is available.
     setInstructionsOpen(true)
   }

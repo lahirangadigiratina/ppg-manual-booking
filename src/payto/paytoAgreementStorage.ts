@@ -1,12 +1,14 @@
 import type { PayToAgreementRecord } from '../config/appRoutes'
 import {
   PAYTO_AGREEMENT_DETAILS_PATH,
-  PAYTO_AGREEMENT_PATH,
+  PAYTO_AGREEMENT_NEW_PATH,
+  PAYTO_AGREEMENT_REQUEST_PATH,
 } from '../config/appRoutes'
 
-const STORAGE_KEY = 'hubbed-payto-agreement'
+const STORAGE_KEY = 'hubbed-payto-agreements'
+const LEGACY_STORAGE_KEY = 'hubbed-payto-agreement'
 
-/** Demo record when opening the details route directly (no prior request in this session). */
+/** Demo record when opening the details route with no saved agreements. */
 export const DEMO_PAYTO_AGREEMENT: PayToAgreementRecord = {
   payerName: 'Yusra Aziz',
   bsb: '062-000',
@@ -33,32 +35,76 @@ function normalizePayToRecord(raw: Partial<PayToAgreementRecord>): PayToAgreemen
   }
 }
 
-export function savePayToAgreement(record: PayToAgreementRecord) {
+function readStoredAgreements(): PayToAgreementRecord[] {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(record))
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) =>
+          normalizePayToRecord(item as Partial<PayToAgreementRecord>),
+        )
+      }
+    }
+
+    // Migrate legacy single-record storage into the list format.
+    const legacyRaw = sessionStorage.getItem(LEGACY_STORAGE_KEY)
+    if (legacyRaw) {
+      const legacy = normalizePayToRecord(
+        JSON.parse(legacyRaw) as Partial<PayToAgreementRecord>,
+      )
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify([legacy]))
+      sessionStorage.removeItem(LEGACY_STORAGE_KEY)
+      return [legacy]
+    }
+  } catch {
+    // sessionStorage may be unavailable
+  }
+  return []
+}
+
+function writeStoredAgreements(agreements: readonly PayToAgreementRecord[]) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(agreements))
+    sessionStorage.removeItem(LEGACY_STORAGE_KEY)
   } catch {
     // sessionStorage may be unavailable
   }
 }
 
+export function getPayToAgreements(): PayToAgreementRecord[] {
+  return readStoredAgreements()
+}
+
+export function hasPayToAgreements() {
+  return getPayToAgreements().length > 0
+}
+
+/** Latest agreement, or null when none are saved. */
 export function getPayToAgreement(): PayToAgreementRecord | null {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (!raw) {
-      return null
-    }
-    return normalizePayToRecord(JSON.parse(raw) as Partial<PayToAgreementRecord>)
-  } catch {
-    return null
-  }
+  const agreements = getPayToAgreements()
+  return agreements[agreements.length - 1] ?? null
 }
 
-export function getPayToAgreementForDisplay(): PayToAgreementRecord {
-  return getPayToAgreement() ?? DEMO_PAYTO_AGREEMENT
+export function addPayToAgreement(record: PayToAgreementRecord) {
+  const next = [...getPayToAgreements(), record]
+  writeStoredAgreements(next)
 }
 
+export function getPayToAgreementsForDisplay(): PayToAgreementRecord[] {
+  const agreements = getPayToAgreements()
+  return agreements.length > 0 ? agreements : [DEMO_PAYTO_AGREEMENT]
+}
+
+/** Profile menu destination: details for existing users, request form for first-time. */
 export function paytoProfilePath(): string {
-  return getPayToAgreement() ? PAYTO_AGREEMENT_DETAILS_PATH : PAYTO_AGREEMENT_PATH
+  return hasPayToAgreements()
+    ? PAYTO_AGREEMENT_DETAILS_PATH
+    : PAYTO_AGREEMENT_REQUEST_PATH
+}
+
+export function paytoCreateAgreementPath(): string {
+  return PAYTO_AGREEMENT_NEW_PATH
 }
 
 export function maskAccountNumber(accountNumber: string) {

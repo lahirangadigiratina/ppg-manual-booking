@@ -3,6 +3,11 @@ export const REPORTS_PATH = '/reports'
 export const HUB_PERSONAL_STORE_PATH = '/hub/personal-store'
 export const HUB_OPERATING_HOURS_PATH = '/hub/operating-hours'
 export const PAYTO_AGREEMENT_PATH = '/payto-agreement'
+/** First-time PayTo request form. */
+export const PAYTO_AGREEMENT_REQUEST_PATH = '/payto-agreement/request'
+/** Create an additional agreement (same form as first-time). */
+export const PAYTO_AGREEMENT_NEW_PATH = '/payto-agreement/new'
+/** Existing agreements list / details. */
 export const PAYTO_AGREEMENT_DETAILS_PATH = '/payto-agreement/details'
 
 export type PayToAgreementStatus = 'pending_authorisation' | 'active'

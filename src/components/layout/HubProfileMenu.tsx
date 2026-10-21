@@ -7,6 +7,7 @@ import {
   HUB_PERSONAL_STORE_PATH,
   PAYTO_AGREEMENT_PATH,
 } from '../../config/appRoutes'
+import { paytoProfilePath } from '../../payto/paytoAgreementStorage'
 
 function PayToMark({ active }: { active: boolean }) {
   return (
@@ -143,7 +144,7 @@ export function HubProfileMenu() {
             active={payToActive}
             label="PayTo Agreement"
             leading={<PayToMark active={payToActive} />}
-            onClick={() => goTo(PAYTO_AGREEMENT_PATH)}
+            onClick={() => goTo(paytoProfilePath())}
           />
         </div>
       )}

@@ -23,7 +23,7 @@ export function PpgManualStepFooter({
         onBack={onBack}
         onNext={onNext}
         nextDisabled={nextDisabled}
-        nextLabel={manualStep === 5 ? 'Pay' : 'Next'}
+        nextLabel={manualStep === 5 ? 'Complete' : 'Next'}
       />
     </div>
   )

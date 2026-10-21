@@ -9,7 +9,9 @@ import {
   HUB_PERSONAL_STORE_PATH,
   isHubProfilePath,
   PAYTO_AGREEMENT_DETAILS_PATH,
+  PAYTO_AGREEMENT_NEW_PATH,
   PAYTO_AGREEMENT_PATH,
+  PAYTO_AGREEMENT_REQUEST_PATH,
   REPORTS_PATH,
 } from './config/appRoutes'
 import { HubProfileRouter } from './pages/HubProfileRouter'
@@ -31,6 +33,14 @@ function pageTitleForNav(id: NavItemId): string {
 function pageTitleForPath(pathname: string, navId: NavItemId): string {
   if (pathname.startsWith(PAYTO_AGREEMENT_DETAILS_PATH)) {
     return 'PayTo Agreement Details'
+  }
+  if (
+    pathname.startsWith(PAYTO_AGREEMENT_REQUEST_PATH) ||
+    pathname.startsWith(PAYTO_AGREEMENT_NEW_PATH)
+  ) {
+    return pathname.startsWith(PAYTO_AGREEMENT_NEW_PATH)
+      ? 'New PayTo Agreement'
+      : 'Request PayTo Agreement'
   }
   if (pathname.startsWith(PAYTO_AGREEMENT_PATH)) {
     return 'PayTo Agreement'
