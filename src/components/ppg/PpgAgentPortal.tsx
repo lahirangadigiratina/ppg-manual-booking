@@ -337,7 +337,7 @@ export function PpgAgentPortal() {
                       setManualStep(1)
                       setBookingMode('online')
                       setScreen('home')
-                      navigate('/returns')
+                      navigate('/returns/dropoff')
                     }}
                   />
                 )}

@@ -1,8 +1,14 @@
 import { Search, X } from 'lucide-react'
 import { useState } from 'react'
 
-export function SearchParcels() {
-  const [query, setQuery] = useState('MP8021760051')
+export function SearchParcels({
+  initialQuery = 'MP8021760051',
+  placeholder = '',
+}: {
+  initialQuery?: string
+  placeholder?: string
+}) {
+  const [query, setQuery] = useState(initialQuery)
 
   return (
     <section>
@@ -16,6 +22,7 @@ export function SearchParcels() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full rounded-md border border-gray-300 bg-white py-3 pl-4 pr-20 text-sm text-black shadow-sm outline-none transition-shadow placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 sm:py-3.5 sm:text-base"
+            placeholder={placeholder}
             aria-label="Search parcels"
           />
           <div className="absolute inset-y-0 right-3 flex items-center gap-2">

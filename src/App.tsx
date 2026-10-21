@@ -20,6 +20,7 @@ import {
 } from './config/appRoutes'
 import { HubProfileRouter } from './pages/HubProfileRouter'
 import { ReportsContent } from './pages/ReportsContent'
+import { ReturnDropoffContent } from './pages/ReturnDropoffContent'
 import { ReturnParcelContent } from './pages/ReturnParcelContent'
 
 const hubMeta = {
@@ -115,6 +116,7 @@ function App() {
     activeNavId === 'reports' &&
     !isHubProfile &&
     location.pathname.startsWith(REPORTS_PATH)
+  const isDropoff = location.pathname.startsWith('/returns/dropoff')
 
   return (
     <Routes>
@@ -142,6 +144,8 @@ function App() {
               <PpgAgentPortal />
             ) : activeNavId === 'reports' ? (
               <ReportsContent />
+            ) : isDropoff ? (
+              <ReturnDropoffContent />
             ) : (
               <ReturnParcelContent />
             )}
