@@ -4,7 +4,6 @@ import { HubProfileLayout } from '../components/layout/HubProfileLayout'
 import { PayToAgreementIntroDialog } from '../components/layout/PayToAgreementIntroDialog'
 import { PayToInstructionsDialog } from '../components/layout/PayToInstructionsDialog'
 import {
-  manualFlowStepHelperClassName,
   manualFlowStepTitleClassName,
   manualSecondaryButtonClassName,
 } from '../components/ppg/manualFormShared'
@@ -53,12 +52,6 @@ export function PayToAgreementDetailsPage() {
           <DetailRow label="Payment Frequency" value={agreement.paymentFrequency} />
           <DetailRow label="Status" value={statusLabel(agreement.status)} />
         </div>
-
-        <p className={`${manualFlowStepHelperClassName} mt-4 line-clamp-none`}>
-          {agreement.status === 'pending_authorisation'
-            ? 'Approve this agreement in your banking app to activate PayTo collections at this location.'
-            : 'This agreement is active. PayTo collections can be processed for eligible bookings.'}
-        </p>
 
         <div className="mt-5">
           <button
