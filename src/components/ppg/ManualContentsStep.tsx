@@ -124,7 +124,7 @@ export function ManualContentsStep({
     <div>
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
-          <ManualFieldLabel htmlFor="whats-inside">What&apos;s inside?</ManualFieldLabel>
+          <ManualFieldLabel htmlFor="whats-inside">What&apos;s Inside?</ManualFieldLabel>
           <WhatsInsideSelect value={contentType} onChange={onContentTypeChange} />
         </div>
 

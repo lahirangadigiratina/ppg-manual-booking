@@ -94,7 +94,7 @@ export function ManualSenderDetailsStep() {
       <form className="space-y-3.5 sm:space-y-4" onSubmit={(e) => e.preventDefault()} noValidate>
         <div>
           <ManualFieldLabel htmlFor="sender-phone" required>
-            Phone number
+            Phone Number
           </ManualFieldLabel>
           <div className="relative">
             <input

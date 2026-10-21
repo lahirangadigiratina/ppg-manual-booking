@@ -68,7 +68,7 @@ export function PpgOnlineSmsFailedView({
 
       <div className="mt-6">
         <label htmlFor="sender-mobile-retry" className="mb-2 block text-sm font-medium text-text-muted">
-          Sender&apos;s mobile number
+          Sender&apos;s Mobile Number
         </label>
         <input
           id="sender-mobile-retry"

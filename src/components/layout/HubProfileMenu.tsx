@@ -5,11 +5,19 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   HUB_OPERATING_HOURS_PATH,
   HUB_PERSONAL_STORE_PATH,
+  NOPAYTO_AGREEMENT_PATH,
   PAYTO_AGREEMENT_PATH,
 } from '../../config/appRoutes'
+import { noPayToProfilePath } from '../../nopayto/noPayToAgreementStorage'
 import { paytoProfilePath } from '../../payto/paytoAgreementStorage'
 
-function PayToMark({ active }: { active: boolean }) {
+function AgreementMark({
+  active,
+  label,
+}: {
+  active: boolean
+  label: string
+}) {
   return (
     <span
       className={`flex size-6 shrink-0 items-center justify-center rounded-md ${
@@ -17,7 +25,7 @@ function PayToMark({ active }: { active: boolean }) {
       }`}
       aria-hidden
     >
-      <span className="text-[8px] font-bold leading-none tracking-tight text-black">PayTo</span>
+      <span className="text-[7px] font-bold leading-none tracking-tight text-black">{label}</span>
     </span>
   )
 }
@@ -66,6 +74,7 @@ export function HubProfileMenu() {
   const menuId = useId()
 
   const payToActive = pathname.startsWith(PAYTO_AGREEMENT_PATH)
+  const noPayToActive = pathname.startsWith(NOPAYTO_AGREEMENT_PATH)
   const personalActive = pathname.startsWith(HUB_PERSONAL_STORE_PATH)
   const hoursActive = pathname.startsWith(HUB_OPERATING_HOURS_PATH)
 
@@ -126,7 +135,7 @@ export function HubProfileMenu() {
           id={menuId}
           role="menu"
           aria-label="Hub profile sections"
-          className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border-light bg-white p-1.5 shadow-lg"
+          className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-border-light bg-white p-1.5 shadow-lg"
         >
           <MenuItem
             active={personalActive}
@@ -143,8 +152,14 @@ export function HubProfileMenu() {
           <MenuItem
             active={payToActive}
             label="PayTo Agreement"
-            leading={<PayToMark active={payToActive} />}
+            leading={<AgreementMark active={payToActive} label="PayTo" />}
             onClick={() => goTo(paytoProfilePath())}
+          />
+          <MenuItem
+            active={noPayToActive}
+            label="NoPayTo Agreement"
+            leading={<AgreementMark active={noPayToActive} label="NoPT" />}
+            onClick={() => goTo(noPayToProfilePath())}
           />
         </div>
       )}

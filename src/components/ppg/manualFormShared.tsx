@@ -16,7 +16,7 @@ export const manualSecondaryButtonClassName = `rounded-md border border-border-l
 export const IN_STORE_BOOKING_TITLE = 'In Store Booking'
 
 export const IN_STORE_BOOKING_INTRO_SUFFIX =
-  'In store payment can be collected through EFTPOS or Cash.'
+  'In store payment can be collected through cash.'
 
 export const CONTINUE_IN_STORE_BOOKING_LABEL = 'Continue with in store booking'
 

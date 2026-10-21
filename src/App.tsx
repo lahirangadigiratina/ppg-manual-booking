@@ -8,6 +8,10 @@ import {
   HUB_OPERATING_HOURS_PATH,
   HUB_PERSONAL_STORE_PATH,
   isHubProfilePath,
+  NOPAYTO_AGREEMENT_DETAILS_PATH,
+  NOPAYTO_AGREEMENT_NEW_PATH,
+  NOPAYTO_AGREEMENT_PATH,
+  NOPAYTO_AGREEMENT_REQUEST_PATH,
   PAYTO_AGREEMENT_DETAILS_PATH,
   PAYTO_AGREEMENT_NEW_PATH,
   PAYTO_AGREEMENT_PATH,
@@ -25,7 +29,7 @@ const hubMeta = {
 
 function pageTitleForNav(id: NavItemId): string {
   if (id === 'returns') return 'Return Parcel'
-  if (id === 'reports') return 'Transaction History'
+  if (id === 'reports') return 'Reports'
   if (id === 'ppg') return 'PPG Agent Portal'
   return 'Return Parcel'
 }
@@ -44,6 +48,20 @@ function pageTitleForPath(pathname: string, navId: NavItemId): string {
   }
   if (pathname.startsWith(PAYTO_AGREEMENT_PATH)) {
     return 'PayTo Agreement'
+  }
+  if (pathname.startsWith(NOPAYTO_AGREEMENT_DETAILS_PATH)) {
+    return 'NoPayTo Agreement Details'
+  }
+  if (
+    pathname.startsWith(NOPAYTO_AGREEMENT_REQUEST_PATH) ||
+    pathname.startsWith(NOPAYTO_AGREEMENT_NEW_PATH)
+  ) {
+    return pathname.startsWith(NOPAYTO_AGREEMENT_NEW_PATH)
+      ? 'New NoPayTo Agreement'
+      : 'Request NoPayTo Agreement'
+  }
+  if (pathname.startsWith(NOPAYTO_AGREEMENT_PATH)) {
+    return 'NoPayTo Agreement'
   }
   if (pathname.startsWith(HUB_PERSONAL_STORE_PATH)) {
     return 'Location Details'

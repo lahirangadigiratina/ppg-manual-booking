@@ -1,5 +1,5 @@
-import { ArrowRight, CreditCard, Store } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowRight, CircleHelp, CreditCard, Store } from 'lucide-react'
+import { useEffect, useId, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   deliveryMethodFromPpgPath,
@@ -7,6 +7,7 @@ import {
   PPG_ONLINE_SMS_FAILED_PATH,
   ppgPathForDeliveryMethod,
 } from '../../config/ppgRoutes'
+import { hasNoPayToAgreements, noPayToProfilePath } from '../../nopayto/noPayToAgreementStorage'
 import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
 import {
   applyAustralianMobileFieldChange,
@@ -25,7 +26,6 @@ import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
 import {
-  IN_STORE_BOOKING_INTRO_SUFFIX,
   IN_STORE_BOOKING_TITLE,
   ManualFieldLabel,
   manualFlowStepHelperClassName,
@@ -67,6 +67,8 @@ function BookingModeOption({
   paymentLabel,
   paymentIcon: PaymentIcon,
   onClick,
+  disabled = false,
+  tooltip,
 }: {
   selected: boolean
   title: string
@@ -74,31 +76,65 @@ function BookingModeOption({
   paymentLabel: string
   paymentIcon: typeof CreditCard
   onClick: () => void
+  disabled?: boolean
+  tooltip?: string
 }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      className={`relative flex flex-col rounded-lg border p-3 text-left transition-colors sm:p-3.5 ${
-        selected
-          ? 'border-[#2b2f36] bg-[#2b2f36] text-white shadow-sm'
-          : 'border-border-light bg-white text-black hover:border-gray-300'
-      }`}
-    >
+  const tooltipId = useId()
+  const cardClassName = `relative flex w-full flex-col rounded-lg border p-3 text-left transition-colors sm:p-3.5 ${
+    disabled
+      ? 'cursor-not-allowed border-border-light bg-gray-50 text-gray-400'
+      : selected
+        ? 'border-[#2b2f36] bg-[#2b2f36] text-white shadow-sm'
+        : 'border-border-light bg-white text-black hover:border-gray-300'
+  }`
+
+  const body = (
+    <>
       <span
         className={`absolute right-2.5 top-2.5 flex size-4 items-center justify-center rounded-full border-2 sm:right-3 sm:top-3 ${
-          selected ? 'border-white' : 'border-gray-300'
+          disabled ? 'border-gray-300' : selected ? 'border-white' : 'border-gray-300'
         }`}
         aria-hidden
       >
-        {selected ? <span className="size-2 rounded-full bg-white" /> : null}
+        {selected && !disabled ? <span className="size-2 rounded-full bg-white" /> : null}
       </span>
 
-      <span className="pe-7 text-sm font-bold leading-snug sm:text-base">{title}</span>
+      <span className="flex items-center gap-1.5 pe-7">
+        <span
+          className={`text-sm font-bold leading-snug sm:text-base ${
+            disabled ? 'text-gray-400' : ''
+          }`}
+        >
+          {title}
+        </span>
+        {tooltip ? (
+          <span className="group/tip relative z-10 inline-flex">
+            <button
+              type="button"
+              aria-label="Why in store booking is unavailable"
+              aria-describedby={tooltipId}
+              onClick={(event) => event.stopPropagation()}
+              className="inline-flex rounded-full text-gray-500 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+            >
+              <CircleHelp className="size-4" strokeWidth={2} aria-hidden />
+            </button>
+            <span
+              id={tooltipId}
+              role="tooltip"
+              className="pointer-events-none invisible absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-md bg-gray-900 px-3 py-2 text-xs font-medium leading-snug text-white opacity-0 shadow-lg transition-opacity group-hover/tip:visible group-hover/tip:opacity-100 group-focus-within/tip:visible group-focus-within/tip:opacity-100"
+            >
+              {tooltip}
+              <span
+                className="absolute left-1/2 top-full size-2 -translate-x-1/2 -translate-y-1 rotate-45 bg-gray-900"
+                aria-hidden
+              />
+            </span>
+          </span>
+        ) : null}
+      </span>
       <span
         className={`mt-1.5 text-xs leading-snug sm:text-sm ${
-          selected ? 'text-white/85' : 'text-text-muted'
+          disabled ? 'text-gray-400' : selected ? 'text-white/85' : 'text-text-muted'
         }`}
       >
         {description}
@@ -106,18 +142,38 @@ function BookingModeOption({
 
       <div
         className={`mt-2 border-t pt-2 sm:mt-2.5 sm:pt-2 ${
-          selected ? 'border-white/20' : 'border-border-light'
+          disabled
+            ? 'border-border-light'
+            : selected
+              ? 'border-white/20'
+              : 'border-border-light'
         }`}
       >
         <span
           className={`flex items-center gap-1.5 text-[11px] font-medium sm:text-xs ${
-            selected ? 'text-white/90' : 'text-text-muted'
+            disabled ? 'text-gray-400' : selected ? 'text-white/90' : 'text-text-muted'
           }`}
         >
           <PaymentIcon className="size-3.5 shrink-0 sm:size-4" strokeWidth={1.75} aria-hidden />
           {paymentLabel}
         </span>
       </div>
+    </>
+  )
+
+  if (tooltip) {
+    return <div className={cardClassName}>{body}</div>
+  }
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      disabled={disabled}
+      onClick={onClick}
+      className={cardClassName}
+    >
+      {body}
     </button>
   )
 }
@@ -145,10 +201,17 @@ export function PpgAgentPortal() {
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
   const [paymentReceived, setPaymentReceived] = useState(false)
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
+  const inStoreBookingEnabled = hasNoPayToAgreements()
 
   useEffect(() => {
     const methodFromPath = deliveryMethodFromPpgPath(location.pathname)
     if (!methodFromPath) {
+      return
+    }
+    if (!hasNoPayToAgreements()) {
+      setBookingMode('online')
+      setScreen('home')
+      navigate(PPG_HOME_PATH, { replace: true })
       return
     }
     setDeliveryMethod(methodFromPath)
@@ -156,7 +219,15 @@ export function PpgAgentPortal() {
     setBookingMode('manual')
     setScreen('manual')
     setManualStep(1)
-  }, [location.pathname])
+  }, [location.pathname, navigate])
+
+  useEffect(() => {
+    if (screen === 'manual' && !hasNoPayToAgreements()) {
+      setBookingMode('online')
+      setScreen('home')
+      navigate(PPG_HOME_PATH, { replace: true })
+    }
+  }, [screen, navigate])
 
   const handleSendSms = async () => {
     setSmsSending(true)
@@ -171,6 +242,10 @@ export function PpgAgentPortal() {
   }
 
   const startManualFlow = () => {
+    if (!hasNoPayToAgreements()) {
+      navigate(noPayToProfilePath())
+      return
+    }
     setManualStep(1)
     setDeliverySelected(false)
     setScreen('manual')
@@ -341,6 +416,10 @@ export function PpgAgentPortal() {
             }}
             onFailure={setSmsErrorMessage}
             onManualBooking={() => {
+              if (!inStoreBookingEnabled) {
+                navigate(noPayToProfilePath())
+                return
+              }
               setBookingMode('manual')
               navigate(PPG_HOME_PATH)
               startManualFlow()
@@ -362,8 +441,8 @@ export function PpgAgentPortal() {
         <div className={ppgPortalPanelClassName}>
           <h2 className={manualFlowStepTitleClassName}>How is the customer booking?</h2>
           <p className={`${manualFlowStepHelperClassName} mb-3 line-clamp-none sm:mb-4`}>
-            Select how the booking will be made. Online payment is via payment gateway while{' '}
-            {IN_STORE_BOOKING_INTRO_SUFFIX}
+            Select how the booking will be made. Online payment is via payment gateway while In
+            store payment can be collected through cash.
           </p>
 
           <div
@@ -378,11 +457,21 @@ export function PpgAgentPortal() {
               onClick={() => setBookingMode('online')}
             />
             <BookingModeOption
-              selected={bookingMode === 'manual'}
+              selected={bookingMode === 'manual' && inStoreBookingEnabled}
               title={IN_STORE_BOOKING_TITLE}
-              description="You book on the customer's behalf as the agent"
+              description={
+                inStoreBookingEnabled
+                  ? "You book on the customer's behalf as the agent"
+                  : 'Requires an active PayTo agreement before booking in store'
+              }
               paymentLabel="Payment in store"
               paymentIcon={Store}
+              disabled={!inStoreBookingEnabled}
+              tooltip={
+                inStoreBookingEnabled
+                  ? undefined
+                  : 'In-store booking is unavailable until a PayTo agreement is set up for this store. You can still proceed with online booking.'
+              }
               onClick={() => {
                 setBookingMode('manual')
                 startManualFlow()
@@ -394,7 +483,7 @@ export function PpgAgentPortal() {
             <section className="flex flex-col gap-3 pt-0 sm:gap-3.5">
               <div>
                 <ManualFieldLabel htmlFor="sender-mobile">
-                  Sender&apos;s mobile number
+                  Sender&apos;s Mobile Number
                 </ManualFieldLabel>
                 <input
                   id="sender-mobile"
