@@ -532,7 +532,7 @@ function ReportDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="absolute inset-y-0 right-0 flex w-full max-w-[calc(100%-1.25rem)] animate-[report-drawer-in_220ms_ease-out] flex-col bg-white shadow-2xl sm:max-w-[calc(100%-5.5rem)] lg:max-w-[calc(100%-9rem)]"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[calc(100%-1.25rem)] animate-[report-drawer-in_450ms_ease-out] flex-col bg-white shadow-2xl sm:max-w-[calc(100%-8rem)] lg:max-w-[calc(100%-14rem)]"
       >
         <div className="flex shrink-0 items-center justify-between border-b border-border-light px-5 py-4 sm:px-6">
           <h2 className="text-base font-semibold text-black sm:text-lg">{title}</h2>

@@ -1,4 +1,4 @@
-import { Info, Printer } from 'lucide-react'
+import { MoreVertical, Printer } from 'lucide-react'
 import { useState } from 'react'
 import { HelpBubble } from '../components/return-parcel/HelpBubble'
 import { SearchParcels } from '../components/return-parcel/SearchParcels'
@@ -43,41 +43,39 @@ export function ReturnDropoffContent() {
 
             <section className="mt-8 sm:mt-10">
               <h2 className="mb-3 text-base font-bold text-black sm:mb-4 sm:text-lg">History</h2>
-              <div className="overflow-hidden rounded-sm border border-border-light">
+              <div className="overflow-x-auto rounded-sm border border-border-light">
                 <article className="bg-white">
-                  <div className="flex flex-col gap-4 p-4 sm:p-5 xl:flex-row xl:items-center xl:gap-6 xl:py-4">
-                    <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-4">
+                  <div className="flex flex-col gap-4 p-4 sm:p-5 xl:flex-row xl:items-center xl:gap-4 xl:py-4">
+                    <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,0.7fr)_15.5rem] xl:gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-black">
+                        <p className="truncate text-xs font-bold text-black">
                           {CONFIRMED_PARCEL.customerName}
                         </p>
-                        <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
+                        <p className="mt-0.5 text-xs text-text-muted">
                           {CONFIRMED_PARCEL.retailer}
                         </p>
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-black">
+                        <p className="truncate text-xs font-bold text-black">
                           {CONFIRMED_PARCEL.consignmentId}
                         </p>
-                        <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
+                        <p className="mt-0.5 text-xs font-bold text-black">
                           Item: {CONFIRMED_PARCEL.itemId}
                         </p>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm text-black">{CONFIRMED_PARCEL.status}</p>
-                        <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
-                          {CONFIRMED_PARCEL.carrier}
-                        </p>
+                        <p className="text-xs text-black">{CONFIRMED_PARCEL.status}</p>
+                        <p className="mt-0.5 text-xs text-black">{CONFIRMED_PARCEL.carrier}</p>
                       </div>
-                      <div className="min-w-0 text-xs text-black sm:text-sm">
+                      <div className="min-w-0 text-xs font-bold text-black">
                         <p>Cons Ref: {CONFIRMED_PARCEL.consRef}</p>
                         <p className="mt-0.5">Item Ref: {CONFIRMED_PARCEL.itemRef}</p>
                       </div>
-                      <div className="min-w-0 text-xs text-black sm:text-sm">
-                        <p>
+                      <div className="min-w-[15.5rem] text-xs text-black">
+                        <p className="whitespace-nowrap">
                           <span className="font-bold">Booked:</span> {CONFIRMED_PARCEL.bookedAt}
                         </p>
-                        <p className="mt-0.5">
+                        <p className="mt-0.5 whitespace-nowrap">
                           <span className="font-bold">Dropped Off:</span>{' '}
                           {CONFIRMED_PARCEL.droppedOffAt}
                         </p>
@@ -94,9 +92,9 @@ export function ReturnDropoffContent() {
                       <button
                         type="button"
                         className="flex size-10 items-center justify-center rounded border border-border-light bg-white text-black hover:bg-gray-50"
-                        aria-label="Parcel details"
+                        aria-label="More actions"
                       >
-                        <Info className="size-5" strokeWidth={1.75} />
+                        <MoreVertical className="size-5" strokeWidth={1.75} />
                       </button>
                     </div>
                   </div>

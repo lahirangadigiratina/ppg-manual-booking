@@ -21,7 +21,7 @@ export function SearchParcels({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white py-3 pl-4 pr-20 text-sm text-black shadow-sm outline-none transition-shadow placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 sm:py-3.5 sm:text-base"
+            className="w-full rounded-md border border-gray-300 bg-white py-3 pl-4 pr-20 text-sm text-black shadow-sm outline-none transition-shadow placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 sm:py-3.5 sm:text-base [&::-webkit-search-cancel-button]:appearance-none"
             placeholder={placeholder}
             aria-label="Search parcels"
           />
