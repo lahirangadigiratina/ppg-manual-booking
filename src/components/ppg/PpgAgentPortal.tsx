@@ -7,7 +7,7 @@ import {
   PPG_ONLINE_SMS_FAILED_PATH,
   ppgPathForDeliveryMethod,
 } from '../../config/ppgRoutes'
-import { hasNoPayToAgreements, noPayToProfilePath } from '../../nopayto/noPayToAgreementStorage'
+import { hasPayToAgreements } from '../../payto/paytoAgreementStorage'
 import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
 import {
   applyAustralianMobileFieldChange,
@@ -121,7 +121,7 @@ function BookingModeOption({
             <span
               id={tooltipId}
               role="tooltip"
-              className="pointer-events-none invisible absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-md bg-gray-900 px-3 py-2 text-xs font-medium leading-snug text-white opacity-0 shadow-lg transition-opacity group-hover/tip:visible group-hover/tip:opacity-100 group-focus-within/tip:visible group-focus-within/tip:opacity-100"
+              className="pointer-events-none invisible absolute bottom-full left-1/2 z-30 mb-2 w-72 -translate-x-1/2 rounded-md bg-gray-900 px-3 py-2 text-xs font-medium leading-snug text-white opacity-0 shadow-lg transition-opacity group-hover/tip:visible group-hover/tip:opacity-100 group-focus-within/tip:visible group-focus-within/tip:opacity-100"
             >
               {tooltip}
               <span
@@ -201,14 +201,14 @@ export function PpgAgentPortal() {
   const [dangerousGoodsConfirmed, setDangerousGoodsConfirmed] = useState(false)
   const [paymentReceived, setPaymentReceived] = useState(false)
   const isSmsFailedRoute = location.pathname === PPG_ONLINE_SMS_FAILED_PATH
-  const inStoreBookingEnabled = hasNoPayToAgreements()
+  const inStoreBookingEnabled = hasPayToAgreements()
 
   useEffect(() => {
     const methodFromPath = deliveryMethodFromPpgPath(location.pathname)
     if (!methodFromPath) {
       return
     }
-    if (!hasNoPayToAgreements()) {
+    if (!hasPayToAgreements()) {
       setBookingMode('online')
       setScreen('home')
       navigate(PPG_HOME_PATH, { replace: true })
@@ -222,7 +222,7 @@ export function PpgAgentPortal() {
   }, [location.pathname, navigate])
 
   useEffect(() => {
-    if (screen === 'manual' && !hasNoPayToAgreements()) {
+    if (screen === 'manual' && !hasPayToAgreements()) {
       setBookingMode('online')
       setScreen('home')
       navigate(PPG_HOME_PATH, { replace: true })
@@ -242,8 +242,7 @@ export function PpgAgentPortal() {
   }
 
   const startManualFlow = () => {
-    if (!hasNoPayToAgreements()) {
-      navigate(noPayToProfilePath())
+    if (!hasPayToAgreements()) {
       return
     }
     setManualStep(1)
@@ -415,9 +414,9 @@ export function PpgAgentPortal() {
               navigate(PPG_HOME_PATH)
             }}
             onFailure={setSmsErrorMessage}
+            manualBookingDisabled={!inStoreBookingEnabled}
             onManualBooking={() => {
               if (!inStoreBookingEnabled) {
-                navigate(noPayToProfilePath())
                 return
               }
               setBookingMode('manual')
@@ -470,7 +469,7 @@ export function PpgAgentPortal() {
               tooltip={
                 inStoreBookingEnabled
                   ? undefined
-                  : 'In-store booking is unavailable until a PayTo agreement is set up for this store. You can still proceed with online booking.'
+                  : 'In-store booking is unavailable until a PayTo agreement is set up for this store. You can create it in the profile. You can still proceed with online booking.'
               }
               onClick={() => {
                 setBookingMode('manual')

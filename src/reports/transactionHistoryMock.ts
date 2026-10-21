@@ -7,7 +7,6 @@ export interface TransactionRecord {
   customerName: string
   date: string
   status: TransactionStatus
-  serviceType: string
   product: string
   amount: string
 }
@@ -18,8 +17,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'John Doe',
     date: '10/09/2025 1:37 PM',
     status: 'PENDING',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$3.50',
   },
   {
@@ -27,8 +25,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Jane Smith',
     date: '10/09/2025 2:15 PM',
     status: 'COMPLETED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$5.00',
   },
   {
@@ -36,8 +33,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Bob Wilson',
     date: '10/09/2025 3:42 PM',
     status: 'CANCELLED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$2.75',
   },
   {
@@ -45,8 +41,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Alice Brown',
     date: '11/09/2025 9:20 AM',
     status: 'COMPLETED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$4.25',
   },
   {
@@ -54,8 +49,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Charlie Davis',
     date: '11/09/2025 10:05 AM',
     status: 'PENDING',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$6.00',
   },
   {
@@ -63,8 +57,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Emma Taylor',
     date: '11/09/2025 11:30 AM',
     status: 'COMPLETED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$3.50',
   },
   {
@@ -72,8 +65,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Frank Miller',
     date: '12/09/2025 8:45 AM',
     status: 'PENDING',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$7.25',
   },
   {
@@ -81,8 +73,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Grace Lee',
     date: '12/09/2025 1:12 PM',
     status: 'COMPLETED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$2.50',
   },
   {
@@ -90,8 +81,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Henry Clark',
     date: '12/09/2025 2:55 PM',
     status: 'CANCELLED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$4.00',
   },
   {
@@ -99,8 +89,7 @@ export const MOCK_TRANSACTIONS: TransactionRecord[] = [
     customerName: 'Ivy Martinez',
     date: '13/09/2025 9:08 AM',
     status: 'COMPLETED',
-    serviceType: 'India',
-    product: 'Send',
+    product: 'Drop-off',
     amount: '$5.75',
   },
 ]

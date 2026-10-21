@@ -23,6 +23,7 @@ interface PpgOnlineSmsFailedViewProps {
   onSuccess: () => void
   onFailure: (message: string) => void
   onManualBooking: () => void
+  manualBookingDisabled?: boolean
 }
 
 export function PpgOnlineSmsFailedView({
@@ -34,6 +35,7 @@ export function PpgOnlineSmsFailedView({
   onSuccess,
   onFailure,
   onManualBooking,
+  manualBookingDisabled = false,
 }: PpgOnlineSmsFailedViewProps) {
   const retrySend = async () => {
     onSendingChange(true)
@@ -95,7 +97,12 @@ export function PpgOnlineSmsFailedView({
           {sending ? 'Sending…' : 'Try again'}
           {!sending && <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />}
         </button>
-        <button type="button" onClick={onManualBooking} className={manualSecondaryButtonClassName}>
+        <button
+          type="button"
+          onClick={onManualBooking}
+          disabled={manualBookingDisabled}
+          className={`${manualSecondaryButtonClassName} disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400`}
+        >
           {CONTINUE_IN_STORE_BOOKING_LABEL}
         </button>
       </div>

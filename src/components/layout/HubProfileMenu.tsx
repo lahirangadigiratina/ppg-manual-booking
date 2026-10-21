@@ -5,10 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   HUB_OPERATING_HOURS_PATH,
   HUB_PERSONAL_STORE_PATH,
-  NOPAYTO_AGREEMENT_PATH,
   PAYTO_AGREEMENT_PATH,
 } from '../../config/appRoutes'
-import { noPayToProfilePath } from '../../nopayto/noPayToAgreementStorage'
 import { paytoProfilePath } from '../../payto/paytoAgreementStorage'
 
 function AgreementMark({
@@ -74,7 +72,6 @@ export function HubProfileMenu() {
   const menuId = useId()
 
   const payToActive = pathname.startsWith(PAYTO_AGREEMENT_PATH)
-  const noPayToActive = pathname.startsWith(NOPAYTO_AGREEMENT_PATH)
   const personalActive = pathname.startsWith(HUB_PERSONAL_STORE_PATH)
   const hoursActive = pathname.startsWith(HUB_OPERATING_HOURS_PATH)
 
@@ -154,12 +151,6 @@ export function HubProfileMenu() {
             label="PayTo Agreement"
             leading={<AgreementMark active={payToActive} label="PayTo" />}
             onClick={() => goTo(paytoProfilePath())}
-          />
-          <MenuItem
-            active={noPayToActive}
-            label="NoPayTo Agreement"
-            leading={<AgreementMark active={noPayToActive} label="NoPT" />}
-            onClick={() => goTo(noPayToProfilePath())}
           />
         </div>
       )}

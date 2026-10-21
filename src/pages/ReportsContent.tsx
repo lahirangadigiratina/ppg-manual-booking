@@ -1,6 +1,5 @@
 import {
   ArrowDownToLine,
-  ArrowLeft,
   ArrowLeftRight,
   CalendarRange,
   ChevronDown,
@@ -8,8 +7,9 @@ import {
   ChevronRight,
   Database,
   SlidersHorizontal,
+  X,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   REPORT_DAILY_SWEEP,
   REPORT_TRANSACTIONS,
@@ -19,10 +19,7 @@ import {
   type TransactionReportTab,
   type TransactionStatus,
 } from '../reports/transactionHistoryMock'
-import {
-  manualPrimaryButtonClassName,
-  manualSecondaryButtonClassName,
-} from '../components/ppg/manualFormShared'
+import { manualPrimaryButtonClassName } from '../components/ppg/manualFormShared'
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 
@@ -121,15 +118,7 @@ function ReportChoice({
           : 'border-border-light bg-white text-black hover:border-gray-300'
       }`}
     >
-      <span
-        className={`absolute right-2.5 top-2.5 flex size-4 items-center justify-center rounded-full border-2 sm:right-3 sm:top-3 ${
-          selected ? 'border-white' : 'border-gray-300'
-        }`}
-        aria-hidden
-      >
-        {selected ? <span className="size-2 rounded-full bg-white" /> : null}
-      </span>
-      <span className="pe-7 text-sm font-bold leading-snug sm:text-base">{title}</span>
+      <span className="text-sm font-bold leading-snug sm:text-base">{title}</span>
       <span
         className={`mt-1.5 text-xs leading-snug sm:text-sm ${
           selected ? 'text-white/85' : 'text-text-muted'
@@ -181,11 +170,8 @@ function AllTransactionsTable({ rows }: { rows: TransactionRecord[] }) {
           <th scope="col" className={`${reportHeadCellClassName} min-w-[7.5rem]`}>
             Status
           </th>
-          <th scope="col" className={`${reportHeadCellClassName} min-w-[8.5rem]`}>
-            Service Type
-          </th>
-          <th scope="col" className={`${reportHeadCellClassName} min-w-[6.5rem]`}>
-            Product
+          <th scope="col" className={`${reportHeadCellClassName} min-w-[11rem]`}>
+            Product Service Type
           </th>
           <th scope="col" className={`${reportHeadCellClassName} min-w-[6.5rem]`}>
             Amount
@@ -195,7 +181,7 @@ function AllTransactionsTable({ rows }: { rows: TransactionRecord[] }) {
       <tbody>
         {rows.length === 0 ? (
           <tr className={reportBodyRowClassName}>
-            <td colSpan={8} className="px-4 py-8 text-center text-sm text-text-muted">
+            <td colSpan={7} className="px-4 py-8 text-center text-sm text-text-muted">
               No transactions match this search.
             </td>
           </tr>
@@ -212,7 +198,6 @@ function AllTransactionsTable({ rows }: { rows: TransactionRecord[] }) {
               <td className={reportCellClassName}>
                 <TransactionStatusBadge status={row.status} />
               </td>
-              <td className={`${reportCellClassName} text-black`}>{row.serviceType}</td>
               <td className={`${reportCellClassName} text-black`}>{row.product}</td>
               <td className={`${reportCellClassName} font-semibold text-black`}>{row.amount}</td>
             </tr>
@@ -294,8 +279,7 @@ function MonthlyTransactionReport() {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="text-base font-bold text-black sm:text-lg">Monthly Transaction Report</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-snug text-text-muted">
+      <p className="max-w-3xl text-sm leading-snug text-text-muted">
         Please note that GST is not included in the data presented within the reports. The report
         for the current month will be ready by 20th of the following month.
       </p>
@@ -437,7 +421,7 @@ function TransactionReportTable({ tab }: { tab: 'all' | 'daily-sweep' }) {
     }
     return REPORT_TRANSACTIONS.filter((row) =>
       matchesQuery(
-        [row.id, row.customerName, row.date, row.status, row.serviceType, row.product, row.amount],
+        [row.id, row.customerName, row.date, row.status, row.product, row.amount],
         query,
       ),
     )
@@ -511,16 +495,73 @@ function TransactionReportTable({ tab }: { tab: 'all' | 'daily-sweep' }) {
   )
 }
 
+const REPORT_DRAWER_TITLES: Record<TransactionReportTab, string> = {
+  monthly: 'Monthly Transaction Report',
+  all: 'All Transactions',
+  'daily-sweep': 'Daily Sweep',
+}
+
+function ReportDrawer({
+  title,
+  onClose,
+  children,
+}: {
+  title: string
+  onClose: () => void
+  children: ReactNode
+}) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  return (
+    <div className="fixed inset-0 z-[70]">
+      <button
+        type="button"
+        aria-label="Close report"
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="absolute inset-y-0 right-0 flex w-full max-w-[calc(100%-1.25rem)] animate-[report-drawer-in_220ms_ease-out] flex-col bg-white shadow-2xl sm:max-w-[calc(100%-5.5rem)] lg:max-w-[calc(100%-9rem)]"
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-border-light px-5 py-4 sm:px-6">
+          <h2 className="text-base font-semibold text-black sm:text-lg">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex size-8 items-center justify-center rounded-md text-black hover:bg-gray-100"
+          >
+            <X className="size-5" strokeWidth={1.75} aria-hidden />
+          </button>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 sm:px-5 sm:py-5 lg:px-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function ReportsContent() {
   const [tab, setTab] = useState<TransactionReportTab | null>(null)
 
   return (
     <div className="mx-auto flex h-full w-full min-h-0 min-w-0 max-w-[1600px] flex-col overflow-hidden px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-      {tab === null ? (
-        <div
-          className="mb-4 grid shrink-0 grid-cols-1 gap-2 sm:mb-5 sm:grid-cols-3 sm:gap-3"
-          aria-label="Report type"
-        >
+      <div
+        className="mb-4 grid shrink-0 grid-cols-1 gap-2 sm:mb-5 sm:grid-cols-3 sm:gap-3"
+        aria-label="Report type"
+      >
           <ReportChoice
             selected={false}
             title="Monthly transaction report"
@@ -545,24 +586,16 @@ export function ReportsContent() {
             icon={Database}
             onClick={() => setTab('daily-sweep')}
           />
-        </div>
-      ) : (
-      <div className="flex w-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setTab(null)}
-        className={`mb-4 inline-flex w-fit shrink-0 items-center gap-2 ${manualSecondaryButtonClassName}`}
-      >
-        <ArrowLeft className="size-4" strokeWidth={2} aria-hidden />
-        Back
-      </button>
-      {tab === 'monthly' ? (
-        <MonthlyTransactionReport />
-      ) : (
-        <TransactionReportTable key={tab} tab={tab} />
-      )}
       </div>
-      )}
+      {tab ? (
+        <ReportDrawer title={REPORT_DRAWER_TITLES[tab]} onClose={() => setTab(null)}>
+          {tab === 'monthly' ? (
+            <MonthlyTransactionReport />
+          ) : (
+            <TransactionReportTable key={tab} tab={tab} />
+          )}
+        </ReportDrawer>
+      ) : null}
     </div>
   )
 }

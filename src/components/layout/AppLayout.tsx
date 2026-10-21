@@ -15,6 +15,7 @@ interface AppLayoutProps {
   hubName: string
   showTopHeader?: boolean
   showNotificationPanel?: boolean
+  showHelpChat?: boolean
   /** Background for the main content column (Returns: gray, PPG: white). */
   contentShellClassName?: string
   mainClassName?: string
@@ -29,6 +30,7 @@ export function AppLayout({
   hubName,
   showTopHeader = true,
   showNotificationPanel = false,
+  showHelpChat = false,
   contentShellClassName = 'bg-page-bg',
   mainClassName = 'overflow-y-auto bg-page-bg',
   children,
@@ -87,7 +89,7 @@ export function AppLayout({
             ) : null}
           </div>
         </div>
-        {showNotificationPanel ? <HelpChatViewportFab /> : null}
+        {showHelpChat ? <HelpChatViewportFab /> : null}
       </div>
     </NotificationPanelProvider>
   )

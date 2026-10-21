@@ -9,7 +9,7 @@ export function PayToAgreementIntroContent({ className = '' }: { className?: str
       <p className="mt-3">
         A <strong className="font-bold text-black">PayTo agreement</strong> is the authorisation your
         store sets up with its nominated account. Once you request an agreement and approve it in
-        your banking app, Hubbed can collect eligible store payments through PayTo without needing
+        your banking app, HUBBED can collect eligible store payments through PayTo without needing
         card details for each transaction.
       </p>
       <p className="mt-3">

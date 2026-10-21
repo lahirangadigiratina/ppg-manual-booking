@@ -128,7 +128,8 @@ function App() {
             pageTitle={pageTitleForPath(location.pathname, activeNavId)}
             locationName={hubMeta.locationName}
             hubName={hubMeta.hubName}
-            showNotificationPanel={!isPpgMain}
+            showNotificationPanel={!isPpgMain && !isReportsMain}
+            showHelpChat={!isPpgMain}
             mainClassName={
               isPpgMain || isReportsMain
                 ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'

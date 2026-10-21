@@ -25,6 +25,15 @@
   }
 }
 
+@keyframes report-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes hubbed-bar-pulse {
   0%,
   100% {
