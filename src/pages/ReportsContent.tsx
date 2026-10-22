@@ -496,9 +496,9 @@ function TransactionReportTable({ tab }: { tab: 'all' | 'daily-sweep' }) {
 }
 
 const REPORT_DRAWER_TITLES: Record<TransactionReportTab, string> = {
-  monthly: 'Monthly Transaction Report',
-  all: 'All Transactions',
-  'daily-sweep': 'Daily Sweep',
+  monthly: 'PARCELPOINT monthly report',
+  all: 'PPG transactions',
+  'daily-sweep': 'PPG daily sweep',
 }
 
 function ReportDrawer({
@@ -564,7 +564,7 @@ export function ReportsContent() {
       >
           <ReportChoice
             selected={false}
-            title="Monthly transaction report"
+            title="PARCELPOINT monthly report"
             description="Transactions grouped for the current month"
             detail="This month"
             icon={CalendarRange}
@@ -572,7 +572,7 @@ export function ReportsContent() {
           />
           <ReportChoice
             selected={false}
-            title="All transactions"
+            title="PPG transactions"
             description="Every booking and payment recorded for this store"
             detail="Full history"
             icon={ArrowLeftRight}
@@ -580,7 +580,7 @@ export function ReportsContent() {
           />
           <ReportChoice
             selected={false}
-            title="Daily sweep"
+            title="PPG daily sweep"
             description="End-of-day sweep totals for this store"
             detail="End of day"
             icon={Database}
