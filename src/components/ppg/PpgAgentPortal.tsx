@@ -42,7 +42,7 @@ import {
   type DeliveryMethod,
   type ManualBookingDraft,
 } from './manualBookingState'
-type BookingMode = 'online' | 'manual' | null
+type BookingMode = 'online' | 'manual'
 type PortalScreen = 'home' | 'manual'
 
 const ppgPageShellClassName =
@@ -183,7 +183,7 @@ export function PpgAgentPortal() {
   const location = useLocation()
   const [screen, setScreen] = useState<PortalScreen>('home')
   const [manualStep, setManualStep] = useState(1)
-  const [bookingMode, setBookingMode] = useState<BookingMode>(null)
+  const [bookingMode, setBookingMode] = useState<BookingMode>('online')
   const [mobile, setMobile] = useState('')
   const [smsLinkSentOpen, setSmsLinkSentOpen] = useState(false)
   const [smsSending, setSmsSending] = useState(false)
@@ -209,7 +209,7 @@ export function PpgAgentPortal() {
       return
     }
     if (!hasPayToAgreements()) {
-      setBookingMode(null)
+      setBookingMode('online')
       setScreen('home')
       navigate(PPG_HOME_PATH, { replace: true })
       return
@@ -223,7 +223,7 @@ export function PpgAgentPortal() {
 
   useEffect(() => {
     if (screen === 'manual' && !hasPayToAgreements()) {
-      setBookingMode(null)
+      setBookingMode('online')
       setScreen('home')
       navigate(PPG_HOME_PATH, { replace: true })
     }
@@ -356,7 +356,7 @@ export function PpgAgentPortal() {
                 }
                 onBack={() => {
                   if (manualStep === 1) {
-                    setBookingMode(null)
+                    setBookingMode('online')
                     setScreen('home')
                     navigate(PPG_HOME_PATH, { replace: true })
                     return
