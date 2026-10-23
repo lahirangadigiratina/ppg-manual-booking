@@ -67,7 +67,7 @@ export function ManualPriceBreakdownStep({
         </h3>
 
         <p className={`${manualFlowStepHelperClassName} mt-2 line-clamp-none`}>
-          Collect {totalLabel} from the customer via EFTPOS or cash. This booking cannot be
+          Collect {totalLabel} from the customer through cash. This booking cannot be
           completed until payment is confirmed.
         </p>
 
