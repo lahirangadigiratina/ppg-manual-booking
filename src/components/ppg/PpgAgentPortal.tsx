@@ -1,4 +1,4 @@
-import { CircleHelp, CreditCard, Store } from 'lucide-react'
+import { ArrowRight, CircleHelp, CreditCard, Store } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -9,7 +9,11 @@ import {
 } from '../../config/ppgRoutes'
 import { hasPayToAgreements } from '../../payto/paytoAgreementStorage'
 import { PpgOnlineSmsFailedView } from './PpgOnlineSmsFailedView'
-import { sendBookingLinkSms } from './ppgSmsUtils'
+import {
+  applyAustralianMobileFieldChange,
+  focusAustralianMobileField,
+  sendBookingLinkSms,
+} from './ppgSmsUtils'
 import { ManualContentsStep } from './ManualContentsStep'
 import { ManualOfferAddonsStep } from './ManualOfferAddonsStep'
 import { ManualBookingSuccessStep } from './ManualBookingSuccessStep'
@@ -20,12 +24,14 @@ import { ManualSenderDetailsStep } from './ManualSenderDetailsStep'
 import { PpgBookingSummaryPanel } from './PpgBookingSummaryPanel'
 import { PpgManualFlowStepHeader } from './PpgManualFlowStepHeader'
 import { PpgManualStepFooter } from './PpgManualStepFooter'
-import { OnlineBookingSmsDialog } from './OnlineBookingSmsDialog'
 import { SmsLinkSuccessDialog } from './SmsLinkSuccessDialog'
 import {
   IN_STORE_BOOKING_TITLE,
+  ManualFieldLabel,
   manualFlowStepHelperClassName,
   manualFlowStepTitleClassName,
+  manualInputClassName,
+  manualPrimaryButtonClassName,
 } from './manualFormShared'
 import {
   calculateBookingTotal,
@@ -179,7 +185,6 @@ export function PpgAgentPortal() {
   const [manualStep, setManualStep] = useState(1)
   const [bookingMode, setBookingMode] = useState<BookingMode>(null)
   const [mobile, setMobile] = useState('')
-  const [onlineBookingDialogOpen, setOnlineBookingDialogOpen] = useState(false)
   const [smsLinkSentOpen, setSmsLinkSentOpen] = useState(false)
   const [smsSending, setSmsSending] = useState(false)
   const [smsErrorMessage, setSmsErrorMessage] = useState('')
@@ -229,11 +234,9 @@ export function PpgAgentPortal() {
     const result = await sendBookingLinkSms(mobile)
     setSmsSending(false)
     if (result.ok) {
-      setOnlineBookingDialogOpen(false)
       setSmsLinkSentOpen(true)
       return
     }
-    setOnlineBookingDialogOpen(false)
     setSmsErrorMessage(result.error ?? 'Unable to send SMS.')
     navigate(PPG_ONLINE_SMS_FAILED_PATH)
   }
@@ -433,17 +436,6 @@ export function PpgAgentPortal() {
         mobileNumber={mobile}
         onClose={() => setSmsLinkSentOpen(false)}
       />
-      <OnlineBookingSmsDialog
-        open={onlineBookingDialogOpen}
-        mobile={mobile}
-        sending={smsSending}
-        onMobileChange={setMobile}
-        onClose={() => {
-          setOnlineBookingDialogOpen(false)
-          setBookingMode(null)
-        }}
-        onSend={() => void handleSendSms()}
-      />
       <div className={`${ppgManualPageShellClassName} items-start overflow-y-auto`}>
         <div className={ppgPortalPanelClassName}>
           <h2 className={manualFlowStepTitleClassName}>How is the customer booking?</h2>
@@ -452,17 +444,16 @@ export function PpgAgentPortal() {
             store payment can be collected through cash.
           </p>
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+          <div
+            className={`grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 ${bookingMode === 'online' ? 'mb-3 sm:mb-4' : 'mb-0'}`}
+          >
             <BookingModeOption
               selected={bookingMode === 'online'}
               title="Online Booking"
               description="Customer books online using their phone"
               paymentLabel="Online payment only"
               paymentIcon={CreditCard}
-              onClick={() => {
-                setBookingMode('online')
-                setOnlineBookingDialogOpen(true)
-              }}
+              onClick={() => setBookingMode('online')}
             />
             <BookingModeOption
               selected={bookingMode === 'manual' && inStoreBookingEnabled}
@@ -481,12 +472,50 @@ export function PpgAgentPortal() {
                   : 'In-store booking is unavailable until a PayTo agreement is set up for this store. You can create it in the profile. You can still proceed with online booking.'
               }
               onClick={() => {
-                setOnlineBookingDialogOpen(false)
                 setBookingMode('manual')
                 startManualFlow()
               }}
             />
           </div>
+
+          {bookingMode === 'online' && (
+            <section className="flex flex-col gap-3 pt-0 sm:gap-3.5">
+              <div>
+                <ManualFieldLabel htmlFor="sender-mobile">
+                  Sender&apos;s Mobile Number
+                </ManualFieldLabel>
+                <input
+                  id="sender-mobile"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={mobile}
+                  onFocus={() => setMobile((current) => focusAustralianMobileField(current))}
+                  onChange={(e) =>
+                    setMobile((previous) =>
+                      applyAustralianMobileFieldChange(previous, e.target.value),
+                    )
+                  }
+                  placeholder="+61 412 345 678"
+                  className={manualInputClassName}
+                />
+              </div>
+
+              <div className="flex w-full justify-end">
+                <button
+                  type="button"
+                  disabled={smsSending}
+                  onClick={() => void handleSendSms()}
+                  className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 disabled:opacity-60 ${manualPrimaryButtonClassName}`}
+                >
+                  {smsSending ? 'Sending…' : 'Send SMS'}
+                  {!smsSending && (
+                    <ArrowRight className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                  )}
+                </button>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>
