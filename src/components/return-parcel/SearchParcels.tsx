@@ -1,5 +1,14 @@
 import { Search, X } from 'lucide-react'
 import { useState } from 'react'
+import { ConfirmDropoffLabelDialog } from './ConfirmDropoffLabelDialog'
+import { ParcelDropoffConfirmDialog } from './ParcelDropoffConfirmDialog'
+import { PrintPreferenceDialog } from './PrintPreferenceDialog'
+import { ReturnDropoffCashConfirmDialog } from './ReturnDropoffCashConfirmDialog'
+import {
+  resolveDropoffDemoParcel,
+  resolvePrintPreferenceParcel,
+  type DropoffLabelParcelDemo,
+} from './returnParcelDemo'
 
 export function SearchParcels({
   initialQuery = 'MP8021760051',
@@ -9,6 +18,55 @@ export function SearchParcels({
   placeholder?: string
 }) {
   const [query, setQuery] = useState(initialQuery)
+  const [cashConfirmOpen, setCashConfirmOpen] = useState(false)
+  const [labelConfirmOpen, setLabelConfirmOpen] = useState(false)
+  const [labelParcel, setLabelParcel] = useState<DropoffLabelParcelDemo | null>(null)
+  const [labelDialogInitialStep, setLabelDialogInitialStep] = useState<1 | 2>(1)
+  const [pendingDropoffParcel, setPendingDropoffParcel] =
+    useState<DropoffLabelParcelDemo | null>(null)
+  const [printPreferenceOpen, setPrintPreferenceOpen] = useState(false)
+  const [parcelDropoffConfirmOpen, setParcelDropoffConfirmOpen] = useState(false)
+  const [includeLabelFlowAfterPayment, setIncludeLabelFlowAfterPayment] = useState(true)
+
+  const resetDropoffFlow = () => {
+    setPendingDropoffParcel(null)
+    setIncludeLabelFlowAfterPayment(true)
+  }
+
+  const tryOpenDialogForQuery = () => {
+    const printPreferenceParcel = resolvePrintPreferenceParcel(query)
+    if (printPreferenceParcel) {
+      setPendingDropoffParcel(printPreferenceParcel)
+      setPrintPreferenceOpen(true)
+      return
+    }
+    const parcel = resolveDropoffDemoParcel(query)
+    if (!parcel) {
+      return
+    }
+    setIncludeLabelFlowAfterPayment(true)
+    setPendingDropoffParcel(parcel)
+    setCashConfirmOpen(true)
+  }
+
+  const openLabelDialog = (parcel: DropoffLabelParcelDemo, initialStep: 1 | 2 = 1) => {
+    setLabelParcel(parcel)
+    setLabelDialogInitialStep(initialStep)
+    setLabelConfirmOpen(true)
+  }
+
+  const continueAfterPrintPreference = (wantsPrint: boolean) => {
+    setIncludeLabelFlowAfterPayment(wantsPrint)
+    setPrintPreferenceOpen(false)
+    if (wantsPrint) {
+      setParcelDropoffConfirmOpen(true)
+      return
+    }
+    if (pendingDropoffParcel) {
+      openLabelDialog(pendingDropoffParcel, 2)
+      setPendingDropoffParcel(null)
+    }
+  }
 
   return (
     <section>
@@ -21,6 +79,12 @@ export function SearchParcels({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                tryOpenDialogForQuery()
+              }
+            }}
             className="w-full rounded-md border border-gray-300 bg-white py-3 pl-4 pr-20 text-sm text-black shadow-sm outline-none transition-shadow placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 sm:py-3.5 sm:text-base [&::-webkit-search-cancel-button]:appearance-none"
             placeholder={placeholder}
             aria-label="Search parcels"
@@ -52,6 +116,56 @@ export function SearchParcels({
           Scan QR Code
         </button>
       </div>
+      <PrintPreferenceDialog
+        open={printPreferenceOpen}
+        onClose={() => {
+          setPrintPreferenceOpen(false)
+          resetDropoffFlow()
+        }}
+        onPrefer={() => continueAfterPrintPreference(true)}
+        onNotPrefer={() => continueAfterPrintPreference(false)}
+      />
+      <ParcelDropoffConfirmDialog
+        open={parcelDropoffConfirmOpen}
+        parcel={pendingDropoffParcel}
+        onClose={() => {
+          setParcelDropoffConfirmOpen(false)
+          resetDropoffFlow()
+        }}
+        onConfirm={() => {
+          setParcelDropoffConfirmOpen(false)
+          resetDropoffFlow()
+        }}
+      />
+      <ReturnDropoffCashConfirmDialog
+        open={cashConfirmOpen}
+        onClose={() => {
+          setCashConfirmOpen(false)
+          resetDropoffFlow()
+        }}
+        onConfirm={() => {
+          if (!pendingDropoffParcel) {
+            return
+          }
+          const parcel = pendingDropoffParcel
+          const showLabelFlow = includeLabelFlowAfterPayment
+          resetDropoffFlow()
+          setCashConfirmOpen(false)
+          if (showLabelFlow) {
+            openLabelDialog(parcel, 1)
+          }
+        }}
+      />
+      <ConfirmDropoffLabelDialog
+        open={labelConfirmOpen}
+        parcel={labelParcel}
+        initialStep={labelDialogInitialStep}
+        onClose={() => {
+          setLabelConfirmOpen(false)
+          setLabelParcel(null)
+          setLabelDialogInitialStep(1)
+        }}
+      />
     </section>
   )
 }

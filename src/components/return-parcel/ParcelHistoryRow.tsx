@@ -1,4 +1,5 @@
 import { MoreVertical, Printer } from 'lucide-react'
+import { confirmDropoffButtonClassName } from './returnParcelShared'
 
 export interface ParcelRecord {
   customerName: string
@@ -52,7 +53,7 @@ export function ParcelHistoryRow({ parcel }: ParcelHistoryRowProps) {
           </button>
           <button
             type="button"
-            className="rounded-md bg-hubbed-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-hubbed-orange-hover sm:px-6 sm:py-3"
+            className={confirmDropoffButtonClassName}
           >
             Confirm Dropoff
           </button>
