@@ -3,6 +3,7 @@ export interface DropoffLabelParcelDemo {
   name: string
   consignmentId: string
   itemId: string
+  itemReference?: string
   retailer?: string
 }
 
@@ -29,9 +30,10 @@ export const DROP_OFF_SECOND_PARCEL: DropoffLabelParcelDemo = {
 export const DROP_OFF_PRINT_PREFERENCE_PARCEL: DropoffLabelParcelDemo = {
   shipmentNumber: 'MP5500123600',
   name: 'Jordan Kumar',
-  consignmentId: 'MP8032101040',
+  consignmentId: 'MP8032116889',
   itemId: 'HCJDGZZG9',
-  retailer: 'PPG Drop-off',
+  itemReference: '',
+  retailer: 'T Return',
 }
 
 export const DROP_OFF_COLLECT_AMOUNT_LABEL = '$24.50'
