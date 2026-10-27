@@ -37,7 +37,7 @@ export function SearchParcels({
     const printPreferenceParcel = resolvePrintPreferenceParcel(query)
     if (printPreferenceParcel) {
       setPendingDropoffParcel(printPreferenceParcel)
-      setPrintPreferenceOpen(true)
+      setCashConfirmOpen(true)
       return
     }
     const parcel = resolveDropoffDemoParcel(query)
@@ -148,9 +148,13 @@ export function SearchParcels({
             return
           }
           const parcel = pendingDropoffParcel
+          setCashConfirmOpen(false)
+          if (resolvePrintPreferenceParcel(parcel.shipmentNumber)) {
+            setPrintPreferenceOpen(true)
+            return
+          }
           const showLabelFlow = includeLabelFlowAfterPayment
           resetDropoffFlow()
-          setCashConfirmOpen(false)
           if (showLabelFlow) {
             openLabelDialog(parcel, 1)
           }
