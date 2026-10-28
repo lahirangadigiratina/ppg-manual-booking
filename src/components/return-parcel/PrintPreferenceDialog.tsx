@@ -1,6 +1,5 @@
-import { X } from 'lucide-react'
+import { Package, X } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
-import { manualPrimaryButtonClassName } from '../ppg/manualFormShared'
 
 type PrintPreferenceChoice = 'prefer' | 'not-prefer'
 
@@ -9,6 +8,14 @@ interface PrintPreferenceDialogProps {
   onClose: () => void
   onPrefer: () => void
   onNotPrefer: () => void
+}
+
+function optionCardClassName(selected: boolean) {
+  return `flex w-full cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+    selected
+      ? 'border-black bg-gray-50/50'
+      : 'border-border-light bg-white hover:border-gray-300'
+  }`
 }
 
 export function PrintPreferenceDialog({
@@ -59,7 +66,7 @@ export function PrintPreferenceDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="print-preference-title"
-        className="relative flex w-full max-w-md flex-col items-center rounded-sm border border-border-light bg-white p-5 shadow-xl sm:p-6"
+        className="relative flex w-full max-w-md flex-col rounded-lg border border-border-light bg-white p-5 shadow-xl sm:p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -73,9 +80,9 @@ export function PrintPreferenceDialog({
 
         <h2
           id="print-preference-title"
-          className="w-full px-8 text-center text-base font-bold text-black sm:text-lg"
+          className="w-full px-8 text-center text-lg font-bold text-black"
         >
-          Would you prefer to print a label?
+          Print a shipping label?
           <span className="text-red-600" aria-hidden>
             *
           </span>
@@ -85,25 +92,24 @@ export function PrintPreferenceDialog({
           <legend className="sr-only">Print label preference</legend>
           <ul className="space-y-3">
             <li>
-              <label
-                htmlFor={preferPrintId}
-                className="flex cursor-pointer items-start gap-2.5 text-sm leading-snug text-black"
-              >
+              <label htmlFor={preferPrintId} className={optionCardClassName(choice === 'prefer')}>
                 <input
                   id={preferPrintId}
                   type="radio"
                   name="print-label-preference"
                   checked={choice === 'prefer'}
                   onChange={() => setChoice('prefer')}
-                  className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
+                  className="mt-1 size-4 shrink-0 border border-gray-400 accent-black"
                 />
-                <span>Location has access to a printer and I want to print a label.</span>
+                <span className="text-sm font-bold text-black">
+                  Location has access to a printer and I want to print a label.
+                </span>
               </label>
             </li>
             <li>
               <label
                 htmlFor={notPreferPrintId}
-                className="flex cursor-pointer items-start gap-2.5 text-sm leading-snug text-black"
+                className={optionCardClassName(choice === 'not-prefer')}
               >
                 <input
                   id={notPreferPrintId}
@@ -111,19 +117,24 @@ export function PrintPreferenceDialog({
                   name="print-label-preference"
                   checked={choice === 'not-prefer'}
                   onChange={() => setChoice('not-prefer')}
-                  className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
+                  className="mt-1 size-4 shrink-0 border border-gray-400 accent-black"
                 />
-                <span>I prefer not to print a label</span>
+                <span className="text-sm font-bold text-black">I prefer not to print a label</span>
               </label>
             </li>
           </ul>
         </fieldset>
 
+        <div className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-border-light bg-gray-100 px-3 py-2.5 text-sm font-medium text-black">
+          <Package className="size-4 shrink-0 text-black" strokeWidth={2} aria-hidden />
+          <span>Please package this parcel before proceeding.</span>
+        </div>
+
         <button
           type="button"
           disabled={choice === null}
           onClick={handleContinue}
-          className={`mt-6 w-full disabled:cursor-not-allowed disabled:opacity-50 ${manualPrimaryButtonClassName}`}
+          className="mt-6 w-full rounded-md py-2.5 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-80 enabled:bg-gray-500 enabled:hover:bg-gray-600 sm:py-3"
         >
           Continue
         </button>
