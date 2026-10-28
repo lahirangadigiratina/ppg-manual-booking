@@ -100,7 +100,14 @@ export function SearchParcels({
                 <X className="size-4" strokeWidth={2} />
               </button>
             )}
-            <Search className="size-5 text-gray-600" strokeWidth={1.75} aria-hidden />
+            <button
+              type="button"
+              onClick={() => tryOpenDialogForQuery()}
+              className="rounded p-0.5 text-gray-600 hover:text-gray-900"
+              aria-label="Search parcels"
+            >
+              <Search className="size-5" strokeWidth={1.75} aria-hidden />
+            </button>
           </div>
         </div>
         <button

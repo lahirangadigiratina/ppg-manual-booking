@@ -183,90 +183,92 @@ export function ConfirmDropoffLabelDialog({
           <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:gap-6">
             {step === 1 ? <AttachLabelIllustration /> : <MatchLabelIllustration />}
 
-            <div className="flex flex-col">
+            <div className="flex min-h-[260px] flex-col sm:min-h-[280px]">
               <DropoffStepper step={step} />
 
               {step === 1 ? (
-                <div className="mt-6">
-                  <p className="text-sm font-bold text-black">Steps:</p>
-                  <ul className="mt-3 space-y-3">
-                    <li>
-                      <label
-                        htmlFor={crossOutId}
-                        className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
-                      >
-                        <input
-                          id={crossOutId}
-                          type="checkbox"
-                          checked={crossedOutOldLabel}
-                          onChange={(event) => setCrossedOutOldLabel(event.target.checked)}
-                          className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
-                        />
-                        <span>Cross out the old label with the marker</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label
-                        htmlFor={attachId}
-                        className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
-                      >
-                        <input
-                          id={attachId}
-                          type="checkbox"
-                          checked={attachedNewLabel}
-                          onChange={(event) => setAttachedNewLabel(event.target.checked)}
-                          className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
-                        />
-                        <span>
-                          Attach the <span className="font-semibold text-red-600">New</span> Print
-                          Free label on the package
-                        </span>
-                      </label>
-                    </li>
-                  </ul>
-                </div>
+                <>
+                  <div className="mt-6">
+                    <p className="text-sm font-bold text-black">Steps:</p>
+                    <ul className="mt-3 space-y-3">
+                      <li>
+                        <label
+                          htmlFor={crossOutId}
+                          className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
+                        >
+                          <input
+                            id={crossOutId}
+                            type="checkbox"
+                            checked={crossedOutOldLabel}
+                            onChange={(event) => setCrossedOutOldLabel(event.target.checked)}
+                            className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
+                          />
+                          <span>Cross out the old label with the marker</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label
+                          htmlFor={attachId}
+                          className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
+                        >
+                          <input
+                            id={attachId}
+                            type="checkbox"
+                            checked={attachedNewLabel}
+                            onChange={(event) => setAttachedNewLabel(event.target.checked)}
+                            className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
+                          />
+                          <span>
+                            Attach the <span className="font-semibold text-red-600">New</span> Print
+                            Free label on the package
+                          </span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="mt-auto flex justify-end pt-6">
+                    <button
+                      type="button"
+                      disabled={!attachStepsComplete}
+                      onClick={() => setStep(2)}
+                      className="min-w-[10rem] rounded-md bg-gray-300 px-10 py-2.5 text-sm font-semibold text-black transition-colors enabled:bg-gray-400 enabled:hover:bg-gray-400 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-80 sm:py-3"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
               ) : (
-                <div className="mt-6 px-1 sm:px-2">
-                  <label htmlFor={referenceInputId} className="text-sm font-bold text-black">
-                    Enter the label reference / scan barcode
-                    <span className="text-red-600" aria-hidden>
-                      *
-                    </span>
-                  </label>
-                  <input
-                    id={referenceInputId}
-                    type="text"
-                    value={referenceCode}
-                    onChange={(event) => setReferenceCode(event.target.value)}
-                    placeholder="Reference Number / Tracking Code"
-                    className={`mt-2 ${manualInputClassName}`}
-                    autoComplete="off"
-                  />
-                </div>
+                <>
+                  <div className="mt-6 px-1 sm:px-2">
+                    <label htmlFor={referenceInputId} className="text-sm font-bold text-black">
+                      Enter the label reference / scan barcode
+                      <span className="text-red-600" aria-hidden>
+                        *
+                      </span>
+                    </label>
+                    <input
+                      id={referenceInputId}
+                      type="text"
+                      value={referenceCode}
+                      onChange={(event) => setReferenceCode(event.target.value)}
+                      placeholder="Reference Number / Tracking Code"
+                      className={`mt-2 ${manualInputClassName}`}
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="mt-auto flex justify-end pt-6">
+                    <button
+                      type="button"
+                      disabled={!referenceProvided}
+                      onClick={onClose}
+                      className="min-w-[10rem] rounded-md bg-gray-600 px-8 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[12rem] sm:py-3"
+                    >
+                      Confirm Dropoff
+                    </button>
+                  </div>
+                </>
               )}
             </div>
-          </div>
-
-          <div className="mt-6 flex justify-center lg:justify-end lg:pe-2">
-            {step === 1 ? (
-              <button
-                type="button"
-                disabled={!attachStepsComplete}
-                onClick={() => setStep(2)}
-                className="min-w-[10rem] rounded-md bg-gray-300 px-10 py-2.5 text-sm font-semibold text-black transition-colors enabled:bg-gray-400 enabled:hover:bg-gray-400 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-80 sm:py-3"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled={!referenceProvided}
-                onClick={onClose}
-                className="min-w-[10rem] rounded-md bg-gray-600 px-8 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[12rem] sm:py-3"
-              >
-                Confirm Dropoff
-              </button>
-            )}
           </div>
         </div>
       </div>
