@@ -140,13 +140,8 @@ export function SearchParcels({
           resetDropoffFlow()
         }}
         onConfirm={() => {
-          if (!pendingDropoffParcel) {
-            return
-          }
-          const parcel = pendingDropoffParcel
           setParcelDropoffConfirmOpen(false)
-          setPendingDropoffParcel(null)
-          openLabelDialog(parcel, 1)
+          resetDropoffFlow()
         }}
       />
       <ReturnDropoffCashConfirmDialog
