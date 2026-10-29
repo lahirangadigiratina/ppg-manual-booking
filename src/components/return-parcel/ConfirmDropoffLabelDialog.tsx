@@ -1,6 +1,7 @@
 import { Check, X } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { manualInputClassName } from '../ppg/manualFormShared'
+import { PackageParcelReminderDialog } from './PackageParcelReminderDialog'
 import type { DropoffLabelParcelDemo } from './returnParcelDemo'
 
 interface ConfirmDropoffLabelDialogProps {
@@ -116,6 +117,7 @@ export function ConfirmDropoffLabelDialog({
   const [crossedOutOldLabel, setCrossedOutOldLabel] = useState(false)
   const [attachedNewLabel, setAttachedNewLabel] = useState(false)
   const [referenceCode, setReferenceCode] = useState('')
+  const [packagingReminderOpen, setPackagingReminderOpen] = useState(false)
 
   useEffect(() => {
     if (!open) {
@@ -123,6 +125,7 @@ export function ConfirmDropoffLabelDialog({
       setCrossedOutOldLabel(false)
       setAttachedNewLabel(false)
       setReferenceCode('')
+      setPackagingReminderOpen(false)
       return
     }
     setStep(initialStep)
@@ -143,6 +146,7 @@ export function ConfirmDropoffLabelDialog({
   const referenceProvided = referenceCode.trim().length > 0
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
       role="presentation"
@@ -260,7 +264,7 @@ export function ConfirmDropoffLabelDialog({
                     <button
                       type="button"
                       disabled={!referenceProvided}
-                      onClick={onClose}
+                      onClick={() => setPackagingReminderOpen(true)}
                       className="min-w-[10rem] rounded-md bg-gray-600 px-8 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[12rem] sm:py-3"
                     >
                       Confirm Dropoff
@@ -273,5 +277,14 @@ export function ConfirmDropoffLabelDialog({
         </div>
       </div>
     </div>
+    <PackageParcelReminderDialog
+      open={packagingReminderOpen}
+      onContinue={() => {
+        setPackagingReminderOpen(false)
+        onClose()
+      }}
+      onGoBack={() => setPackagingReminderOpen(false)}
+    />
+    </>
   )
 }

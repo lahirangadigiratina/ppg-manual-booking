@@ -1,6 +1,7 @@
 import { Printer, X } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { manualPrimaryButtonClassName } from '../ppg/manualFormShared'
+import { PackageParcelReminderDialog } from './PackageParcelReminderDialog'
 import type { DropoffLabelParcelDemo } from './returnParcelDemo'
 
 interface ParcelDropoffConfirmDialogProps {
@@ -46,10 +47,12 @@ export function ParcelDropoffConfirmDialog({
   const printedAttachedId = useId()
   const customerAttachedId = useId()
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
+  const [packagingReminderOpen, setPackagingReminderOpen] = useState(false)
 
   useEffect(() => {
     if (!open) {
       setAttachmentChoice(null)
+      setPackagingReminderOpen(false)
       return
     }
     const onKeyDown = (event: KeyboardEvent) => {
@@ -68,6 +71,7 @@ export function ParcelDropoffConfirmDialog({
   const itemReference = parcel.itemReference ?? parcel.itemId
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
       role="presentation"
@@ -165,7 +169,7 @@ export function ParcelDropoffConfirmDialog({
               <button
                 type="button"
                 disabled={attachmentChoice === null}
-                onClick={onConfirm}
+                onClick={() => setPackagingReminderOpen(true)}
                 className="mt-5 w-full rounded-md bg-gray-400 px-6 py-2.5 text-sm font-semibold text-white transition-colors enabled:bg-gray-600 enabled:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-70 sm:py-3"
               >
                 Confirm Dropoff
@@ -180,5 +184,14 @@ export function ParcelDropoffConfirmDialog({
         </div>
       </div>
     </div>
+    <PackageParcelReminderDialog
+      open={packagingReminderOpen}
+      onContinue={() => {
+        setPackagingReminderOpen(false)
+        onConfirm()
+      }}
+      onGoBack={() => setPackagingReminderOpen(false)}
+    />
+    </>
   )
 }

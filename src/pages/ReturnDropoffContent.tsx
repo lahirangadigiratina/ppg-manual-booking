@@ -1,6 +1,7 @@
 import { MoreVertical, Printer } from 'lucide-react'
 import { useState } from 'react'
 import { HelpBubble } from '../components/return-parcel/HelpBubble'
+import { PackageParcelReminderDialog } from '../components/return-parcel/PackageParcelReminderDialog'
 import { SearchParcels } from '../components/return-parcel/SearchParcels'
 import {
   manualPrimaryButtonClassName,
@@ -32,6 +33,7 @@ const CONFIRMED_PARCEL = {
 
 export function ReturnDropoffContent() {
   const [confirmOpen, setConfirmOpen] = useState(true)
+  const [packagingReminderOpen, setPackagingReminderOpen] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
 
   if (confirmed) {
@@ -210,7 +212,7 @@ export function ReturnDropoffContent() {
                 type="button"
                 onClick={() => {
                   setConfirmOpen(false)
-                  setConfirmed(true)
+                  setPackagingReminderOpen(true)
                 }}
                 className={`w-full ${manualPrimaryButtonClassName}`}
               >
@@ -220,6 +222,17 @@ export function ReturnDropoffContent() {
           </div>
         </div>
       ) : null}
+      <PackageParcelReminderDialog
+        open={packagingReminderOpen}
+        onContinue={() => {
+          setPackagingReminderOpen(false)
+          setConfirmed(true)
+        }}
+        onGoBack={() => {
+          setPackagingReminderOpen(false)
+          setConfirmOpen(true)
+        }}
+      />
     </>
   )
 }
