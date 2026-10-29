@@ -147,6 +147,7 @@ export function ConfirmDropoffLabelDialog({
 
   return (
     <>
+    {!packagingReminderOpen ? (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
       role="presentation"
@@ -277,6 +278,7 @@ export function ConfirmDropoffLabelDialog({
         </div>
       </div>
     </div>
+    ) : null}
     <PackageParcelReminderDialog
       open={packagingReminderOpen}
       onContinue={() => {

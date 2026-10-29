@@ -1,5 +1,6 @@
 import { Package, X } from 'lucide-react'
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { manualPrimaryButtonClassName } from '../ppg/manualFormShared'
 
 interface PackageParcelReminderDialogProps {
@@ -30,9 +31,9 @@ export function PackageParcelReminderDialog({
     return null
   }
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-[100] flex min-h-[100dvh] w-full items-center justify-center bg-black/40 p-4"
       role="presentation"
       onClick={onGoBack}
     >
@@ -78,6 +79,7 @@ export function PackageParcelReminderDialog({
           OK
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
