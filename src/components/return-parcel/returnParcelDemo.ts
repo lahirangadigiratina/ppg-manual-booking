@@ -5,6 +5,12 @@ export interface DropoffLabelParcelDemo {
   itemId: string
   itemReference?: string
   retailer?: string
+  /** Payment dialog: packaging add-on checked and not editable. */
+  packagingPreIncluded?: boolean
+  /** Confirm dropoff: show “Location has access to a printer…” as a third shipping label option. */
+  showLocationPrinterLabelOption?: boolean
+  /** Confirm dropoff: packaging add-on card (when payment confirmation is skipped). */
+  showPackagingSelection?: boolean
 }
 
 /** Step 1: search + Enter → payment confirmation, then label dialog after Confirm Dropoff. */
@@ -23,10 +29,16 @@ export const DROP_OFF_SECOND_PARCEL: DropoffLabelParcelDemo = {
   itemId: 'HHZZZGLH4',
 }
 
-/**
- * Shipment 3: print preference first → payment → label dialog only if user chose Prefer.
- * Search + Enter → “Do you wish to print?” (Prefer / Not prefer).
- */
+/** Payment confirmation with packaging already included (locked on). */
+export const DROP_OFF_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo = {
+  shipmentNumber: 'MP5500123700',
+  name: 'Packaging Included Demo',
+  consignmentId: 'HHZZZGLH5',
+  itemId: 'HHZZZGLH5',
+  packagingPreIncluded: true,
+}
+
+/** Shipment 3: payment confirmation → confirm dropoff (two shipping label options). */
 export const DROP_OFF_PRINT_PREFERENCE_PARCEL: DropoffLabelParcelDemo = {
   shipmentNumber: 'MP5500123600',
   name: 'Jordan Kumar',
@@ -36,7 +48,46 @@ export const DROP_OFF_PRINT_PREFERENCE_PARCEL: DropoffLabelParcelDemo = {
   retailer: 'T Return',
 }
 
-export const DROP_OFF_COLLECT_AMOUNT_LABEL = '$24.50'
+/** Same as MP5500123600 (payment → confirm dropoff), with a third shipping label option. */
+export const DROP_OFF_LOCATION_PRINT_LABEL_PARCEL: DropoffLabelParcelDemo = {
+  shipmentNumber: 'MP5500123800',
+  name: 'Sam Rivera',
+  consignmentId: 'MP8032116990',
+  itemId: 'HCJDGZZG0',
+  itemReference: '',
+  retailer: 'T Return',
+  showLocationPrinterLabelOption: true,
+}
+
+/** Search → confirm dropoff only (no payment confirmation). */
+export const DROP_OFF_DIRECT_CONFIRM_DROPOFF_PARCEL: DropoffLabelParcelDemo = {
+  shipmentNumber: 'MP5500123900',
+  name: 'Alex Chen',
+  consignmentId: 'MP8032117001',
+  itemId: 'HCJDGZZG1',
+  itemReference: '',
+  retailer: 'T Return',
+  showPackagingSelection: true,
+}
+
+export const DROP_OFF_BASE_COLLECT_AMOUNT = 24.5
+export const DROP_OFF_PACKAGING_SURCHARGE_AMOUNT = 2
+
+export function formatDropOffCurrency(amount: number): string {
+  return `$${amount.toFixed(2)}`
+}
+
+export const DROP_OFF_COLLECT_AMOUNT_LABEL = formatDropOffCurrency(DROP_OFF_BASE_COLLECT_AMOUNT)
+export const DROP_OFF_PACKAGING_SURCHARGE_LABEL = formatDropOffCurrency(
+  DROP_OFF_PACKAGING_SURCHARGE_AMOUNT,
+)
+
+export function dropOffCollectAmountLabel(includePackaging: boolean): string {
+  const total = includePackaging
+    ? DROP_OFF_BASE_COLLECT_AMOUNT + DROP_OFF_PACKAGING_SURCHARGE_AMOUNT
+    : DROP_OFF_BASE_COLLECT_AMOUNT
+  return formatDropOffCurrency(total)
+}
 
 function normalizeShipmentQuery(query: string): string {
   return query.trim().toUpperCase()
@@ -45,6 +96,7 @@ function normalizeShipmentQuery(query: string): string {
 const DEMO_DROP_OFF_PARCELS: DropoffLabelParcelDemo[] = [
   DROP_OFF_CASH_CONFIRM_PARCEL,
   DROP_OFF_SECOND_PARCEL,
+  DROP_OFF_PACKAGING_INCLUDED_PARCEL,
 ]
 
 export function resolveDropoffDemoParcel(query: string): DropoffLabelParcelDemo | null {
@@ -52,9 +104,29 @@ export function resolveDropoffDemoParcel(query: string): DropoffLabelParcelDemo 
   return DEMO_DROP_OFF_PARCELS.find((parcel) => parcel.shipmentNumber === normalized) ?? null
 }
 
+const PARCEL_DROPOFF_CONFIRM_FLOW_PARCELS: DropoffLabelParcelDemo[] = [
+  DROP_OFF_PRINT_PREFERENCE_PARCEL,
+  DROP_OFF_LOCATION_PRINT_LABEL_PARCEL,
+]
+
 export function resolvePrintPreferenceParcel(query: string): DropoffLabelParcelDemo | null {
-  if (normalizeShipmentQuery(query) === DROP_OFF_PRINT_PREFERENCE_PARCEL.shipmentNumber) {
-    return DROP_OFF_PRINT_PREFERENCE_PARCEL
-  }
-  return null
+  const normalized = normalizeShipmentQuery(query)
+  return (
+    PARCEL_DROPOFF_CONFIRM_FLOW_PARCELS.find((parcel) => parcel.shipmentNumber === normalized) ??
+    null
+  )
+}
+
+const DIRECT_PARCEL_DROPOFF_CONFIRM_PARCELS: DropoffLabelParcelDemo[] = [
+  DROP_OFF_DIRECT_CONFIRM_DROPOFF_PARCEL,
+]
+
+export function resolveDirectParcelDropoffConfirmParcel(
+  query: string,
+): DropoffLabelParcelDemo | null {
+  const normalized = normalizeShipmentQuery(query)
+  return (
+    DIRECT_PARCEL_DROPOFF_CONFIRM_PARCELS.find((parcel) => parcel.shipmentNumber === normalized) ??
+    null
+  )
 }

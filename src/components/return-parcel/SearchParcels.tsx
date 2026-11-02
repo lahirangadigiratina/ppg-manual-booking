@@ -2,9 +2,9 @@ import { Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { ConfirmDropoffLabelDialog } from './ConfirmDropoffLabelDialog'
 import { ParcelDropoffConfirmDialog } from './ParcelDropoffConfirmDialog'
-import { PrintPreferenceDialog } from './PrintPreferenceDialog'
 import { ReturnDropoffCashConfirmDialog } from './ReturnDropoffCashConfirmDialog'
 import {
+  resolveDirectParcelDropoffConfirmParcel,
   resolveDropoffDemoParcel,
   resolvePrintPreferenceParcel,
   type DropoffLabelParcelDemo,
@@ -24,16 +24,19 @@ export function SearchParcels({
   const [labelDialogInitialStep, setLabelDialogInitialStep] = useState<1 | 2>(1)
   const [pendingDropoffParcel, setPendingDropoffParcel] =
     useState<DropoffLabelParcelDemo | null>(null)
-  const [printPreferenceOpen, setPrintPreferenceOpen] = useState(false)
   const [parcelDropoffConfirmOpen, setParcelDropoffConfirmOpen] = useState(false)
-  const [includeLabelFlowAfterPayment, setIncludeLabelFlowAfterPayment] = useState(true)
 
   const resetDropoffFlow = () => {
     setPendingDropoffParcel(null)
-    setIncludeLabelFlowAfterPayment(true)
   }
 
   const tryOpenDialogForQuery = () => {
+    const directConfirmParcel = resolveDirectParcelDropoffConfirmParcel(query)
+    if (directConfirmParcel) {
+      setPendingDropoffParcel(directConfirmParcel)
+      setParcelDropoffConfirmOpen(true)
+      return
+    }
     const printPreferenceParcel = resolvePrintPreferenceParcel(query)
     if (printPreferenceParcel) {
       setPendingDropoffParcel(printPreferenceParcel)
@@ -44,7 +47,6 @@ export function SearchParcels({
     if (!parcel) {
       return
     }
-    setIncludeLabelFlowAfterPayment(true)
     setPendingDropoffParcel(parcel)
     setCashConfirmOpen(true)
   }
@@ -53,19 +55,6 @@ export function SearchParcels({
     setLabelParcel(parcel)
     setLabelDialogInitialStep(initialStep)
     setLabelConfirmOpen(true)
-  }
-
-  const continueAfterPrintPreference = (wantsPrint: boolean) => {
-    setIncludeLabelFlowAfterPayment(wantsPrint)
-    setPrintPreferenceOpen(false)
-    if (wantsPrint) {
-      setParcelDropoffConfirmOpen(true)
-      return
-    }
-    if (pendingDropoffParcel) {
-      openLabelDialog(pendingDropoffParcel, 1)
-      setPendingDropoffParcel(null)
-    }
   }
 
   return (
@@ -123,15 +112,6 @@ export function SearchParcels({
           Scan QR Code
         </button>
       </div>
-      <PrintPreferenceDialog
-        open={printPreferenceOpen}
-        onClose={() => {
-          setPrintPreferenceOpen(false)
-          resetDropoffFlow()
-        }}
-        onPrefer={() => continueAfterPrintPreference(true)}
-        onNotPrefer={() => continueAfterPrintPreference(false)}
-      />
       <ParcelDropoffConfirmDialog
         open={parcelDropoffConfirmOpen}
         parcel={pendingDropoffParcel}
@@ -146,6 +126,7 @@ export function SearchParcels({
       />
       <ReturnDropoffCashConfirmDialog
         open={cashConfirmOpen}
+        packagingIncludedLocked={Boolean(pendingDropoffParcel?.packagingPreIncluded)}
         onClose={() => {
           setCashConfirmOpen(false)
           resetDropoffFlow()
@@ -157,14 +138,11 @@ export function SearchParcels({
           const parcel = pendingDropoffParcel
           setCashConfirmOpen(false)
           if (resolvePrintPreferenceParcel(parcel.shipmentNumber)) {
-            setPrintPreferenceOpen(true)
+            setParcelDropoffConfirmOpen(true)
             return
           }
-          const showLabelFlow = includeLabelFlowAfterPayment
           resetDropoffFlow()
-          if (showLabelFlow) {
-            openLabelDialog(parcel, 1)
-          }
+          openLabelDialog(parcel, 1)
         }}
       />
       <ConfirmDropoffLabelDialog
