@@ -1,7 +1,8 @@
 import { Package, Printer, X } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
-import { PackageParcelReminderDialog } from './PackageParcelReminderDialog'
+import { manualInputClassName } from '../ppg/manualFormShared'
 import { DROP_OFF_PACKAGING_SURCHARGE_LABEL, type DropoffLabelParcelDemo } from './returnParcelDemo'
+import { downloadDemoShippingLabel } from './returnParcelShared'
 
 interface ParcelDropoffConfirmDialogProps {
   open: boolean
@@ -21,11 +22,11 @@ function labelOptionCardClassName(selected: boolean) {
 }
 
 function formatItemReference(parcel: DropoffLabelParcelDemo): string {
-  if (parcel.itemReference !== undefined) {
-    const trimmed = parcel.itemReference.trim()
-    return trimmed.length > 0 ? trimmed : 'None'
+  if (parcel.itemReference === undefined) {
+    return '—'
   }
-  return parcel.itemId?.trim() ? parcel.itemId : 'None'
+  const trimmed = parcel.itemReference.trim()
+  return trimmed.length > 0 ? trimmed : '—'
 }
 
 export function ParcelDropoffConfirmDialog({
@@ -39,17 +40,24 @@ export function ParcelDropoffConfirmDialog({
   const locationPrintLabelId = useId()
   const shippingLabelChoiceName = useId()
   const includePackagingId = useId()
+  const crossOutOldLabelId = useId()
+  const attachPrintFreeLabelId = useId()
+  const labelReferenceInputId = useId()
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
-  const [packagingReminderOpen, setPackagingReminderOpen] = useState(false)
   const [includePackaging, setIncludePackaging] = useState(false)
+  const [crossedOutOldLabel, setCrossedOutOldLabel] = useState(false)
+  const [attachedPrintFreeLabel, setAttachedPrintFreeLabel] = useState(false)
+  const [labelReferenceCode, setLabelReferenceCode] = useState('')
 
   const packagingIncludedLocked = Boolean(parcel?.packagingPreIncluded)
 
   useEffect(() => {
     if (!open) {
       setAttachmentChoice(null)
-      setPackagingReminderOpen(false)
       setIncludePackaging(false)
+      setCrossedOutOldLabel(false)
+      setAttachedPrintFreeLabel(false)
+      setLabelReferenceCode('')
       return
     }
     if (packagingIncludedLocked) {
@@ -72,15 +80,19 @@ export function ParcelDropoffConfirmDialog({
   const showLocationPrinterOption = Boolean(parcel.showLocationPrinterLabelOption)
   const showPackagingSelection = Boolean(parcel.showPackagingSelection)
   const packagingActive = packagingIncludedLocked || includePackaging
+  const printFreeFlowComplete =
+    crossedOutOldLabel && attachedPrintFreeLabel && labelReferenceCode.trim().length > 0
+  const canConfirmDropoff =
+    attachmentChoice === 'printed-attached'
+      ? printFreeFlowComplete
+      : attachmentChoice !== null
 
   return (
-    <>
-      {!packagingReminderOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
-          role="presentation"
-          onClick={onClose}
-        >
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
+      role="presentation"
+      onClick={onClose}
+    >
           <div
             role="dialog"
             aria-modal="true"
@@ -100,25 +112,20 @@ export function ParcelDropoffConfirmDialog({
             <div className="flex flex-col overflow-y-auto px-4 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-6">
               <h2
                 id="confirm-parcel-dropoff-title"
-                className="pr-8 text-lg font-bold text-black sm:text-xl"
+                className="px-8 text-center text-lg font-bold text-black sm:text-xl"
               >
                 Confirm dropoff
               </h2>
-              <p className="mt-1 text-sm text-text-muted">
-                Choose how the parcel is labelled, then confirm.
-              </p>
 
               <dl className="mx-auto mt-5 grid w-fit max-w-full grid-cols-[auto_auto] gap-x-6 gap-y-2.5 rounded-xl bg-gray-100 px-4 py-4 text-sm sm:px-5">
                 <dt className="text-text-muted">Consignment ID</dt>
                 <dd className="text-right font-semibold text-black">{parcel.consignmentId}</dd>
-                <dt className="text-text-muted">Item reference</dt>
+                <dt className="text-text-muted">Item Reference</dt>
                 <dd className="text-right font-semibold text-black">{itemReferenceDisplay}</dd>
-                {parcel.retailer ? (
-                  <>
-                    <dt className="text-text-muted">Retailer</dt>
-                    <dd className="text-right font-semibold text-black">{parcel.retailer}</dd>
-                  </>
-                ) : null}
+                <dt className="text-text-muted">Retailer</dt>
+                <dd className="text-right font-semibold text-black">
+                  {parcel.retailer?.trim() ? parcel.retailer : '—'}
+                </dd>
               </dl>
 
               {showPackagingSelection ? (
@@ -161,7 +168,9 @@ export function ParcelDropoffConfirmDialog({
               ) : null}
 
               <fieldset className="mt-5 border-0 p-0">
-                <legend className="text-sm font-bold text-black">Shipping label</legend>
+                <legend className="text-sm font-bold text-black">
+                  Choose how the parcel is labelled, then confirm.
+                </legend>
                 <ul className="mt-3 space-y-3">
                   <li>
                     <label
@@ -204,6 +213,7 @@ export function ParcelDropoffConfirmDialog({
                         onClick={(event) => {
                           event.preventDefault()
                           event.stopPropagation()
+                          downloadDemoShippingLabel()
                         }}
                         className="flex size-10 shrink-0 items-center justify-center rounded border border-border-light bg-white text-black hover:bg-gray-50"
                       >
@@ -239,8 +249,9 @@ export function ParcelDropoffConfirmDialog({
                             onClick={(event) => {
                               event.preventDefault()
                               event.stopPropagation()
+                              downloadDemoShippingLabel()
                             }}
-                            className="inline-flex shrink-0 items-center gap-2 rounded border border-border-light bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-gray-50"
+                            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
                           >
                             <Printer className="size-5 shrink-0" strokeWidth={1.75} aria-hidden />
                             Print label
@@ -252,28 +263,81 @@ export function ParcelDropoffConfirmDialog({
                     </li>
                   ) : null}
                 </ul>
+
+                {attachmentChoice === 'printed-attached' ? (
+                  <div className="mt-5 space-y-5 border-t border-border-light pt-5">
+                    <div>
+                      <p className="text-sm font-bold text-black">Steps:</p>
+                      <ul className="mt-3 space-y-3">
+                        <li>
+                          <label
+                            htmlFor={crossOutOldLabelId}
+                            className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
+                          >
+                            <input
+                              id={crossOutOldLabelId}
+                              type="checkbox"
+                              checked={crossedOutOldLabel}
+                              onChange={(event) => setCrossedOutOldLabel(event.target.checked)}
+                              className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
+                            />
+                            <span>Cross out the old label with the marker</span>
+                          </label>
+                        </li>
+                        <li>
+                          <label
+                            htmlFor={attachPrintFreeLabelId}
+                            className="flex cursor-pointer items-start gap-2.5 text-sm text-black"
+                          >
+                            <input
+                              id={attachPrintFreeLabelId}
+                              type="checkbox"
+                              checked={attachedPrintFreeLabel}
+                              onChange={(event) =>
+                                setAttachedPrintFreeLabel(event.target.checked)
+                              }
+                              className="mt-0.5 size-4 shrink-0 rounded border border-gray-400 accent-black"
+                            />
+                            <span>
+                              Attach the{' '}
+                              <span className="font-semibold text-red-600">New</span> Print Free
+                              label on the package
+                            </span>
+                          </label>
+                        </li>
+                      </ul>
+                    </div>
+                    <div>
+                      <label htmlFor={labelReferenceInputId} className="text-sm font-bold text-black">
+                        Enter the label reference / scan barcode
+                        <span className="text-red-600" aria-hidden>
+                          *
+                        </span>
+                      </label>
+                      <input
+                        id={labelReferenceInputId}
+                        type="text"
+                        value={labelReferenceCode}
+                        onChange={(event) => setLabelReferenceCode(event.target.value)}
+                        placeholder="Reference Number / Tracking Code"
+                        className={`mt-2 w-full ${manualInputClassName}`}
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+                ) : null}
               </fieldset>
 
               <button
                 type="button"
-                disabled={attachmentChoice === null}
-                onClick={() => setPackagingReminderOpen(true)}
+                disabled={!canConfirmDropoff}
+                onClick={() => onConfirm()}
                 className="mt-6 w-auto min-w-[12rem] self-center rounded-md px-8 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 enabled:bg-black enabled:text-white enabled:hover:bg-gray-900 sm:py-2.5 sm:text-base"
               >
                 Confirm dropoff
               </button>
             </div>
           </div>
-        </div>
-      ) : null}
-      <PackageParcelReminderDialog
-        open={packagingReminderOpen}
-        onContinue={() => {
-          setPackagingReminderOpen(false)
-          onConfirm()
-        }}
-        onGoBack={() => setPackagingReminderOpen(false)}
-      />
-    </>
+    </div>
   )
 }

@@ -11,7 +11,7 @@ import {
 } from './returnParcelDemo'
 
 export function SearchParcels({
-  initialQuery = 'MP8021760051',
+  initialQuery = 'MP5500123700',
   placeholder = '',
 }: {
   initialQuery?: string

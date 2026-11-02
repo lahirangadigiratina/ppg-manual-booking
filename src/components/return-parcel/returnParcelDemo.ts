@@ -33,8 +33,10 @@ export const DROP_OFF_SECOND_PARCEL: DropoffLabelParcelDemo = {
 export const DROP_OFF_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo = {
   shipmentNumber: 'MP5500123700',
   name: 'Packaging Included Demo',
-  consignmentId: 'HHZZZGLH5',
+  consignmentId: 'MP5500123700',
   itemId: 'HHZZZGLH5',
+  itemReference: '',
+  retailer: 'T Return',
   packagingPreIncluded: true,
 }
 
@@ -107,6 +109,7 @@ export function resolveDropoffDemoParcel(query: string): DropoffLabelParcelDemo 
 const PARCEL_DROPOFF_CONFIRM_FLOW_PARCELS: DropoffLabelParcelDemo[] = [
   DROP_OFF_PRINT_PREFERENCE_PARCEL,
   DROP_OFF_LOCATION_PRINT_LABEL_PARCEL,
+  DROP_OFF_PACKAGING_INCLUDED_PARCEL,
 ]
 
 export function resolvePrintPreferenceParcel(query: string): DropoffLabelParcelDemo | null {
