@@ -83,6 +83,18 @@ export const DROP_OFF_DIRECT_CONFIRM_DROPOFF_PARCEL: DropoffLabelParcelDemo = {
   showPackagingSelection: true,
 }
 
+/** Confirm dropoff only: packaging selection shown, checked and locked. */
+export const DROP_OFF_DIRECT_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo = {
+  shipmentNumber: 'MP5500124100',
+  name: 'Morgan Lee',
+  consignmentId: 'MP5500124100',
+  itemId: 'HCJDGZZG2',
+  itemReference: '',
+  retailer: 'T Return',
+  showPackagingSelection: true,
+  packagingPreIncluded: true,
+}
+
 export const DROP_OFF_BASE_COLLECT_AMOUNT = 24.5
 export const DROP_OFF_PACKAGING_SURCHARGE_AMOUNT = 2
 
@@ -134,6 +146,7 @@ export function resolvePrintPreferenceParcel(query: string): DropoffLabelParcelD
 
 const DIRECT_PARCEL_DROPOFF_CONFIRM_PARCELS: DropoffLabelParcelDemo[] = [
   DROP_OFF_DIRECT_CONFIRM_DROPOFF_PARCEL,
+  DROP_OFF_DIRECT_PACKAGING_INCLUDED_PARCEL,
 ]
 
 export function resolveDirectParcelDropoffConfirmParcel(

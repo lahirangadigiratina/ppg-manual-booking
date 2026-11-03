@@ -104,6 +104,11 @@ export function ReturnDropoffCashConfirmDialog({
             <span className="block text-sm font-bold text-black">
               {packagingIncludedLocked ? 'Packaging Included' : 'Add packaging'}
             </span>
+            {packagingIncludedLocked ? (
+              <span className="mt-0.5 block text-xs leading-snug text-black sm:text-sm">
+                Please package this parcel
+              </span>
+            ) : null}
             <span className="mt-0.5 block text-xs leading-snug text-text-muted sm:text-sm">
               Shoebox · 30 × 25 × 15 cm ·{' '}
               <span className="whitespace-nowrap">up to 3kg</span>

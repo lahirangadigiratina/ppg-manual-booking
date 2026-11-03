@@ -43,9 +43,7 @@ export function ParcelDropoffConfirmDialog({
   const crossOutOldLabelId = useId()
   const attachPrintFreeLabelId = useId()
   const labelReferenceInputId = useId()
-  const paymentReceivedId = useId()
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
-  const [paymentReceived, setPaymentReceived] = useState(false)
   const [includePackaging, setIncludePackaging] = useState(false)
   const [crossedOutOldLabel, setCrossedOutOldLabel] = useState(false)
   const [attachedPrintFreeLabel, setAttachedPrintFreeLabel] = useState(false)
@@ -60,7 +58,6 @@ export function ParcelDropoffConfirmDialog({
       setCrossedOutOldLabel(false)
       setAttachedPrintFreeLabel(false)
       setLabelReferenceCode('')
-      setPaymentReceived(false)
       return
     }
     if (packagingIncludedLocked) {
@@ -89,8 +86,7 @@ export function ParcelDropoffConfirmDialog({
     attachmentChoice === 'printed-attached'
       ? printFreeFlowComplete
       : attachmentChoice !== null
-  const canConfirmDropoff =
-    labelChoiceComplete && (!showPackagingSelection || paymentReceived)
+  const canConfirmDropoff = labelChoiceComplete
 
   return (
     <div
@@ -159,15 +155,24 @@ export function ParcelDropoffConfirmDialog({
                       <Package className="size-5" strokeWidth={1.75} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-black">Add packaging</span>
+                      <span className="block text-sm font-bold text-black">
+                        {packagingIncludedLocked ? 'Packaging Included' : 'Add packaging'}
+                      </span>
+                      {packagingIncludedLocked ? (
+                        <span className="mt-0.5 block text-xs leading-snug text-black sm:text-sm">
+                          Please package this parcel
+                        </span>
+                      ) : null}
                       <span className="mt-0.5 block text-xs leading-snug text-text-muted sm:text-sm">
                         Shoebox · 30 × 25 × 15 cm ·{' '}
                         <span className="whitespace-nowrap">up to 3kg</span>
                       </span>
                     </span>
-                    <span className="shrink-0 text-sm font-bold tabular-nums text-black">
-                      +{DROP_OFF_PACKAGING_SURCHARGE_LABEL}
-                    </span>
+                    {packagingIncludedLocked ? null : (
+                      <span className="shrink-0 text-sm font-bold tabular-nums text-black">
+                        +{DROP_OFF_PACKAGING_SURCHARGE_LABEL}
+                      </span>
+                    )}
                   </label>
                 </fieldset>
               ) : null}
@@ -332,22 +337,6 @@ export function ParcelDropoffConfirmDialog({
                   </div>
                 ) : null}
               </fieldset>
-
-              {showPackagingSelection ? (
-                <label
-                  htmlFor={paymentReceivedId}
-                  className="mt-5 flex w-full cursor-pointer items-center gap-2.5 text-sm text-black"
-                >
-                  <input
-                    id={paymentReceivedId}
-                    type="checkbox"
-                    checked={paymentReceived}
-                    onChange={(event) => setPaymentReceived(event.target.checked)}
-                    className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
-                  />
-                  <span className="font-medium text-red-600">Payment Received</span>
-                </label>
-              ) : null}
 
               <button
                 type="button"
