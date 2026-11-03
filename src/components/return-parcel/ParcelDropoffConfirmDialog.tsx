@@ -43,7 +43,9 @@ export function ParcelDropoffConfirmDialog({
   const crossOutOldLabelId = useId()
   const attachPrintFreeLabelId = useId()
   const labelReferenceInputId = useId()
+  const paymentReceivedId = useId()
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
+  const [paymentReceived, setPaymentReceived] = useState(false)
   const [includePackaging, setIncludePackaging] = useState(false)
   const [crossedOutOldLabel, setCrossedOutOldLabel] = useState(false)
   const [attachedPrintFreeLabel, setAttachedPrintFreeLabel] = useState(false)
@@ -58,6 +60,7 @@ export function ParcelDropoffConfirmDialog({
       setCrossedOutOldLabel(false)
       setAttachedPrintFreeLabel(false)
       setLabelReferenceCode('')
+      setPaymentReceived(false)
       return
     }
     if (packagingIncludedLocked) {
@@ -82,10 +85,12 @@ export function ParcelDropoffConfirmDialog({
   const packagingActive = packagingIncludedLocked || includePackaging
   const printFreeFlowComplete =
     crossedOutOldLabel && attachedPrintFreeLabel && labelReferenceCode.trim().length > 0
-  const canConfirmDropoff =
+  const labelChoiceComplete =
     attachmentChoice === 'printed-attached'
       ? printFreeFlowComplete
       : attachmentChoice !== null
+  const canConfirmDropoff =
+    labelChoiceComplete && (!showPackagingSelection || paymentReceived)
 
   return (
     <div
@@ -327,6 +332,22 @@ export function ParcelDropoffConfirmDialog({
                   </div>
                 ) : null}
               </fieldset>
+
+              {showPackagingSelection ? (
+                <label
+                  htmlFor={paymentReceivedId}
+                  className="mt-5 flex w-full cursor-pointer items-center gap-2.5 text-sm text-black"
+                >
+                  <input
+                    id={paymentReceivedId}
+                    type="checkbox"
+                    checked={paymentReceived}
+                    onChange={(event) => setPaymentReceived(event.target.checked)}
+                    className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
+                  />
+                  <span className="font-medium text-red-600">Payment Received</span>
+                </label>
+              ) : null}
 
               <button
                 type="button"
