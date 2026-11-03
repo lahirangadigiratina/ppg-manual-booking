@@ -141,7 +141,7 @@ export function ReturnDropoffCashConfirmDialog({
             onChange={(event) => setCashReceived(event.target.checked)}
             className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
           />
-          <span>Payment Received</span>
+          <span className="font-medium text-red-600">Payment Received</span>
         </label>
 
         <button
