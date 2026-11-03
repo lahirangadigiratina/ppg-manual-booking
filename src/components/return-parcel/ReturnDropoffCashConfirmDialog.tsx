@@ -101,15 +101,19 @@ export function ReturnDropoffCashConfirmDialog({
             <Package className="size-5" strokeWidth={1.75} />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-sm font-bold text-black">Add packaging</span>
+            <span className="block text-sm font-bold text-black">
+              {packagingIncludedLocked ? 'Packaging Included' : 'Add packaging'}
+            </span>
             <span className="mt-0.5 block text-xs leading-snug text-text-muted sm:text-sm">
               Shoebox · 30 × 25 × 15 cm ·{' '}
               <span className="whitespace-nowrap">up to 3kg</span>
             </span>
           </span>
-          <span className="shrink-0 text-sm font-bold tabular-nums text-black">
-            +{DROP_OFF_PACKAGING_SURCHARGE_LABEL}
-          </span>
+          {packagingIncludedLocked ? null : (
+            <span className="shrink-0 text-sm font-bold tabular-nums text-black">
+              +{DROP_OFF_PACKAGING_SURCHARGE_LABEL}
+            </span>
+          )}
         </label>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-md border border-gray-300 border-l-4 border-l-black bg-gray-200/80 py-4 pl-3 pr-4 sm:pl-4 sm:pr-5">
