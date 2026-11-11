@@ -74,6 +74,26 @@ export const DROP_OFF_DIRECT_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo =
   packagingPreIncluded: true,
 }
 
+/** Shown on Returns search for QA / demo. */
+export const DROP_OFF_DEMO_SEARCH_HINTS: { description: string; shipmentNumber: string }[] = [
+  {
+    description: 'Location has access to print a label + packaging included',
+    shipmentNumber: 'MP5500123700',
+  },
+  {
+    description: 'Location has access to print a label + packaging not included',
+    shipmentNumber: 'MP5500123800',
+  },
+  {
+    description: 'Card payment + packaging not selected',
+    shipmentNumber: 'MP5500123900',
+  },
+  {
+    description: 'Card payment + packaging included',
+    shipmentNumber: 'MP5500124100',
+  },
+]
+
 export const DROP_OFF_BASE_COLLECT_AMOUNT = 24.5
 export const DROP_OFF_PACKAGING_SURCHARGE_AMOUNT = 2
 
