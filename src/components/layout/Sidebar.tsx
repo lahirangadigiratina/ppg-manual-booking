@@ -2,14 +2,15 @@ import type { LucideIcon } from 'lucide-react'
 import { navItems, type NavItemId } from '../../config/navigation'
 import { HubbedLogo } from './HubbedLogo'
 
-const INTERACTIVE_NAV_IDS: NavItemId[] = ['returns', 'reports']
+const INTERACTIVE_NAV_IDS: NavItemId[] = ['returns', 'reports', 'ppg']
 
-/** Bottom bar on small screens — must include interactive destinations. */
+/** Bottom bar on small screens — must include interactive destinations (e.g. PPG). */
 const MOBILE_NAV_IDS: NavItemId[] = [
   'collection',
   'returns',
   'manual-checkin',
   'reports',
+  'ppg',
 ]
 
 interface SidebarProps {

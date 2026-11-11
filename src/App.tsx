@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import { PpgAgentPortal } from './components/ppg/PpgAgentPortal'
 import type { NavItemId } from './config/navigation'
+import { PPG_HOME_PATH } from './config/ppgRoutes'
 import {
   HUB_OPERATING_HOURS_PATH,
   HUB_PERSONAL_STORE_PATH,
@@ -29,6 +31,7 @@ const hubMeta = {
 function pageTitleForNav(id: NavItemId): string {
   if (id === 'returns') return 'Return Parcel'
   if (id === 'reports') return 'Reports'
+  if (id === 'ppg') return 'PPG Agent Portal'
   return 'Return Parcel'
 }
 
@@ -71,6 +74,9 @@ function pageTitleForPath(pathname: string, navId: NavItemId): string {
 }
 
 function navIdFromPath(pathname: string): NavItemId {
+  if (pathname.startsWith(PPG_HOME_PATH)) {
+    return 'ppg'
+  }
   if (pathname.startsWith(REPORTS_PATH)) {
     return 'reports'
   }
@@ -90,6 +96,10 @@ function App() {
 
   const handleNavigate = (id: NavItemId) => {
     setActiveNavId(id)
+    if (id === 'ppg') {
+      navigate(PPG_HOME_PATH)
+      return
+    }
     if (id === 'reports') {
       navigate(REPORTS_PATH)
       return
@@ -98,6 +108,8 @@ function App() {
   }
 
   const isHubProfile = isHubProfilePath(location.pathname)
+  const isPpgMain =
+    activeNavId === 'ppg' && !isHubProfile && location.pathname.startsWith(PPG_HOME_PATH)
   const isReportsMain =
     activeNavId === 'reports' &&
     !isHubProfile &&
@@ -107,7 +119,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/returns" replace />} />
-      <Route path="/ppg/*" element={<Navigate to="/returns" replace />} />
       <Route
         path="*"
         element={
@@ -117,16 +128,18 @@ function App() {
             pageTitle={pageTitleForPath(location.pathname, activeNavId)}
             locationName={hubMeta.locationName}
             hubName={hubMeta.hubName}
-            showNotificationPanel={!isReportsMain}
-            showHelpChat
+            showNotificationPanel={!isPpgMain && !isReportsMain}
+            showHelpChat={!isPpgMain}
             mainClassName={
-              isReportsMain
+              isPpgMain || isReportsMain
                 ? 'flex min-h-0 flex-col overflow-hidden bg-page-bg'
                 : 'overflow-y-auto bg-page-bg'
             }
           >
             {isHubProfile ? (
               <HubProfileRouter />
+            ) : activeNavId === 'ppg' ? (
+              <PpgAgentPortal />
             ) : activeNavId === 'reports' ? (
               <ReportsContent />
             ) : isDropoff ? (
