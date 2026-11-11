@@ -40,28 +40,7 @@ export const DROP_OFF_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo = {
   packagingPreIncluded: true,
 }
 
-/** Same payment confirmation as MP5500123700 (packaging locked, $26.50). */
-export const DROP_OFF_PAYMENT_CONFIRM_DUPLICATE_PARCEL: DropoffLabelParcelDemo = {
-  shipmentNumber: 'MP5500124000',
-  name: 'Payment Confirmation Duplicate',
-  consignmentId: 'MP5500124000',
-  itemId: 'HHZZZGLH6',
-  itemReference: '',
-  retailer: 'T Return',
-  packagingPreIncluded: true,
-}
-
-/** Shipment 3: payment confirmation → confirm dropoff (two shipping label options). */
-export const DROP_OFF_PRINT_PREFERENCE_PARCEL: DropoffLabelParcelDemo = {
-  shipmentNumber: 'MP5500123600',
-  name: 'Jordan Kumar',
-  consignmentId: 'MP8032116889',
-  itemId: 'HCJDGZZG9',
-  itemReference: '',
-  retailer: 'T Return',
-}
-
-/** Same as MP5500123600 (payment → confirm dropoff), with a third shipping label option. */
+/** Payment confirmation → confirm dropoff. */
 export const DROP_OFF_LOCATION_PRINT_LABEL_PARCEL: DropoffLabelParcelDemo = {
   shipmentNumber: 'MP5500123800',
   name: 'Sam Rivera',
@@ -122,7 +101,6 @@ const DEMO_DROP_OFF_PARCELS: DropoffLabelParcelDemo[] = [
   DROP_OFF_CASH_CONFIRM_PARCEL,
   DROP_OFF_SECOND_PARCEL,
   DROP_OFF_PACKAGING_INCLUDED_PARCEL,
-  DROP_OFF_PAYMENT_CONFIRM_DUPLICATE_PARCEL,
 ]
 
 export function resolveDropoffDemoParcel(query: string): DropoffLabelParcelDemo | null {
@@ -131,7 +109,6 @@ export function resolveDropoffDemoParcel(query: string): DropoffLabelParcelDemo 
 }
 
 const PARCEL_DROPOFF_CONFIRM_FLOW_PARCELS: DropoffLabelParcelDemo[] = [
-  DROP_OFF_PRINT_PREFERENCE_PARCEL,
   DROP_OFF_LOCATION_PRINT_LABEL_PARCEL,
   DROP_OFF_PACKAGING_INCLUDED_PARCEL,
 ]

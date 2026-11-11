@@ -38,8 +38,10 @@ export function ParcelDropoffConfirmDialog({
   const locationPrintLabelId = useId()
   const shippingLabelChoiceName = useId()
   const includePackagingId = useId()
+  const paymentReceivedId = useId()
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
   const [includePackaging, setIncludePackaging] = useState(false)
+  const [paymentReceived, setPaymentReceived] = useState(false)
 
   const packagingIncludedLocked = Boolean(parcel?.packagingPreIncluded)
 
@@ -47,6 +49,7 @@ export function ParcelDropoffConfirmDialog({
     if (!open) {
       setAttachmentChoice(null)
       setIncludePackaging(false)
+      setPaymentReceived(false)
       return
     }
     if (packagingIncludedLocked) {
@@ -66,10 +69,12 @@ export function ParcelDropoffConfirmDialog({
   }
 
   const itemReferenceDisplay = formatItemReference(parcel)
-  const showLocationPrinterOption = Boolean(parcel.showLocationPrinterLabelOption)
   const showPackagingSelection = Boolean(parcel.showPackagingSelection)
   const packagingActive = packagingIncludedLocked || includePackaging
-  const canConfirmDropoff = attachmentChoice !== null
+  const showPaymentReceived =
+    showPackagingSelection && includePackaging && !packagingIncludedLocked
+  const paymentRequirementMet = !showPaymentReceived || paymentReceived
+  const canConfirmDropoff = attachmentChoice !== null && paymentRequirementMet
 
   return (
     <div
@@ -128,7 +133,13 @@ export function ParcelDropoffConfirmDialog({
                       type="checkbox"
                       checked={packagingActive}
                       disabled={packagingIncludedLocked}
-                      onChange={(event) => setIncludePackaging(event.target.checked)}
+                      onChange={(event) => {
+                        const checked = event.target.checked
+                        setIncludePackaging(checked)
+                        if (!checked) {
+                          setPaymentReceived(false)
+                        }
+                      }}
                       className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-70"
                     />
                     <span
@@ -161,7 +172,7 @@ export function ParcelDropoffConfirmDialog({
               ) : null}
 
               <fieldset className="mt-5 border-0 p-0">
-                <legend className="sr-only">Shipping label</legend>
+                <legend className="text-sm font-bold text-black">Shipping label</legend>
                 <ul className="mt-3 space-y-3">
                   <li>
                     <label
@@ -193,49 +204,61 @@ export function ParcelDropoffConfirmDialog({
                       </button>
                     </label>
                   </li>
-                  {showLocationPrinterOption ? (
-                    <li>
-                      <div
-                        className={labelOptionCardClassName(
-                          attachmentChoice === 'location-print',
-                        )}
+                  <li>
+                    <div
+                      className={labelOptionCardClassName(attachmentChoice === 'location-print')}
+                    >
+                      <input
+                        id={locationPrintLabelId}
+                        type="radio"
+                        name={shippingLabelChoiceName}
+                        checked={attachmentChoice === 'location-print'}
+                        onChange={() => setAttachmentChoice('location-print')}
+                        className="size-4 shrink-0 border border-gray-400 accent-black"
+                      />
+                      <label
+                        htmlFor={locationPrintLabelId}
+                        className="min-w-0 cursor-pointer text-sm font-bold text-black"
                       >
-                        <input
-                          id={locationPrintLabelId}
-                          type="radio"
-                          name={shippingLabelChoiceName}
-                          checked={attachmentChoice === 'location-print'}
-                          onChange={() => setAttachmentChoice('location-print')}
-                          className="size-4 shrink-0 border border-gray-400 accent-black"
-                        />
-                        <label
-                          htmlFor={locationPrintLabelId}
-                          className="min-w-0 cursor-pointer text-sm font-bold text-black"
+                        Location has access to a printer and I want to print a label.
+                      </label>
+                      {attachmentChoice === 'location-print' ? (
+                        <button
+                          type="button"
+                          aria-label="Print label"
+                          onClick={(event) => {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            downloadDemoShippingLabel()
+                          }}
+                          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
                         >
-                          Location has access to a printer and I want to print a label.
-                        </label>
-                        {attachmentChoice === 'location-print' ? (
-                          <button
-                            type="button"
-                            aria-label="Print label"
-                            onClick={(event) => {
-                              event.preventDefault()
-                              event.stopPropagation()
-                              downloadDemoShippingLabel()
-                            }}
-                            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
-                          >
-                            <Printer className="size-5 shrink-0" strokeWidth={1.75} aria-hidden />
-                            Print label
-                          </button>
-                        ) : (
-                          <span className="size-10 shrink-0" aria-hidden />
-                        )}
-                      </div>
-                    </li>
-                  ) : null}
+                          <Printer className="size-5 shrink-0" strokeWidth={1.75} aria-hidden />
+                          Print label
+                        </button>
+                      ) : (
+                        <span className="size-10 shrink-0" aria-hidden />
+                      )}
+                    </div>
+                  </li>
                 </ul>
               </fieldset>
+
+              {showPaymentReceived ? (
+                <label
+                  htmlFor={paymentReceivedId}
+                  className="mt-5 flex w-full cursor-pointer items-center gap-2.5 text-sm text-black"
+                >
+                  <input
+                    id={paymentReceivedId}
+                    type="checkbox"
+                    checked={paymentReceived}
+                    onChange={(event) => setPaymentReceived(event.target.checked)}
+                    className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
+                  />
+                  <span className="font-medium text-red-600">Payment Received</span>
+                </label>
+              ) : null}
 
               <button
                 type="button"
