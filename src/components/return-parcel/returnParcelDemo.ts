@@ -32,7 +32,7 @@ export const DROP_OFF_SECOND_PARCEL: DropoffLabelParcelDemo = {
 /** Payment confirmation with packaging already included (locked on). */
 export const DROP_OFF_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo = {
   shipmentNumber: 'MP5500123700',
-  name: 'Packaging Included Demo',
+  name: 'John',
   consignmentId: 'MP5500123700',
   itemId: 'HHZZZGLH5',
   itemReference: '',

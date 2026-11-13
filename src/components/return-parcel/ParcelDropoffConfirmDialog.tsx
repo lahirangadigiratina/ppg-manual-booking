@@ -13,7 +13,7 @@ interface ParcelDropoffConfirmDialogProps {
 type LabelAttachmentChoice = 'customer-attached' | 'location-print'
 
 function labelOptionCardClassName(selected: boolean) {
-  return `grid w-full cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl border p-4 transition-colors sm:p-4 ${
+  return `grid w-full cursor-pointer grid-cols-[auto_1fr_auto] items-start gap-3 rounded-xl border p-4 transition-colors sm:p-4 ${
     selected
       ? 'border-black bg-gray-50'
       : 'border-border-light bg-white hover:border-gray-300'
@@ -111,9 +111,9 @@ export function ParcelDropoffConfirmDialog({
                 <dd className="text-right font-semibold text-black">{parcel.consignmentId}</dd>
                 <dt className="text-text-muted">Item Reference</dt>
                 <dd className="text-right font-semibold text-black">{itemReferenceDisplay}</dd>
-                <dt className="text-text-muted">Retailer</dt>
+                <dt className="text-text-muted">Sender Name</dt>
                 <dd className="text-right font-semibold text-black">
-                  {parcel.retailer?.trim() ? parcel.retailer : '—'}
+                  {parcel.name.trim() ? parcel.name : '—'}
                 </dd>
               </dl>
 
@@ -185,23 +185,17 @@ export function ParcelDropoffConfirmDialog({
                         name={shippingLabelChoiceName}
                         checked={attachmentChoice === 'customer-attached'}
                         onChange={() => setAttachmentChoice('customer-attached')}
-                        className="size-4 shrink-0 border border-gray-400 accent-black"
+                        className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
                       />
-                      <span className="min-w-0 text-sm font-bold text-black">
-                        Label already attached to the parcel
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold text-black">
+                          Label already on the parcel
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-snug text-text-muted sm:text-sm">
+                          The customer printed and attached it.
+                        </span>
                       </span>
-                      <button
-                        type="button"
-                        aria-label="Print label"
-                        onClick={(event) => {
-                          event.preventDefault()
-                          event.stopPropagation()
-                          downloadDemoShippingLabel()
-                        }}
-                        className="flex size-10 shrink-0 items-center justify-center rounded border border-border-light bg-white text-black hover:bg-gray-50"
-                      >
-                        <Printer className="size-5" strokeWidth={1.75} aria-hidden />
-                      </button>
+                      <span className="size-10 shrink-0 self-center" aria-hidden />
                     </label>
                   </li>
                   <li>
@@ -214,13 +208,16 @@ export function ParcelDropoffConfirmDialog({
                         name={shippingLabelChoiceName}
                         checked={attachmentChoice === 'location-print'}
                         onChange={() => setAttachmentChoice('location-print')}
-                        className="size-4 shrink-0 border border-gray-400 accent-black"
+                        className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
                       />
                       <label
                         htmlFor={locationPrintLabelId}
-                        className="min-w-0 cursor-pointer text-sm font-bold text-black"
+                        className="min-w-0 cursor-pointer"
                       >
-                        Location has access to a printer and I want to print a label.
+                        <span className="block text-sm font-bold text-black">Print a label now</span>
+                        <span className="mt-0.5 block text-xs leading-snug text-text-muted sm:text-sm">
+                          Print on the store printer and attach it.
+                        </span>
                       </label>
                       {attachmentChoice === 'location-print' ? (
                         <button
@@ -231,13 +228,13 @@ export function ParcelDropoffConfirmDialog({
                             event.stopPropagation()
                             downloadDemoShippingLabel()
                           }}
-                          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
+                          className="inline-flex shrink-0 self-center items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
                         >
                           <Printer className="size-5 shrink-0" strokeWidth={1.75} aria-hidden />
                           Print label
                         </button>
                       ) : (
-                        <span className="size-10 shrink-0" aria-hidden />
+                        <span className="size-10 shrink-0 self-center" aria-hidden />
                       )}
                     </div>
                   </li>
