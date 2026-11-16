@@ -70,6 +70,7 @@ export function ParcelDropoffConfirmDialog({
 
   const itemReferenceDisplay = formatItemReference(parcel)
   const showPackagingSelection = Boolean(parcel.showPackagingSelection)
+  const showPrePaidLabelFlag = Boolean(parcel.prePaidLabel)
   const packagingActive = packagingIncludedLocked || includePackaging
   const showPaymentReceived =
     showPackagingSelection && includePackaging && !packagingIncludedLocked
@@ -172,7 +173,14 @@ export function ParcelDropoffConfirmDialog({
               ) : null}
 
               <fieldset className="mt-5 border-0 p-0">
-                <legend className="text-sm font-bold text-black">Shipping label</legend>
+                <legend className="flex flex-wrap items-center gap-2 text-sm font-bold text-black">
+                  <span>Shipping label</span>
+                  {showPrePaidLabelFlag ? (
+                    <span className="rounded border border-black bg-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
+                      PREPAID LABEL
+                    </span>
+                  ) : null}
+                </legend>
                 <ul className="mt-3 space-y-3">
                   <li>
                     <label
