@@ -3,7 +3,6 @@ import {
   Archive,
   ClipboardList,
   FileText,
-  LayoutGrid,
   Package,
   PackageCheck,
   Presentation,
@@ -18,7 +17,6 @@ export type NavItemId =
   | 'aged-parcels'
   | 'training'
   | 'supply-request'
-  | 'ppg'
 
 export interface NavItem {
   id: NavItemId
@@ -35,5 +33,4 @@ export const navItems: NavItem[] = [
   { id: 'aged-parcels', label: 'Aged Parcels', icon: Archive, badge: 0 },
   { id: 'training', label: 'Training', icon: Presentation },
   { id: 'supply-request', label: 'Supply Request', icon: ClipboardList },
-  { id: 'ppg', label: 'PPG', icon: LayoutGrid },
 ]
