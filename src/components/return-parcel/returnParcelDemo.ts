@@ -11,7 +11,7 @@ export interface DropoffLabelParcelDemo {
   showLocationPrinterLabelOption?: boolean
   /** Confirm dropoff: packaging add-on card (when payment confirmation is skipped). */
   showPackagingSelection?: boolean
-  /** Confirm dropoff: show PREPAID LABEL badge next to Shipping label (online payment). */
+  /** Confirm dropoff: show Prepaid Label badge next to Shipping label (online payment). */
   prePaidLabel?: boolean
 }
 
@@ -75,6 +75,7 @@ export const DROP_OFF_DIRECT_PACKAGING_INCLUDED_PARCEL: DropoffLabelParcelDemo =
   retailer: 'T Return',
   showPackagingSelection: true,
   packagingPreIncluded: true,
+  prePaidLabel: true,
 }
 
 /** Shown on Returns search for QA / demo. */

@@ -176,8 +176,8 @@ export function ParcelDropoffConfirmDialog({
                 <legend className="flex flex-wrap items-center gap-2 text-sm font-bold text-black">
                   <span>Shipping label</span>
                   {showPrePaidLabelFlag ? (
-                    <span className="rounded border border-black bg-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
-                      PREPAID LABEL
+                    <span className="rounded border border-black bg-black px-2 py-0.5 text-[10px] font-bold tracking-wide text-white sm:text-xs">
+                      Prepaid Label
                     </span>
                   ) : null}
                 </legend>
