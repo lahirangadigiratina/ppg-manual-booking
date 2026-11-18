@@ -42,6 +42,7 @@ export function ParcelDropoffConfirmDialog({
   const [attachmentChoice, setAttachmentChoice] = useState<LabelAttachmentChoice | null>(null)
   const [includePackaging, setIncludePackaging] = useState(false)
   const [paymentReceived, setPaymentReceived] = useState(false)
+  const [hasClickedPrintLabel, setHasClickedPrintLabel] = useState(false)
 
   const packagingIncludedLocked = Boolean(parcel?.packagingPreIncluded)
 
@@ -50,6 +51,7 @@ export function ParcelDropoffConfirmDialog({
       setAttachmentChoice(null)
       setIncludePackaging(false)
       setPaymentReceived(false)
+      setHasClickedPrintLabel(false)
       return
     }
     if (packagingIncludedLocked) {
@@ -75,7 +77,10 @@ export function ParcelDropoffConfirmDialog({
   const showPaymentReceived =
     showPackagingSelection && includePackaging && !packagingIncludedLocked
   const paymentRequirementMet = !showPaymentReceived || paymentReceived
-  const canConfirmDropoff = attachmentChoice !== null && paymentRequirementMet
+  const printLabelRequirementMet =
+    attachmentChoice !== 'location-print' || hasClickedPrintLabel
+  const canConfirmDropoff =
+    attachmentChoice !== null && paymentRequirementMet && printLabelRequirementMet
 
   return (
     <div
@@ -172,6 +177,22 @@ export function ParcelDropoffConfirmDialog({
                 </fieldset>
               ) : null}
 
+              {showPaymentReceived ? (
+                <label
+                  htmlFor={paymentReceivedId}
+                  className="mt-5 flex w-full cursor-pointer items-center gap-2.5 text-sm text-black"
+                >
+                  <input
+                    id={paymentReceivedId}
+                    type="checkbox"
+                    checked={paymentReceived}
+                    onChange={(event) => setPaymentReceived(event.target.checked)}
+                    className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
+                  />
+                  <span className="font-medium text-red-600">Payment Received</span>
+                </label>
+              ) : null}
+
               <fieldset className="mt-5 border-0 p-0">
                 <legend className="flex flex-wrap items-center gap-2 text-sm font-bold text-black">
                   <span>Shipping label</span>
@@ -192,7 +213,10 @@ export function ParcelDropoffConfirmDialog({
                         type="radio"
                         name={shippingLabelChoiceName}
                         checked={attachmentChoice === 'customer-attached'}
-                        onChange={() => setAttachmentChoice('customer-attached')}
+                        onChange={() => {
+                          setAttachmentChoice('customer-attached')
+                          setHasClickedPrintLabel(false)
+                        }}
                         className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
                       />
                       <span className="min-w-0">
@@ -215,7 +239,10 @@ export function ParcelDropoffConfirmDialog({
                         type="radio"
                         name={shippingLabelChoiceName}
                         checked={attachmentChoice === 'location-print'}
-                        onChange={() => setAttachmentChoice('location-print')}
+                        onChange={() => {
+                          setAttachmentChoice('location-print')
+                          setHasClickedPrintLabel(false)
+                        }}
                         className="mt-0.5 size-4 shrink-0 border border-gray-400 accent-black"
                       />
                       <label
@@ -235,6 +262,7 @@ export function ParcelDropoffConfirmDialog({
                             event.preventDefault()
                             event.stopPropagation()
                             downloadDemoShippingLabel()
+                            setHasClickedPrintLabel(true)
                           }}
                           className="inline-flex shrink-0 self-center items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900"
                         >
@@ -248,22 +276,6 @@ export function ParcelDropoffConfirmDialog({
                   </li>
                 </ul>
               </fieldset>
-
-              {showPaymentReceived ? (
-                <label
-                  htmlFor={paymentReceivedId}
-                  className="mt-5 flex w-full cursor-pointer items-center gap-2.5 text-sm text-black"
-                >
-                  <input
-                    id={paymentReceivedId}
-                    type="checkbox"
-                    checked={paymentReceived}
-                    onChange={(event) => setPaymentReceived(event.target.checked)}
-                    className="size-4 shrink-0 rounded border border-gray-400 accent-black focus:ring-2 focus:ring-gray-300"
-                  />
-                  <span className="font-medium text-red-600">Payment Received</span>
-                </label>
-              ) : null}
 
               <button
                 type="button"

@@ -155,7 +155,7 @@ export function ReturnDropoffCashConfirmDialog({
           onClick={() => onConfirm()}
           className="mt-6 w-auto min-w-[12rem] self-center rounded-md px-8 py-2.5 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:bg-[#f5ded4] disabled:hover:bg-[#f5ded4] enabled:bg-hubbed-orange enabled:hover:bg-hubbed-orange-hover sm:py-3 sm:text-base"
         >
-          Confirm Dropoff
+          Next
         </button>
       </div>
     </div>
